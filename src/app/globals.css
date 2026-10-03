@@ -1,0 +1,304 @@
+@import "tailwindcss";
+
+:root {
+  /* OBASIX brand tokens — extracted from official logo */
+  --obx-green: #1b5e3b;
+  --obx-green-dark: #0f3d26;
+  --obx-green-deep: #0a2a1a;
+  --obx-green-muted: #2d7a4f;
+  --obx-green-soft: #e8f2ec;
+  --obx-red: #e31c23;
+  --obx-red-dark: #b81419;
+  --obx-orange: #f5a623;
+  --obx-orange-soft: #fff4e0;
+
+  --obx-white: #ffffff;
+  --obx-cream: #f7f5f2;
+  --obx-stone: #ebe7e1;
+  --obx-mist: #f3f4f3;
+  --obx-ink: #1a1f1c;
+  --obx-charcoal: #2c322e;
+  --obx-muted: #5c6560;
+  --obx-line: #d8ddd9;
+
+  --background: var(--obx-cream);
+  --foreground: var(--obx-ink);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-brand: 14px 6px 6px 6px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 61, 38, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 61, 38, 0.08);
+  --shadow-lg: 0 20px 48px rgba(15, 61, 38, 0.12);
+
+  --header-h: 72px;
+  --mobile-nav-h: 64px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-obx-green: var(--obx-green);
+  --color-obx-green-dark: var(--obx-green-dark);
+  --color-obx-green-deep: var(--obx-green-deep);
+  --color-obx-green-muted: var(--obx-green-muted);
+  --color-obx-green-soft: var(--obx-green-soft);
+  --color-obx-red: var(--obx-red);
+  --color-obx-red-dark: var(--obx-red-dark);
+  --color-obx-orange: var(--obx-orange);
+  --color-obx-orange-soft: var(--obx-orange-soft);
+  --color-obx-white: var(--obx-white);
+  --color-obx-cream: var(--obx-cream);
+  --color-obx-stone: var(--obx-stone);
+  --color-obx-mist: var(--obx-mist);
+  --color-obx-ink: var(--obx-ink);
+  --color-obx-charcoal: var(--obx-charcoal);
+  --color-obx-muted: var(--obx-muted);
+  --color-obx-line: var(--obx-line);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--obx-green);
+  color: white;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.container-obx {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .container-obx {
+    padding-inline: 2rem;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1;
+  padding: 0.9rem 1.35rem;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--obx-red);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--obx-red-dark);
+  box-shadow: 0 8px 20px rgba(227, 28, 35, 0.25);
+}
+
+.btn-secondary {
+  background: var(--obx-green);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: var(--obx-green-dark);
+  box-shadow: 0 8px 20px rgba(27, 94, 59, 0.25);
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--obx-green);
+  color: var(--obx-green);
+}
+
+.btn-outline:hover {
+  background: var(--obx-green-soft);
+}
+
+.btn-ghost {
+  background: white;
+  border-color: var(--obx-line);
+  color: var(--obx-ink);
+}
+
+.btn-ghost:hover {
+  border-color: var(--obx-green);
+  color: var(--obx-green);
+}
+
+.section-pad {
+  padding-block: 4.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-pad {
+    padding-block: 6rem;
+  }
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--obx-green);
+  margin-bottom: 0.85rem;
+}
+
+.section-label::before {
+  content: "";
+  width: 1.5rem;
+  height: 2px;
+  background: var(--obx-orange);
+}
+
+.fade-up {
+  animation: fadeUp 0.7s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatSoft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.float-soft {
+  animation: floatSoft 4s ease-in-out infinite;
+}
+
+.board-preview {
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 45%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.03) 0px,
+      rgba(0, 0, 0, 0.03) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.35s ease,
+    filter 0.35s ease;
+}
+
+.finish-matte {
+  filter: saturate(0.95) brightness(0.98);
+}
+
+.finish-gloss {
+  filter: saturate(1.1) brightness(1.05);
+  box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.35);
+}
+
+.finish-wood {
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 0%, transparent 40%, rgba(0, 0, 0, 0.06) 100%),
+    repeating-linear-gradient(
+      95deg,
+      rgba(0, 0, 0, 0.05) 0px,
+      rgba(0, 0, 0, 0.05) 2px,
+      transparent 2px,
+      transparent 10px
+    );
+}
+
+.finish-textured {
+  background-image: radial-gradient(
+    rgba(0, 0, 0, 0.08) 0.6px,
+    transparent 0.6px
+  );
+  background-size: 4px 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--obx-line);
+  border-radius: 999px;
+}
+
+.pb-mobile-nav {
+  padding-bottom: calc(var(--mobile-nav-h) + 1rem);
+}
+
+@media (min-width: 768px) {
+  .pb-mobile-nav {
+    padding-bottom: 0;
+  }
+}

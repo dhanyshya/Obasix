@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { DM_Sans, Outfit } from "next/font/google";
+import { Cormorant_Garamond, Inter } from "next/font/google";
+import Box from "@mui/material/Box";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -7,13 +8,15 @@ import { AIChatbot } from "@/components/ai/AIChatbot";
 import { AppProviders } from "@/components/providers/AppProviders";
 import "./globals.css";
 
-const display = Outfit({
+const display = Cormorant_Garamond({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const body = DM_Sans({
+const body = Inter({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -21,23 +24,47 @@ const body = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "OBASIX — Better Boards. Better Spaces.",
+    default: "OBASIX — Boards for Working Spaces",
     template: "%s | OBASIX",
   },
   description:
-    "Discover, customize and buy OBASIX boards and material solutions for modern kitchens, wardrobes, offices and commercial spaces.",
+    "OBASIX designs boards and accessories for offices, classrooms, homes and commercial interiors. Explore, visualize and customize your setup.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased">
+    <html
+      lang="en"
+      className={`${display.variable} ${body.variable} h-full`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-full antialiased" suppressHydrationWarning>
         <AppProviders>
-          <Header />
-          <main className="flex-1 pb-mobile-nav">{children}</main>
-          <Footer />
-          <MobileNav />
-          <AIChatbot />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "100%",
+              overflowX: "clip",
+            }}
+          >
+            <Header />
+            <Box
+              component="main"
+              sx={{
+                flex: 1,
+                bgcolor: "background.default",
+                overflowX: "clip",
+                /* Leave room for mobile tab bar + compact AI launcher */
+                pb: { xs: "calc(var(--mobile-nav-h, 64px) + 0.5rem)", md: 3 },
+              }}
+            >
+              {children}
+            </Box>
+            <Footer />
+            <MobileNav />
+            <AIChatbot />
+          </Box>
         </AppProviders>
       </body>
     </html>

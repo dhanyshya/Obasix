@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OBASIX Industries — Premium Ecommerce UI
 
-## Getting Started
+Next-generation ecommerce experience for **OBASIX Industries** — whiteboards, notice boards, pin-up boards, combination boards, stands and accessories.
 
-First, run the development server:
+Inspired by the real catalogue at [obasix.com](https://www.obasix.com/).
+
+## Brand
+
+- Official logo: `public/obasix-logo.png`
+- Tokens: forest green (`#174F3A`), charcoal (`#202923`), pale green (`#F0F5EF`) in `src/theme/brandTokens.ts` and `src/app/globals.css`
+
+## Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy `.env.example` to `.env.local` and set AI keys when you want live chat answers (see below).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Key routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Purpose |
+| --- | --- |
+| `/` | Homepage — Discover / Customize / Build |
+| `/products` | Showroom catalogue |
+| `/products/[id]` | Product detail |
+| `/customize` | Design Your Board customizer |
+| `/visualize` | Visualize Your Space |
+| `/smart-space` | Space setups + Build Your Setup |
+| `/cart` | Your OBASIX Setup |
+| `/quote` | Custom quote with file uploads |
+| `/orders/track` | Order tracking |
+| `/solutions` | Application solutions |
+| `/about` | About OBASIX |
+| `/api/ai/chat` | Server-side OBASIX AI chat (POST) |
 
-## Learn More
+## OBASIX AI Assistant
 
-To learn more about Next.js, take a look at the following resources:
+The floating **Ask OBASIX AI** button is global (root layout). Chat calls **`POST /api/ai/chat`** on the server — API keys are never exposed to the browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Required | Description |
+| --- | --- | --- |
+| `OBASIX_AI_API_KEY` | Yes (for live AI) | API key for an OpenAI-compatible Chat Completions provider |
+| `OBASIX_AI_BASE_URL` | No | Defaults to `https://api.openai.com/v1` |
+| `OBASIX_AI_MODEL` | No | Defaults to `gpt-4o-mini` |
+| `OPENAI_API_KEY` | Fallback | Used if `OBASIX_AI_API_KEY` is unset |
 
-## Deploy on Vercel
+Without a key — or if the provider returns quota/auth errors — the assistant stays usable with a friendly message, Retry, catalogue-grounded suggestions, and links to Products / Customize / Quote. It does **not** invent fake AI answers or claim a live model reply succeeded.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+If OpenAI returns `insufficient_quota` / `credit_balance_exhausted`, add credits in the OpenAI billing dashboard or switch `OBASIX_AI_BASE_URL` / `OBASIX_AI_API_KEY` to another OpenAI-compatible provider.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Catalogue grounding uses `src/data/catalogue.ts`. Recommended product ids are validated server-side before cards are shown.
+
+Check status: `GET /api/ai/chat`.
+
+## Data architecture
+
+- Catalogue: `src/data/catalogue.ts` (real SKUs / series / prices from OBASIX catalogue)
+- Images: `src/data/images.ts` (centralized — replace with official CDN assets later)
+- AI: `src/app/api/ai/chat/route.ts` + `src/lib/ai/*` + floating UI in `src/components/ai/`
+
+## Experience
+
+**Discover → Ask OBASIX AI → Find product → Customize → Visualize → Accessories → Cart / Quote**

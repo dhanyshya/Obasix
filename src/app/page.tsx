@@ -1,27 +1,17 @@
 import {
-  AIAssistantCTASection,
-  CustomizeCTASection,
-  FeaturedProductsSection,
-  FeaturedProjectsSection,
-  FindBoardSection,
-  HeroSection,
-  ShopByApplicationSection,
-  SmartSpaceSection,
-  WhyObasixSection,
-} from "@/components/home/HomeSections";
+  Collections,
+  ExploreProducts,
+  PremiumHero,
+  TrendingProducts,
+} from "@/components/home/premium";
 
 export default function HomePage() {
   return (
-    <>
-      <HeroSection />
-      <FindBoardSection />
-      <FeaturedProductsSection />
-      <ShopByApplicationSection />
-      <CustomizeCTASection />
-      <SmartSpaceSection />
-      <WhyObasixSection />
-      <FeaturedProjectsSection />
-      <AIAssistantCTASection />
-    </>
+    <div style={{ backgroundColor: "#FFFFFF" }}>
+      <PremiumHero />
+      <Collections />
+      <ExploreProducts />
+      <TrendingProducts />
+    </div>
   );
 }

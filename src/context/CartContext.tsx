@@ -9,7 +9,8 @@ import {
   type ReactNode,
 } from "react";
 import type { CartConfiguration, CartItem } from "@/lib/types";
-import { getProductById } from "@/data/products";
+import { getProductById } from "@/data/catalogue";
+import { cartLineId } from "@/lib/auth/cart";
 
 interface CartContextValue {
   items: CartItem[];
@@ -17,25 +18,21 @@ interface CartContextValue {
   subtotal: number;
   addItem: (
     productId: string,
-    configuration: CartConfiguration,
+    configuration?: Partial<CartConfiguration>,
     quantity?: number,
     unitPrice?: number,
   ) => void;
+  addSetup: (productIds: string[]) => void;
   updateQuantity: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
   clearCart: () => void;
+  replaceItems: (next: CartItem[]) => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 function buildId(productId: string, configuration: CartConfiguration): string {
-  return [
-    productId,
-    configuration.colourId,
-    configuration.finishId,
-    configuration.thickness,
-    configuration.sizeId,
-  ].join("-");
+  return cartLineId(productId, configuration);
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -44,15 +41,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addItem = useCallback(
     (
       productId: string,
-      configuration: CartConfiguration,
+      configuration: Partial<CartConfiguration> = {},
       quantity = 1,
       unitPrice?: number,
     ) => {
       const product = getProductById(productId);
       if (!product) return;
 
-      const id = buildId(productId, configuration);
-      const price = unitPrice ?? product.startingPrice;
+      const config: CartConfiguration = {
+        sizeId: configuration.sizeId ?? product.sizes[0]?.id ?? "standard",
+        frameId: configuration.frameId ?? product.frame,
+        colourId: configuration.colourId ?? product.colours[0],
+        features: configuration.features ?? [],
+        customWidthFt: configuration.customWidthFt,
+        customHeightFt: configuration.customHeightFt,
+        branding: configuration.branding,
+        logoDataUrl: configuration.logoDataUrl,
+        application: configuration.application,
+      };
+
+      const id = buildId(productId, config);
+      const price = unitPrice ?? product.price;
 
       setItems((prev) => {
         const existing = prev.find((item) => item.id === id);
@@ -63,19 +72,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
               : item,
           );
         }
-        return [
-          ...prev,
-          {
-            id,
-            productId,
-            quantity,
-            configuration,
-            unitPrice: price,
-          },
-        ];
+        return [...prev, { id, productId, quantity, configuration: config, unitPrice: price }];
       });
     },
     [],
+  );
+
+  const addSetup = useCallback(
+    (productIds: string[]) => {
+      productIds.forEach((id) => addItem(id, {}, 1));
+    },
+    [addItem],
   );
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
@@ -93,6 +100,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearCart = useCallback(() => setItems([]), []);
+  const replaceItems = useCallback((next: CartItem[]) => setItems(next), []);
 
   const value = useMemo<CartContextValue>(() => {
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -105,19 +113,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
       itemCount,
       subtotal,
       addItem,
+      addSetup,
       updateQuantity,
       removeItem,
       clearCart,
+      replaceItems,
     };
-  }, [items, addItem, updateQuantity, removeItem, clearCart]);
+  }, [items, addItem, addSetup, updateQuantity, removeItem, clearCart, replaceItems]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
-export function useCart(): CartContextValue {
+export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) {
-    throw new Error("useCart must be used within CartProvider");
-  }
+  if (!ctx) throw new Error("useCart must be used within CartProvider");
   return ctx;
 }

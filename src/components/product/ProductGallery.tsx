@@ -2,76 +2,77 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Search } from "lucide-react";
-import { cn } from "@/lib/format";
+import Box from "@mui/material/Box";
+import ButtonBase from "@mui/material/ButtonBase";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
 
-interface ProductGalleryProps {
-  images: string[];
-  alt: string;
-  finishPreviewHex?: string;
-}
-
-export function ProductGallery({
-  images,
-  alt,
-  finishPreviewHex,
-}: ProductGalleryProps) {
+export function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
   const [active, setActive] = useState(0);
   const [zoomed, setZoomed] = useState(false);
 
   return (
-    <div className="space-y-3">
-      <div
-        className={cn(
-          "relative aspect-square overflow-hidden rounded-[var(--radius-lg)] border border-[var(--obx-line)] bg-[var(--obx-stone)]",
-          zoomed && "cursor-zoom-out",
-        )}
+    <Stack spacing={1.5}>
+      <Box
         onClick={() => setZoomed((v) => !v)}
+        sx={{
+          position: "relative",
+          aspectRatio: "1 / 1",
+          overflow: "hidden",
+          border: 1,
+          borderColor: "divider",
+          borderRadius: 1.5,
+          bgcolor: "background.paper",
+          cursor: zoomed ? "zoom-out" : "zoom-in",
+        }}
       >
         <Image
           src={images[active]}
           alt={alt}
           fill
-          className={cn(
-            "object-cover transition duration-500",
-            zoomed ? "scale-150" : "scale-100",
-          )}
+          className={zoomed ? "object-cover" : "object-contain p-4"}
+          style={{
+            transition: "transform 0.5s",
+            transform: zoomed ? "scale(1.5)" : "scale(1)",
+          }}
           sizes="(max-width: 1024px) 100vw, 50vw"
           priority
         />
-        <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[var(--obx-ink)] backdrop-blur">
-          <Search size={12} /> Click to zoom
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-2">
+        <Chip
+          size="small"
+          icon={<ZoomInIcon />}
+          label="Click to zoom"
+          sx={{
+            position: "absolute",
+            bottom: 12,
+            left: 12,
+            bgcolor: "rgba(255,255,255,0.92)",
+            fontWeight: 600,
+            fontSize: 12,
+          }}
+        />
+      </Box>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1 }}>
         {images.map((image, index) => (
-          <button
+          <ButtonBase
             key={image + index}
-            type="button"
             onClick={() => setActive(index)}
-            className={cn(
-              "relative aspect-square overflow-hidden rounded-[var(--radius-md)] border-2",
-              active === index
-                ? "border-[var(--obx-green)]"
-                : "border-transparent",
-            )}
+            aria-label={`Show image ${index + 1}`}
+            aria-current={active === index}
+            sx={{
+              position: "relative",
+              aspectRatio: "1 / 1",
+              overflow: "hidden",
+              borderRadius: 1,
+              border: 2,
+              borderColor: active === index ? "primary.main" : "transparent",
+            }}
           >
             <Image src={image} alt="" fill className="object-cover" sizes="120px" />
-          </button>
+          </ButtonBase>
         ))}
-        {finishPreviewHex && (
-          <div
-            className="relative aspect-square overflow-hidden rounded-[var(--radius-md)] border border-[var(--obx-line)] board-preview"
-            style={{ backgroundColor: finishPreviewHex }}
-            title="Finish preview"
-          >
-            <span className="absolute inset-x-0 bottom-0 bg-black/40 py-1 text-center text-[10px] font-semibold text-white">
-              Finish
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
+      </Box>
+    </Stack>
   );
 }

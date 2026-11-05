@@ -1,29 +1,67 @@
 "use client";
 
-import type { ApplicationType, MaterialType, ProductFilters as Filters } from "@/lib/types";
-import { colours } from "@/data/colours";
-import { finishes } from "@/data/finishes";
-import { cn } from "@/lib/format";
+import type { ReactNode } from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import ButtonBase from "@mui/material/ButtonBase";
+import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import type {
+  ApplicationType,
+  BoardCategory,
+  FrameType,
+  ProductFilters as Filters,
+  SurfaceType,
+} from "@/lib/types";
+import { colours, frames } from "@/data/catalogue";
 
-interface ProductFiltersProps {
-  filters: Filters;
-  onChange: (next: Filters) => void;
-  categories: string[];
-  materials: MaterialType[];
-  thicknesses: number[];
-  maxPrice: number;
-}
+const categories: { id: BoardCategory; label: string }[] = [
+  { id: "magnetic-whiteboard", label: "Magnetic Whiteboards" },
+  { id: "non-magnetic-whiteboard", label: "Non-Magnetic" },
+  { id: "notice-board", label: "Notice Boards" },
+  { id: "pin-up-board", label: "Pin-up Boards" },
+  { id: "chalk-board", label: "Chalk Boards" },
+  { id: "combination-board", label: "Combination" },
+  { id: "wooden-product", label: "Wooden Products" },
+  { id: "accessory", label: "Accessories" },
+  { id: "stand", label: "Stands" },
+  { id: "desk-accessory", label: "Desk Accessories" },
+];
+
+const boardTypes = [
+  { id: "whiteboard", label: "Whiteboard" },
+  { id: "magnetic-whiteboard", label: "Magnetic Whiteboard" },
+  { id: "notice-board", label: "Notice Board" },
+  { id: "pin-up-board", label: "Pin-up Board" },
+  { id: "combination-board", label: "Combination" },
+  { id: "chalk-board", label: "Chalk Board" },
+] as const;
+
+const surfaces: { id: SurfaceType; label: string }[] = [
+  { id: "resin-coated", label: "Resin Coated" },
+  { id: "melamine-hpl", label: "Melamine HPL" },
+  { id: "ceramic-steel", label: "Ceramic Steel" },
+  { id: "fabric-softboard", label: "Fabric Softboard" },
+  { id: "chalkboard", label: "Chalkboard" },
+  { id: "dual-side", label: "Dual Side" },
+];
 
 const applications: ApplicationType[] = [
-  "kitchen",
-  "bedroom",
-  "wardrobe",
   "office",
-  "wall",
-  "furniture",
-  "partition",
+  "classroom",
+  "meeting-room",
+  "home",
+  "studio",
+  "reception",
+  "retail",
   "commercial",
 ];
+
+const sizeLabels = ["1x2", "1.5x2", "2x3", "3x4", "4x6", "4x8"];
 
 function toggleValue<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -32,247 +70,238 @@ function toggleValue<T>(list: T[], value: T): T[] {
 export function ProductFilters({
   filters,
   onChange,
-  categories,
-  materials,
-  thicknesses,
   maxPrice,
-}: ProductFiltersProps) {
+}: {
+  filters: Filters;
+  onChange: (next: Filters) => void;
+  maxPrice: number;
+}) {
   return (
-    <aside className="space-y-6 rounded-[var(--radius-lg)] border border-[var(--obx-line)] bg-white p-5 shadow-[var(--shadow-sm)]">
-      <div>
-        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[var(--obx-green)]">
-          Search
-        </label>
-        <input
-          value={filters.search}
-          onChange={(e) => onChange({ ...filters, search: e.target.value })}
-          placeholder="Board, finish, use..."
-          className="w-full rounded-[var(--radius-md)] border border-[var(--obx-line)] bg-[var(--obx-mist)] px-3 py-2.5 text-sm outline-none focus:border-[var(--obx-green)] focus:bg-white"
-        />
-      </div>
+    <Paper component="aside" variant="outlined" sx={{ p: 2.5, borderRadius: 1.5 }}>
+      <Stack spacing={3}>
+        <Field label="Search">
+          <TextField
+            fullWidth
+            value={filters.search}
+            onChange={(e) => onChange({ ...filters, search: e.target.value })}
+            placeholder="Whiteboard, pin-up, stand..."
+            slotProps={{ htmlInput: { "aria-label": "Search" } }}
+          />
+        </Field>
 
-      <FilterGroup title="Category">
-        {categories.map((category) => (
-          <Chip
-            key={category}
-            active={filters.categories.includes(category)}
-            onClick={() =>
-              onChange({
-                ...filters,
-                categories: toggleValue(filters.categories, category),
-              })
-            }
-          >
-            {category}
-          </Chip>
-        ))}
-      </FilterGroup>
+        <Group title="Category">
+          {categories.map((c) => (
+            <FilterChip
+              key={c.id}
+              active={filters.categories.includes(c.id)}
+              onClick={() =>
+                onChange({ ...filters, categories: toggleValue(filters.categories, c.id) })
+              }
+            >
+              {c.label}
+            </FilterChip>
+          ))}
+        </Group>
 
-      <FilterGroup title="Material">
-        {materials.map((material) => (
-          <Chip
-            key={material}
-            active={filters.materials.includes(material)}
-            onClick={() =>
-              onChange({
-                ...filters,
-                materials: toggleValue(filters.materials, material),
-              })
-            }
-          >
-            {material.replace("-", " ")}
-          </Chip>
-        ))}
-      </FilterGroup>
+        <Group title="Board Type">
+          {boardTypes.map((b) => (
+            <FilterChip
+              key={b.id}
+              active={filters.boardTypes.includes(b.id)}
+              onClick={() =>
+                onChange({ ...filters, boardTypes: toggleValue(filters.boardTypes, b.id) })
+              }
+            >
+              {b.label}
+            </FilterChip>
+          ))}
+        </Group>
 
-      <FilterGroup title="Thickness">
-        {thicknesses.map((thickness) => (
-          <Chip
-            key={thickness}
-            active={filters.thicknesses.includes(thickness)}
-            onClick={() =>
-              onChange({
-                ...filters,
-                thicknesses: toggleValue(filters.thicknesses, thickness),
-              })
-            }
-          >
-            {thickness}mm
-          </Chip>
-        ))}
-      </FilterGroup>
+        <Group title="Size">
+          {sizeLabels.map((s) => (
+            <FilterChip
+              key={s}
+              active={filters.sizes.includes(s)}
+              onClick={() => onChange({ ...filters, sizes: toggleValue(filters.sizes, s) })}
+            >
+              {s.replace("x", " × ")} ft
+            </FilterChip>
+          ))}
+        </Group>
 
-      <FilterGroup title="Finish">
-        {finishes.map((finish) => (
-          <Chip
-            key={finish.id}
-            active={filters.finishes.includes(finish.id)}
-            onClick={() =>
-              onChange({
-                ...filters,
-                finishes: toggleValue(filters.finishes, finish.id),
-              })
-            }
-          >
-            {finish.name}
-          </Chip>
-        ))}
-      </FilterGroup>
+        <Group title="Frame">
+          {frames.map((f) => (
+            <FilterChip
+              key={f.id}
+              active={filters.frames.includes(f.id)}
+              onClick={() =>
+                onChange({
+                  ...filters,
+                  frames: toggleValue(filters.frames, f.id as FrameType),
+                })
+              }
+            >
+              {f.name}
+            </FilterChip>
+          ))}
+        </Group>
 
-      <FilterGroup title="Colour">
-        <div className="flex flex-wrap gap-2">
-          {colours.map((colour) => {
-            const active = filters.colours.includes(colour.id);
+        <Group title="Surface">
+          {surfaces.map((s) => (
+            <FilterChip
+              key={s.id}
+              active={filters.surfaces.includes(s.id)}
+              onClick={() =>
+                onChange({ ...filters, surfaces: toggleValue(filters.surfaces, s.id) })
+              }
+            >
+              {s.label}
+            </FilterChip>
+          ))}
+        </Group>
+
+        <Group title="Colour">
+          {colours.map((c) => {
+            const selected = filters.colours.includes(c.id);
             return (
-              <button
-                key={colour.id}
-                type="button"
-                title={colour.name}
+              <ButtonBase
+                key={c.id}
+                title={c.name}
+                aria-label={c.name}
+                aria-pressed={selected}
                 onClick={() =>
-                  onChange({
-                    ...filters,
-                    colours: toggleValue(filters.colours, colour.id),
-                  })
+                  onChange({ ...filters, colours: toggleValue(filters.colours, c.id) })
                 }
-                className={cn(
-                  "h-8 w-8 rounded-full border-2 transition",
-                  active ? "border-[var(--obx-green)] scale-110" : "border-white shadow-[inset_0_0_0_1px_var(--obx-line)]",
-                )}
-                style={{ backgroundColor: colour.hex }}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  border: 2,
+                  borderColor: selected ? "primary.main" : "background.paper",
+                  boxShadow: selected ? "none" : "inset 0 0 0 1px var(--mui-palette-divider)",
+                  transform: selected ? "scale(1.1)" : "none",
+                }}
+                style={{ backgroundColor: c.hex }}
               />
             );
           })}
-        </div>
-      </FilterGroup>
+        </Group>
 
-      <FilterGroup title="Application">
-        {applications.map((app) => (
-          <Chip
-            key={app}
-            active={filters.applications.includes(app)}
-            onClick={() =>
-              onChange({
-                ...filters,
-                applications: toggleValue(filters.applications, app),
-              })
-            }
+        <Group title="Application">
+          {applications.map((a) => (
+            <FilterChip
+              key={a}
+              active={filters.applications.includes(a)}
+              onClick={() =>
+                onChange({
+                  ...filters,
+                  applications: toggleValue(filters.applications, a),
+                })
+              }
+            >
+              {a.replace("-", " ")}
+            </FilterChip>
+          ))}
+        </Group>
+
+        <Field label="Price">
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+            <TextField
+              type="number"
+              value={filters.priceMin}
+              onChange={(e) => onChange({ ...filters, priceMin: Number(e.target.value) || 0 })}
+              slotProps={{ htmlInput: { "aria-label": "Minimum price" } }}
+            />
+            <Typography component="span">–</Typography>
+            <TextField
+              type="number"
+              value={filters.priceMax}
+              onChange={(e) =>
+                onChange({ ...filters, priceMax: Number(e.target.value) || maxPrice })
+              }
+              slotProps={{ htmlInput: { "aria-label": "Maximum price" } }}
+            />
+          </Stack>
+        </Field>
+
+        <Field label="Sort">
+          <TextField
+            select
+            fullWidth
+            value={filters.sort}
+            onChange={(e) => onChange({ ...filters, sort: e.target.value as Filters["sort"] })}
+            slotProps={{ htmlInput: { "aria-label": "Sort" } }}
           >
-            {app}
-          </Chip>
-        ))}
-      </FilterGroup>
+            <MenuItem value="featured">Featured</MenuItem>
+            <MenuItem value="price-asc">Price: Low to High</MenuItem>
+            <MenuItem value="price-desc">Price: High to Low</MenuItem>
+            <MenuItem value="name">Name</MenuItem>
+          </TextField>
+        </Field>
 
-      <div>
-        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[var(--obx-green)]">
-          Price range
-        </label>
-        <div className="flex items-center gap-2 text-sm">
-          <input
-            type="number"
-            min={0}
-            value={filters.priceMin}
-            onChange={(e) =>
-              onChange({ ...filters, priceMin: Number(e.target.value) || 0 })
-            }
-            className="w-full rounded-[var(--radius-md)] border border-[var(--obx-line)] px-2 py-2"
-          />
-          <span className="text-[var(--obx-muted)]">–</span>
-          <input
-            type="number"
-            min={0}
-            max={maxPrice}
-            value={filters.priceMax}
-            onChange={(e) =>
-              onChange({ ...filters, priceMax: Number(e.target.value) || maxPrice })
-            }
-            className="w-full rounded-[var(--radius-md)] border border-[var(--obx-line)] px-2 py-2"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[var(--obx-green)]">
-          Sort
-        </label>
-        <select
-          value={filters.sort}
-          onChange={(e) =>
+        <Button
+          variant="outlined"
+          fullWidth
+          onClick={() =>
             onChange({
-              ...filters,
-              sort: e.target.value as Filters["sort"],
+              search: "",
+              categories: [],
+              boardTypes: [],
+              sizes: [],
+              frames: [],
+              surfaces: [],
+              colours: [],
+              applications: [],
+              priceMin: 0,
+              priceMax: maxPrice,
+              sort: "featured",
             })
           }
-          className="w-full rounded-[var(--radius-md)] border border-[var(--obx-line)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--obx-green)]"
         >
-          <option value="featured">Featured</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="name">Name</option>
-        </select>
-      </div>
-
-      <button
-        type="button"
-        className="btn btn-ghost w-full"
-        onClick={() =>
-          onChange({
-            search: "",
-            categories: [],
-            materials: [],
-            thicknesses: [],
-            finishes: [],
-            colours: [],
-            applications: [],
-            priceMin: 0,
-            priceMax: maxPrice,
-            sort: "featured",
-          })
-        }
-      >
-        Clear filters
-      </button>
-    </aside>
+          Clear filters
+        </Button>
+      </Stack>
+    </Paper>
   );
 }
 
-function FilterGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div>
-      <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[var(--obx-green)]">
-        {title}
-      </p>
-      <div className="flex flex-wrap gap-2">{children}</div>
-    </div>
+    <Box>
+      <Typography variant="overline" color="primary" sx={{ display: "block", mb: 1, lineHeight: 1.6 }}>
+        {label}
+      </Typography>
+      {children}
+    </Box>
   );
 }
 
-function Chip({
+function Group({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <Field label={title}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>{children}</Box>
+    </Field>
+  );
+}
+
+function FilterChip({
   active,
   onClick,
   children,
 }: {
   active: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <button
-      type="button"
+    <Chip
+      clickable
       onClick={onClick}
-      className={cn(
-        "rounded-full px-3 py-1.5 text-xs font-semibold capitalize transition",
-        active
-          ? "bg-[var(--obx-green)] text-white"
-          : "bg-[var(--obx-mist)] text-[var(--obx-charcoal)] hover:bg-[var(--obx-green-soft)]",
-      )}
-    >
-      {children}
-    </button>
+      aria-pressed={active}
+      color="primary"
+      variant={active ? "filled" : "outlined"}
+      label={children}
+      sx={{ fontSize: 12, fontWeight: 600, textTransform: "capitalize" }}
+    />
   );
 }

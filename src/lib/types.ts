@@ -1,43 +1,48 @@
-export type FinishType =
-  | "matte"
-  | "gloss"
-  | "wood"
-  | "textured"
-  | "laminate"
-  | "veneer";
+export type BoardCategory =
+  | "magnetic-whiteboard"
+  | "non-magnetic-whiteboard"
+  | "notice-board"
+  | "pin-up-board"
+  | "chalk-board"
+  | "combination-board"
+  | "wooden-product"
+  | "accessory"
+  | "stand"
+  | "desk-accessory";
+
+export type BoardType =
+  | "whiteboard"
+  | "magnetic-whiteboard"
+  | "notice-board"
+  | "pin-up-board"
+  | "combination-board"
+  | "chalk-board";
+
+export type FrameType =
+  | "aluminium-light"
+  | "aluminium-heavy-black"
+  | "aluminium-heavy-white"
+  | "aluminium-natural"
+  | "pine-wood"
+  | "powder-coated-black";
+
+export type SurfaceType =
+  | "resin-coated"
+  | "melamine-hpl"
+  | "ceramic-steel"
+  | "fabric-softboard"
+  | "chalkboard"
+  | "dual-side";
 
 export type ApplicationType =
-  | "kitchen"
-  | "bedroom"
-  | "wardrobe"
   | "office"
-  | "wall"
-  | "furniture"
-  | "partition"
-  | "commercial"
-  | "living";
-
-export type MaterialType =
-  | "mdf"
-  | "hdf"
-  | "particle"
-  | "plywood"
-  | "acrylic"
-  | "laminate-board";
-
-export interface ColourSwatch {
-  id: string;
-  name: string;
-  hex: string;
-  family: "wood" | "neutral" | "bold" | "cool";
-}
-
-export interface FinishOption {
-  id: string;
-  name: string;
-  type: FinishType;
-  description: string;
-}
+  | "classroom"
+  | "meeting-room"
+  | "home"
+  | "studio"
+  | "reception"
+  | "retail"
+  | "commercial";
 
 export interface ProductSize {
   id: string;
@@ -48,66 +53,106 @@ export interface ProductSize {
 
 export interface Product {
   id: string;
+  sku: string;
   slug: string;
   name: string;
+  shortName: string;
   shortDescription: string;
   description: string;
-  category: string;
-  material: MaterialType;
-  finishes: string[];
-  colours: string[];
-  thicknesses: number[];
-  sizes: ProductSize[];
-  applications: ApplicationType[];
-  startingPrice: number;
-  currency: "INR";
+  category: BoardCategory;
+  series?: "classic" | "superior" | "essential" | "ceramic" | "accessories" | "stands";
+  boardType?: BoardType;
+  magnetic: boolean;
   images: string[];
+  price: number;
+  compareAtPrice?: number;
+  currency: "INR";
+  sizes: ProductSize[];
+  frame: FrameType;
+  surface: SurfaceType;
+  colours: string[];
   features: string[];
-  specifications: Record<string, string>;
+  applications: ApplicationType[];
+  customizable: boolean;
   accessories: string[];
+  specifications: Record<string, string>;
+  whatsIncluded: string[];
   featured?: boolean;
   tag?: string;
 }
 
-export interface Accessory {
+export interface CategoryCard {
   id: string;
   name: string;
   description: string;
-  price: number;
   image: string;
-  category: string;
+  href: string;
+  category: BoardCategory;
 }
 
-export interface RoomSpace {
+export interface FrameOption {
+  id: FrameType;
+  name: string;
+  description: string;
+  swatch: string;
+}
+
+export interface ColourOption {
   id: string;
+  name: string;
+  hex: string;
+}
+
+export interface FeatureOption {
+  id: string;
+  name: string;
+  description: string;
+  boardTypes: BoardType[];
+}
+
+export interface SpaceSetup {
+  id: ApplicationType;
   name: string;
   description: string;
   image: string;
   recommendedProductIds: string[];
-  suggestedColours: string[];
-  suggestedFinishes: string[];
-  accessories: string[];
+  setupProductIds: string[];
 }
 
-export interface Project {
+export type BoardLayoutMode = "single" | "combination";
+export type SplitOrientation = "vertical" | "horizontal";
+
+export type CombinationMaterialId =
+  | "magnetic-whiteboard"
+  | "non-magnetic-whiteboard"
+  | "ceramic-steel"
+  | "fabric-softboard"
+  | "chalkboard";
+
+export interface BoardSection {
   id: string;
-  title: string;
-  location: string;
-  application: ApplicationType;
-  image: string;
-  summary: string;
+  materialId: CombinationMaterialId;
+  percent: number;
+}
+
+export interface CombinationLayout {
+  mode: BoardLayoutMode;
+  orientation: SplitOrientation;
+  sections: BoardSection[];
 }
 
 export interface CartConfiguration {
-  colourId: string;
-  finishId: string;
-  thickness: number;
   sizeId: string;
-  width?: number;
-  height?: number;
-  customWidthMm?: number;
-  customHeightMm?: number;
+  frameId?: FrameType;
+  colourId?: string;
+  features?: string[];
+  customWidthFt?: number;
+  customHeightFt?: number;
+  branding?: boolean;
+  logoDataUrl?: string;
   application?: ApplicationType;
+  /** Custom multi-surface layout — quote-only when mode is combination. */
+  combinationLayout?: CombinationLayout;
 }
 
 export interface CartItem {
@@ -118,25 +163,45 @@ export interface CartItem {
   unitPrice: number;
 }
 
+export interface CustomizerState {
+  boardType: BoardType;
+  productId: string;
+  sizeId: string;
+  customWidthFt: number;
+  customHeightFt: number;
+  useCustomSize: boolean;
+  frameId: FrameType;
+  colourId: string;
+  features: string[];
+  branding: boolean;
+  logoDataUrl?: string;
+  quantity: number;
+  /** Multi-surface layout; defaults to single catalogue surface when omitted. */
+  combinationLayout?: CombinationLayout;
+}
+
 export interface QuoteRequest {
   name: string;
   company: string;
   phone: string;
   email: string;
-  projectType: string;
-  product: string;
-  dimensions: string;
+  boardType: string;
+  customSize: string;
   quantity: string;
+  colour: string;
+  features: string;
+  branding: string;
   requirements: string;
   configurationSummary?: string;
 }
 
 export interface ProductFilters {
   search: string;
-  categories: string[];
-  materials: MaterialType[];
-  thicknesses: number[];
-  finishes: string[];
+  categories: BoardCategory[];
+  boardTypes: BoardType[];
+  sizes: string[];
+  frames: FrameType[];
+  surfaces: SurfaceType[];
   colours: string[];
   applications: ApplicationType[];
   priceMin: number;
@@ -144,15 +209,58 @@ export interface ProductFilters {
   sort: "featured" | "price-asc" | "price-desc" | "name";
 }
 
-export interface CustomizerState {
+export interface AIRecommendation {
   productId: string;
-  material: MaterialType;
-  thickness: number;
+  reason: string;
+  customizerPrefill?: Partial<CustomizerState>;
+}
+
+/** Relative placement region on a wall scene (0–1 fractions of the preview) */
+export interface WallArea {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  maxWidthFt: number;
+  maxHeightFt: number;
+}
+
+export interface WallModel {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  wallArea: WallArea;
+  recommendedBoards: string[];
+  application?: ApplicationType;
+}
+
+export type VisualizeBoardKind =
+  | "magnetic-whiteboard"
+  | "non-magnetic-whiteboard"
+  | "ceramic-glass"
+  | "notice-board"
+  | "pin-up-board"
+  | "combination-board"
+  | "chalk-board";
+
+export interface VisualizeState {
+  wallId: string;
+  boardKind: VisualizeBoardKind;
+  productId: string;
+  widthFt: number;
+  heightFt: number;
+  useCustomSize: boolean;
   sizeId: string;
+  frameId: FrameType;
   colourId: string;
-  finishId: string;
-  widthMm: number;
-  heightMm: number;
+  features: string[];
+  logoDataUrl?: string;
+  logoScale: number;
+  logoX: number;
+  logoY: number;
+  accessoryIds: string[];
+  boardOffsetX: number;
+  boardOffsetY: number;
   quantity: number;
-  application: ApplicationType;
 }

@@ -1,20 +1,48 @@
 "use client";
 
-import Link from "next/link";
-import { use, useMemo, useState } from "react";
+import { use, useState } from "react";
 import { notFound } from "next/navigation";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
+import TextField from "@mui/material/TextField";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import Typography from "@mui/material/Typography";
+import Link from "@/components/Link";
 import {
-  accessories,
+  colours,
+  frames,
   getProductById,
   getRelatedProducts,
-} from "@/data/products";
-import { colours } from "@/data/colours";
-import { finishes } from "@/data/finishes";
+} from "@/data/catalogue";
+import { CompleteYourBoard } from "@/components/product/CompleteYourBoard";
+import { ProductActions } from "@/components/product/ProductActions";
 import { ProductGallery } from "@/components/product/ProductGallery";
-import { ColourSelector } from "@/components/customizer/ColourSelector";
 import { RecommendationCard } from "@/components/product/RecommendationCard";
-import { useCart } from "@/context/CartContext";
-import { cn, formatPrice } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
+import { quoteBoardLabel } from "@/lib/quotes/schema";
+
+function Attribute({ label, value }: { label: string; value: string }) {
+  return (
+    <Typography variant="body2">
+      <Box component="span" sx={{ color: "text.secondary" }}>
+        {label}:
+      </Box>{" "}
+      <Box component="span" sx={{ fontWeight: 500, textTransform: "capitalize" }}>
+        {value}
+      </Box>
+    </Typography>
+  );
+}
 
 export default function ProductDetailPage({
   params,
@@ -23,247 +51,227 @@ export default function ProductDetailPage({
 }) {
   const { id } = use(params);
   const product = getProductById(id);
-  const { addItem } = useCart();
-
-  if (!product) {
-    notFound();
-  }
-
-  const [colourId, setColourId] = useState(product.colours[0]);
-  const [finishId, setFinishId] = useState(product.finishes[0]);
-  const [thickness, setThickness] = useState(
-    product.thicknesses.includes(18) ? 18 : product.thicknesses[0],
-  );
-  const [sizeId, setSizeId] = useState(product.sizes[0].id);
+  const [sizeId, setSizeId] = useState(() => product?.sizes[0]?.id ?? "standard");
   const [quantity, setQuantity] = useState(1);
 
-  const availableColours = useMemo(
-    () => colours.filter((c) => product.colours.includes(c.id)),
-    [product],
-  );
-  const availableFinishes = useMemo(
-    () => finishes.filter((f) => product.finishes.includes(f.id)),
-    [product],
-  );
+  if (!product) notFound();
+
   const related = getRelatedProducts(product);
-  const recommendedAccessories = accessories.filter((a) =>
-    product.accessories.includes(a.id),
-  );
-  const finishPreviewHex = availableColours.find((c) => c.id === colourId)?.hex;
 
   return (
-    <div className="bg-[var(--obx-cream)]">
-      <div className="container-obx py-8 md:py-12">
-        <div className="grid gap-10 lg:grid-cols-2">
-          <ProductGallery
-            images={product.images}
-            alt={product.name}
-            finishPreviewHex={finishPreviewHex}
-          />
-
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--obx-green)]">
-              {product.category}
-            </p>
-            <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold md:text-4xl">
+    <Box sx={{ bgcolor: "background.paper" }}>
+      <Container sx={{ py: { xs: 4, md: 6 } }}>
+        <Grid container spacing={{ xs: 4, lg: 6 }}>
+          <Grid size={{ xs: 12, lg: 6 }}>
+            <ProductGallery images={product.images} alt={product.name} />
+          </Grid>
+          <Grid size={{ xs: 12, lg: 6 }}>
+            <Typography
+              variant="overline"
+              sx={{
+                display: "inline-flex",
+                px: 1,
+                py: 0.35,
+                borderRadius: 0.5,
+                bgcolor: "primary.light",
+                color: "primary.main",
+                fontWeight: 700,
+              }}
+            >
+              {product.series ?? product.category.replace(/-/g, " ")} · {product.sku}
+            </Typography>
+            <Typography
+              variant="h3"
+              component="h1"
+              sx={{ mt: 0.5, fontSize: { xs: 30, md: 38 }, color: "text.primary" }}
+            >
               {product.name}
-            </h1>
-            <p className="mt-4 text-[var(--obx-muted)] leading-relaxed">
+            </Typography>
+            <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
+            <Typography color="text.secondary" sx={{ mt: 2, lineHeight: 1.7 }}>
               {product.description}
-            </p>
-            <p className="mt-6 text-3xl font-bold">
-              {formatPrice(product.startingPrice)}
-              <span className="ml-2 text-sm font-medium text-[var(--obx-muted)]">
-                starting price
-              </span>
-            </p>
+            </Typography>
+            <Typography variant="h4" component="p" sx={{ mt: 3, fontWeight: 700 }}>
+              {formatPrice(product.price)}
+              {product.compareAtPrice && (
+                <Box
+                  component="span"
+                  sx={{
+                    ml: 1.5,
+                    fontSize: 16,
+                    fontWeight: 500,
+                    color: "text.secondary",
+                    textDecoration: "line-through",
+                  }}
+                >
+                  {formatPrice(product.compareAtPrice)}
+                </Box>
+              )}
+            </Typography>
 
-            <div className="mt-8 space-y-6 rounded-[var(--radius-lg)] border border-[var(--obx-line)] bg-white p-5">
-              <ColourSelector
-                colours={availableColours}
-                value={colourId}
-                onChange={setColourId}
-              />
+            <Divider sx={{ my: 3 }} />
 
-              <div>
-                <p className="mb-2 text-sm font-semibold">Available finishes</p>
-                <div className="flex flex-wrap gap-2">
-                  {availableFinishes.map((finish) => (
-                    <button
-                      key={finish.id}
-                      type="button"
-                      onClick={() => setFinishId(finish.id)}
-                      className={cn(
-                        "rounded-full px-3 py-1.5 text-xs font-semibold",
-                        finishId === finish.id
-                          ? "bg-[var(--obx-green)] text-white"
-                          : "bg-[var(--obx-mist)]",
-                      )}
-                    >
-                      {finish.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <Grid container spacing={1}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Attribute label="Surface" value={product.surface.replace(/-/g, " ")} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Attribute label="Frame" value={product.frame.replace(/-/g, " ")} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Attribute label="Colour" value={product.colours.join(", ")} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Attribute label="Magnetic" value={product.magnetic ? "Yes" : "No"} />
+              </Grid>
+            </Grid>
 
-              <div>
-                <p className="mb-2 text-sm font-semibold">Thickness</p>
-                <div className="flex flex-wrap gap-2">
-                  {product.thicknesses.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setThickness(t)}
-                      className={cn(
-                        "rounded-full px-3 py-1.5 text-xs font-semibold",
-                        thickness === t
-                          ? "bg-[var(--obx-green)] text-white"
-                          : "bg-[var(--obx-mist)]",
-                      )}
-                    >
-                      {t}mm
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-2 text-sm font-semibold">Sizes</p>
-                <div className="flex flex-wrap gap-2">
+            {product.sizes.length > 0 && (
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  Size
+                </Typography>
+                <ToggleButtonGroup
+                  exclusive
+                  size="small"
+                  color="primary"
+                  value={sizeId}
+                  onChange={(_, next: string | null) => {
+                    if (next) setSizeId(next);
+                  }}
+                  aria-label="Size"
+                  sx={{ flexWrap: "wrap", gap: 1, "& .MuiToggleButtonGroup-grouped": { border: 1, borderColor: "divider", borderRadius: 1 } }}
+                >
                   {product.sizes.map((size) => (
-                    <button
-                      key={size.id}
-                      type="button"
-                      onClick={() => setSizeId(size.id)}
-                      className={cn(
-                        "rounded-full px-3 py-1.5 text-xs font-semibold",
-                        sizeId === size.id
-                          ? "bg-[var(--obx-green)] text-white"
-                          : "bg-[var(--obx-mist)]",
-                      )}
-                    >
+                    <ToggleButton key={size.id} value={size.id} sx={{ px: 1.75, textTransform: "none", fontWeight: 600 }}>
                       {size.label}
-                    </button>
+                    </ToggleButton>
                   ))}
-                </div>
-              </div>
+                </ToggleButtonGroup>
+              </Box>
+            )}
 
-              <div>
-                <p className="mb-2 text-sm font-semibold">Quantity</p>
-                <input
-                  type="number"
-                  min={1}
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value) || 1)}
-                  className="w-28 rounded-[var(--radius-md)] border border-[var(--obx-line)] px-3 py-2.5 text-sm"
-                />
-              </div>
-            </div>
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                Quantity
+              </Typography>
+              <TextField
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value) || 1)}
+                slotProps={{ htmlInput: { min: 1, "aria-label": "Quantity" } }}
+                sx={{ width: 112 }}
+              />
+            </Box>
 
-            <div className="mt-5 grid gap-2 sm:grid-cols-3">
-              <Link
-                href={`/customize?productId=${product.id}&colourId=${colourId}&finishId=${finishId}&thickness=${thickness}&sizeId=${sizeId}&quantity=${quantity}`}
-                className="btn btn-secondary"
-              >
-                Customize Product
-              </Link>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() =>
-                  addItem(
-                    product.id,
-                    {
-                      colourId,
-                      finishId,
-                      thickness,
-                      sizeId,
-                      application: product.applications[0],
-                    },
-                    quantity,
-                  )
-                }
-              >
-                Add to Cart
-              </button>
-              <Link
-                href={`/quote?product=${encodeURIComponent(product.name)}&quantity=${quantity}`}
-                className="btn btn-outline"
+            <Box sx={{ mt: 4 }}>
+              <ProductActions product={product} sizeId={sizeId} quantity={quantity} variant="detail" />
+              <Button
+                component={Link}
+                variant="text"
+                color="inherit"
+                href={`/quote?${new URLSearchParams({
+                  boardType: quoteBoardLabel(product),
+                  quantity: String(quantity),
+                  product: product.shortName,
+                  productId: product.id,
+                  customSize: product.sizes.find((size) => size.id === sizeId)?.label ?? "",
+                  frame: frames.find((frame) => frame.id === product.frame)?.name ?? "",
+                  colour: colours.find((colour) => colour.id === product.colours[0])?.name ?? "",
+                  config: `${product.shortName} · ${product.sku}`,
+                }).toString()}`}
+                sx={{ mt: 1.5, px: 0, fontWeight: 600 }}
               >
                 Request Custom Quote
-              </Link>
-            </div>
-          </div>
-        </div>
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          <section className="rounded-[var(--radius-lg)] border border-[var(--obx-line)] bg-white p-6">
-            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold">
+        <Grid container spacing={{ xs: 4, lg: 6 }} sx={{ mt: { xs: 6, md: 8 } }}>
+          <Grid size={{ xs: 12, lg: 4 }} component="section">
+            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 2, borderColor: "primary.main" }}>
               Specifications
-            </h2>
-            <dl className="mt-4 space-y-2 text-sm">
-              {Object.entries(product.specifications).map(([key, value]) => (
-                <div key={key} className="flex justify-between gap-4 border-b border-[var(--obx-line)] py-2">
-                  <dt className="text-[var(--obx-muted)]">{key}</dt>
-                  <dd className="font-medium text-right">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
+            </Typography>
+            <Table size="small" aria-label="Specifications">
+              <TableBody>
+                {Object.entries(product.specifications).map(([key, value]) => (
+                  <TableRow key={key} sx={{ "&:last-child td, &:last-child th": { borderBottom: 0 } }}>
+                    <TableCell component="th" scope="row" sx={{ pl: 0, color: "text.secondary", fontWeight: 400 }}>
+                      {key}
+                    </TableCell>
+                    <TableCell align="right" sx={{ pr: 0, fontWeight: 500 }}>
+                      {value}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Grid>
 
-          <section className="rounded-[var(--radius-lg)] border border-[var(--obx-line)] bg-white p-6">
-            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold">
-              Applications
-            </h2>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {product.applications.map((app) => (
-                <li
-                  key={app}
-                  className="rounded-full bg-[var(--obx-green-soft)] px-3 py-1.5 text-xs font-semibold capitalize text-[var(--obx-green)]"
-                >
-                  {app}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="rounded-[var(--radius-lg)] border border-[var(--obx-line)] bg-white p-6">
-            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold">
+          <Grid size={{ xs: 12, lg: 4 }} component="section">
+            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 2, borderColor: "primary.main" }}>
               Features
-            </h2>
-            <ul className="mt-4 space-y-2 text-sm text-[var(--obx-muted)]">
-              {product.features.map((feature) => (
-                <li key={feature} className="flex gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--obx-orange)]" />
-                  {feature}
-                </li>
+            </Typography>
+            <Stack component="ul" spacing={1} sx={{ m: 0, mt: 2, p: 0, listStyle: "none" }}>
+              {product.features.map((f) => (
+                <Stack key={f} component="li" direction="row" spacing={1.25}>
+                  <Box
+                    component="span"
+                    sx={{ mt: "8px", width: 6, height: 6, flexShrink: 0, borderRadius: "50%", bgcolor: "warning.main" }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {f}
+                  </Typography>
+                </Stack>
               ))}
-            </ul>
-          </section>
-        </div>
+            </Stack>
+            <Typography variant="subtitle2" component="h3" sx={{ mt: 3, fontWeight: 600 }}>
+              Applications
+            </Typography>
+            <Stack direction="row" useFlexGap spacing={1} sx={{ mt: 1, flexWrap: "wrap" }}>
+              {product.applications.map((a) => (
+                <Chip
+                  key={a}
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  label={a.replace("-", " ")}
+                  sx={{ textTransform: "capitalize", fontWeight: 600 }}
+                />
+              ))}
+            </Stack>
+          </Grid>
 
-        <section className="mt-14">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold">
-            Related products
-          </h2>
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <Grid size={{ xs: 12, lg: 4 }} component="section">
+            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 2, borderColor: "primary.main" }}>
+              What&apos;s Included
+            </Typography>
+            <Stack component="ul" spacing={1} sx={{ m: 0, mt: 2, p: 0, listStyle: "none" }}>
+              {product.whatsIncluded.map((item) => (
+                <Typography key={item} component="li" variant="body2" color="text.secondary">
+                  • {item}
+                </Typography>
+              ))}
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <CompleteYourBoard product={product} />
+
+        <Box component="section" sx={{ mt: { xs: 6, md: 8 } }}>
+          <Typography variant="h5" component="h2">
+            Related Products
+          </Typography>
+          <Grid container spacing={1.5} sx={{ mt: 2.5 }}>
             {related.map((item) => (
-              <RecommendationCard key={item.id} item={item} />
+              <Grid key={item.id} size={{ xs: 12, md: 6 }}>
+                <RecommendationCard item={item} />
+              </Grid>
             ))}
-          </div>
-        </section>
-
-        <section className="mt-14">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold">
-            Recommended accessories
-          </h2>
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {recommendedAccessories.map((item) => (
-              <RecommendationCard key={item.id} item={item} href="/cart" />
-            ))}
-          </div>
-        </section>
-      </div>
-    </div>
+          </Grid>
+        </Box>
+      </Container>
+    </Box>
   );
 }

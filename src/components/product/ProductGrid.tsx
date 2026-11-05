@@ -1,30 +1,48 @@
+"use client";
+
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import type { Product } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 
-interface ProductGridProps {
+export function ProductGrid({
+  products,
+  onQuickView,
+}: {
   products: Product[];
   onQuickView?: (product: Product) => void;
-}
-
-export function ProductGrid({ products, onQuickView }: ProductGridProps) {
+}) {
   if (products.length === 0) {
     return (
-      <div className="rounded-[var(--radius-lg)] border border-dashed border-[var(--obx-line)] bg-white px-6 py-16 text-center">
-        <p className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--obx-ink)]">
-          No boards match these filters
-        </p>
-        <p className="mt-2 text-sm text-[var(--obx-muted)]">
-          Adjust filters or clear your search to explore the full OBASIX range.
-        </p>
-      </div>
+      <Box
+        sx={{
+          border: "1px dashed",
+          borderColor: "divider",
+          borderRadius: 1.5,
+          bgcolor: "background.paper",
+          px: 3,
+          py: 8,
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="h6" component="p">
+          No products match these filters
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Try another category, size or clear filters to explore the OBASIX catalogue.
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    <Grid container spacing={2.5}>
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} onQuickView={onQuickView} />
+        <Grid key={product.id} size={{ xs: 12, sm: 6, xl: 4 }}>
+          <ProductCard product={product} onQuickView={onQuickView} />
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 }

@@ -1,41 +1,78 @@
 "use client";
 
-import type { FinishOption } from "@/lib/types";
-import { cn } from "@/lib/format";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import ToggleButton from "@mui/material/ToggleButton";
+import Typography from "@mui/material/Typography";
+import type { ColourOption } from "@/lib/types";
 
-interface FinishSelectorProps {
-  finishes: FinishOption[];
+export function FinishSelector({
+  colours,
+  value,
+  onChange,
+}: {
+  colours: ColourOption[];
   value: string;
   onChange: (id: string) => void;
-}
+}) {
+  if (colours.length === 0) {
+    return (
+      <Typography variant="caption" color="text.secondary">
+        No colour options listed for this board.
+      </Typography>
+    );
+  }
 
-export function FinishSelector({ finishes, value, onChange }: FinishSelectorProps) {
   return (
-    <div>
-      <p className="mb-2 text-sm font-semibold text-[var(--obx-ink)]">Finish</p>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {finishes.map((finish) => {
-          const active = finish.id === value;
+    <Box>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: "baseline", justifyContent: "space-between", mb: 1.25 }}>
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          Colour
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {colours.find((c) => c.id === value)?.name}
+        </Typography>
+      </Stack>
+      <Stack direction="row" useFlexGap spacing={1.25} sx={{ flexWrap: "wrap" }}>
+        {colours.map((colour) => {
+          const selected = value === colour.id;
           return (
-            <button
-              key={finish.id}
-              type="button"
-              onClick={() => onChange(finish.id)}
-              className={cn(
-                "rounded-[var(--radius-md)] border px-3 py-3 text-left transition",
-                active
-                  ? "border-[var(--obx-green)] bg-[var(--obx-green-soft)]"
-                  : "border-[var(--obx-line)] bg-white hover:border-[var(--obx-green-muted)]",
-              )}
+            <ToggleButton
+              key={colour.id}
+              value={colour.id}
+              selected={selected}
+              aria-pressed={selected}
+              aria-label={colour.name}
+              title={colour.name}
+              // Always selects; never toggles a colour off.
+              onChange={() => onChange(colour.id)}
+              sx={{
+                width: 44,
+                height: 44,
+                p: 0,
+                minWidth: 0,
+                borderRadius: "50%",
+                border: "none",
+                bgcolor: "transparent",
+                boxShadow: selected ? (theme) => `0 0 0 2px ${theme.palette.background.paper}, 0 0 0 4px ${theme.palette.primary.main}` : "none",
+                "&.Mui-selected, &.Mui-selected:hover": { bgcolor: "transparent" },
+                "&:hover": { bgcolor: "action.hover" },
+              }}
             >
-              <p className="text-sm font-semibold">{finish.name}</p>
-              <p className="mt-1 text-xs leading-relaxed text-[var(--obx-muted)]">
-                {finish.description}
-              </p>
-            </button>
+              <Box
+                aria-hidden
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(0,0,0,0.1)",
+                  backgroundColor: colour.hex,
+                }}
+              />
+            </ToggleButton>
           );
         })}
-      </div>
-    </div>
+      </Stack>
+    </Box>
   );
 }

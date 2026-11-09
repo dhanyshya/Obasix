@@ -14,6 +14,8 @@ import { layoutSummary } from "@/lib/combination";
 import { featureName } from "@/lib/features";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
+import { signType } from "@/components/home/directory/sign";
+import { brandTokens as brand } from "@/theme/brandTokens";
 
 function Detail({ label, children }: { label: string; children: string }) {
   return (
@@ -47,30 +49,28 @@ export function CartItem({ item }: { item: CartItemType }) {
       sx={{
         display: "grid",
         gap: 2,
-        py: 2.5,
+        py: 3,
         borderBottom: 1,
         borderColor: "divider",
-        gridTemplateColumns: { xs: "96px 1fr", md: "120px 1fr auto" },
+        "&:last-of-type": { borderBottom: 0 },
+        gridTemplateColumns: { xs: "96px 1fr", md: "136px 1fr auto" },
       }}
     >
       <Box
         sx={{
           position: "relative",
-          width: { xs: 96, md: 120 },
-          height: { xs: 96, md: 112 },
+          width: { xs: 96, md: 136 },
+          height: { xs: 96, md: 120 },
           overflow: "hidden",
-          borderRadius: 1,
-          bgcolor: "background.default",
+          bgcolor: brand.ivory,
         }}
       >
-        <Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="120px" />
+        <Image src={product.images[0]} alt={product.name} fill sizes="136px" style={{ objectFit: "contain", padding: "8%" }} />
       </Box>
       <Box sx={{ minWidth: 0 }}>
-        <Typography variant="h6" component="h3">
+        <Typography sx={{ ...signType.code, fontSize: 12, color: brand.forest }}>{product.sku}</Typography>
+        <Typography component="h3" sx={{ ...signType.plate, fontSize: { xs: 18, md: 21 }, color: brand.charcoal, mt: 0.5 }}>
           {product.shortName}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          Customization
         </Typography>
         <Box sx={{ mt: 1.5, display: "grid", gap: 0.5, gridTemplateColumns: { sm: "1fr 1fr" } }}>
           <Detail label="Size">{size}</Detail>
@@ -95,7 +95,7 @@ export function CartItem({ item }: { item: CartItemType }) {
        
         sx={{ alignItems: { xs: "center", md: "flex-end" }, justifyContent: "space-between", gridColumn: { xs: "1 / -1", md: "auto" } }}
       >
-        <Typography variant="h6" component="p" sx={{ fontWeight: 700 }}>
+        <Typography component="p" sx={{ ...signType.plate, fontSize: 22, fontVariantNumeric: "tabular-nums", color: brand.charcoal }}>
           {formatPrice(item.unitPrice * item.quantity)}
         </Typography>
         <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
@@ -103,7 +103,7 @@ export function CartItem({ item }: { item: CartItemType }) {
             size="small"
             aria-label="Decrease quantity"
             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-            sx={{ border: 1, borderColor: "divider" }}
+            sx={{ border: 1, borderColor: "divider", borderRadius: 0, width: 36, height: 36 }}
           >
             <RemoveIcon fontSize="small" />
           </IconButton>
@@ -114,16 +114,15 @@ export function CartItem({ item }: { item: CartItemType }) {
             size="small"
             aria-label="Increase quantity"
             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-            sx={{ border: 1, borderColor: "divider" }}
+            sx={{ border: 1, borderColor: "divider", borderRadius: 0, width: 36, height: 36 }}
           >
             <AddIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
-            color="secondary"
             aria-label="Remove item"
             onClick={() => removeItem(item.id)}
-            sx={{ ml: 0.5 }}
+            sx={{ ml: 0.5, borderRadius: 0, width: 36, height: 36, color: brand.muted, "&:hover": { color: brand.actionDark, bgcolor: "#FBECEC" } }}
           >
             <DeleteOutlineIcon fontSize="small" />
           </IconButton>

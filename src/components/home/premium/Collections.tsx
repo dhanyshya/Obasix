@@ -141,7 +141,7 @@ export function Collections() {
                   <Typography
                     component="h3"
                     sx={{
-                      fontFamily: "var(--font-display), Georgia, serif",
+                      fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                       fontSize: { xs: 14.5, md: 16.5 },
                       lineHeight: 1.2,
                       color: home.charcoal,

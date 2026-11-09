@@ -69,7 +69,7 @@ export function SpaceDiscoverySection() {
     <Box component="section" sx={{ py: { xs: 10, md: 14 }, bgcolor: "background.default" }}>
       <Container>
         <Reveal>
-          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
             Discover
           </Typography>
           <Typography
@@ -140,7 +140,7 @@ export function SpaceDiscoverySection() {
                     }}
                   />
                   <Box sx={{ position: "absolute", left: 12, right: 12, bottom: 12, color: "#fff" }}>
-                    <Typography variant="caption" sx={{ opacity: 0.7, letterSpacing: "0.12em" }}>
+                    <Typography variant="caption" sx={{ opacity: 0.7, letterSpacing: "0.05em" }}>
                       {String(index + 1).padStart(2, "0")}
                     </Typography>
                     <Typography sx={{ mt: 0.25, fontWeight: 600, fontSize: 14 }}>{space.label}</Typography>
@@ -152,7 +152,7 @@ export function SpaceDiscoverySection() {
 
           <Reveal delay={80}>
             <Box sx={{ border: 1, borderColor: "divider", bgcolor: "background.paper", p: { xs: 2.5, md: 3.5 } }}>
-              <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: "0.14em" }}>
+              <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: "0.05em" }}>
                 Selected space
               </Typography>
               <Typography variant="h4" sx={{ mt: 1, fontSize: { xs: "1.5rem", md: "1.85rem" } }}>

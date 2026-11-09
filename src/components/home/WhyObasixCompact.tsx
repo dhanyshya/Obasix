@@ -51,7 +51,7 @@ export function WhyObasixCompact() {
         >
           {points.map((point, index) => (
             <Box key={point.title} sx={{ borderTop: 1, borderColor: "divider", pt: 2 }}>
-              <Typography variant="caption" sx={{ color: "text.secondary", letterSpacing: "0.12em" }}>
+              <Typography variant="caption" sx={{ color: "text.secondary", letterSpacing: "0.05em" }}>
                 0{index + 1}
               </Typography>
               <Typography sx={{ mt: 1, fontWeight: 600, fontSize: 15 }}>{point.title}</Typography>

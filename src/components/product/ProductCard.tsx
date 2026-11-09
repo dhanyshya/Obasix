@@ -15,6 +15,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { ProductActions } from "./ProductActions";
+import { CompareToggle } from "@/components/compare/CompareToggle";
 import { productCardDetailsButtonSx } from "./productCardButtonStyles";
 
 const categoryLabel: Record<string, string> = {
@@ -59,30 +60,20 @@ export function ProductCard({
         flexDirection: "column",
         height: "100%",
         minWidth: 0,
-        border: "1px solid",
-        borderColor: "divider",
-        bgcolor: "background.paper",
-        borderRadius: 1,
-        overflow: "hidden",
-        transition: "border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease",
-        "&:hover": {
-          borderColor: "primary.main",
-          boxShadow: "0 10px 28px rgba(37,42,38,0.06)",
-          transform: "translateY(-2px)",
-        },
-        "&:hover .pc-image": { transform: "scale(1.02)" },
+        bgcolor: "transparent",
+        "&:hover .pc-image": { transform: "scale(1.035)" },
         "&:hover .pc-quick": { opacity: 1 },
-        "&:focus-within": { borderColor: "primary.main" },
+        "&:hover .pc-rule": { transform: "scaleX(1)" },
       }}
     >
       <Box
         sx={{
           position: "relative",
-          aspectRatio: "4 / 3",
+          aspectRatio: "1 / 1",
           overflow: "hidden",
           bgcolor: "#FFFFFF",
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          outline: "1px solid #DCDFDA",
+          outlineOffset: -1,
           flexShrink: 0,
         }}
       >
@@ -92,7 +83,7 @@ export function ProductCard({
             alt={product.name}
             fill
             className="pc-image object-contain"
-            style={{ transition: "transform 0.35s ease", padding: 18 }}
+            style={{ transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)", padding: "9%" }}
             sizes="(max-width: 600px) 100vw, (max-width: 1200px) 33vw, 25vw"
             onError={() => setImgFailed(true)}
           />
@@ -124,7 +115,7 @@ export function ProductCard({
             right: 8,
             top: 8,
             bgcolor: "rgba(255,255,255,0.96)",
-            color: wished ? "secondary.main" : "text.secondary",
+            color: wished ? "#C8282E" : "text.secondary",
             boxShadow: "0 1px 4px rgba(37,42,38,0.08)",
             "&:hover": { bgcolor: "#FFFFFF" },
             "&:focus-visible": {
@@ -165,57 +156,30 @@ export function ProductCard({
         ) : null}
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          flex: 1,
-          flexDirection: "column",
-          px: { xs: 1.6, md: 1.85 },
-          pt: 1.6,
-          pb: 1.75,
-          minWidth: 0,
-        }}
-      >
-        <Typography
-          variant="overline"
-          sx={{ color: "primary.main", letterSpacing: "0.12em", fontSize: 10, lineHeight: 1.4 }}
-        >
-          {label}
-        </Typography>
-        <Typography
-          component={Link}
-          href={`/products/${product.id}`}
-          variant="h6"
+      <Box sx={{ position: "relative", height: 3, bgcolor: "#141917" }}>
+        <Box
+          className="pc-rule"
+          aria-hidden
           sx={{
-            mt: 0.4,
-            minHeight: { xs: "2.5em", md: "2.55em" },
-            fontSize: { xs: "0.92rem", md: "1rem" },
-            lineHeight: 1.3,
-            fontWeight: 600,
-            color: "text.primary",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            transition: "color 0.2s ease",
-            "&:hover": { color: "primary.main" },
-            "&:focus-visible": {
-              outline: "2px solid",
-              outlineColor: "primary.main",
-              outlineOffset: 2,
-            },
+            position: "absolute",
+            inset: 0,
+            bgcolor: "#EE6A1F",
+            transform: "scaleX(0)",
+            transformOrigin: "left",
+            transition: "transform 420ms cubic-bezier(0.16,1,0.3,1)",
+            "@media (prefers-reduced-motion: reduce)": { transition: "none" },
           }}
-        >
-          {product.shortName}
-        </Typography>
-        {product.sku ? (
+        />
+      </Box>
+      <Box sx={{ display: "flex", flex: 1, flexDirection: "column", pt: 1.5, minWidth: 0 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5, alignItems: "baseline" }}>
           <Typography
-            variant="caption"
             sx={{
-              mt: 0.45,
-              color: "text.secondary",
-              letterSpacing: "0.03em",
-              display: "block",
+              fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+              fontWeight: 600,
+              fontSize: 12,
+              letterSpacing: "0.05em",
+              color: "#164E3B",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -223,24 +187,63 @@ export function ProductCard({
           >
             {product.sku}
           </Typography>
-        ) : null}
-        <Typography sx={{ mt: 1.1, fontWeight: 700, fontSize: "0.98rem", color: "text.primary" }}>
-          {product.price > 0 ? formatPrice(product.price) : "Quote on request"}
+          <Typography sx={{ fontSize: 12, color: "text.secondary", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
+            {product.sizes[0]?.label ?? label}
+          </Typography>
+        </Box>
+        <Typography
+          component={Link}
+          href={`/products/${product.id}`}
+          sx={{
+            mt: 0.75,
+            minHeight: "2.3em",
+            fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+            fontWeight: 700,
+            fontVariationSettings: '"wdth" 94',
+            fontSize: { xs: "1.15rem", md: "1.2rem" },
+            lineHeight: 1.15,
+            letterSpacing: "-0.02em",
+            color: "text.primary",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            "&:hover": { textDecoration: "underline", textUnderlineOffset: 4 },
+            "&:focus-visible": { outline: "3px solid #EE6A1F", outlineOffset: 2 },
+          }}
+        >
+          {product.shortName}
         </Typography>
-
-        <Stack spacing={0.75} sx={{ mt: "auto", pt: 1.6 }}>
-          <Button
-            component={Link}
-            href={`/products/${product.id}`}
-            size="small"
-            variant="outlined"
-            fullWidth
-            sx={productCardDetailsButtonSx}
+        <Typography sx={{ mt: 0.5, fontSize: 13, color: "text.secondary" }}>{label}</Typography>
+        <Box sx={{ mt: 1.25, display: "flex", alignItems: "baseline", gap: 1 }}>
+          <Typography
+            sx={{
+              fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+              fontWeight: 800,
+              fontSize: "1.45rem",
+              letterSpacing: "-0.02em",
+              fontVariantNumeric: "tabular-nums",
+              color: "text.primary",
+            }}
           >
+            {product.price > 0 ? formatPrice(product.price) : "On quote"}
+          </Typography>
+          {product.compareAtPrice && product.price > 0 ? (
+            <Typography component="s" sx={{ fontSize: 13.5, color: "text.secondary" }}>
+              {formatPrice(product.compareAtPrice)}
+            </Typography>
+          ) : null}
+        </Box>
+
+        <Box sx={{ mt: "auto", pt: 1.75 }}>
+          <ProductActions product={product} variant="card" />
+        </Box>
+        <Box sx={{ mt: 0.25, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+          <Button component={Link} href={`/products/${product.id}`} size="small" variant="outlined" sx={productCardDetailsButtonSx}>
             {detailsLabel}
           </Button>
-          <ProductActions product={product} variant="card" />
-        </Stack>
+          <CompareToggle productId={product.id} />
+        </Box>
       </Box>
     </Box>
   );

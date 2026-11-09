@@ -43,3 +43,10 @@ next-env.d.ts
 
 # local demo quote files, not a database
 .data/
+e2e/.tmp/
+test-results/
+playwright-report/
+
+# design tool scratch output
+.impeccable/review/
+.impeccable/hook.cache.json

@@ -52,7 +52,7 @@ function ProductMini({ product }: { product: Product }) {
       <Box sx={{ p: 2, borderTop: `1px solid ${home.line}` }}>
         <Typography
           sx={{
-            fontFamily: "var(--font-display), Georgia, serif",
+            fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
             fontSize: 19,
             lineHeight: 1.15,
             color: home.charcoal,
@@ -111,7 +111,7 @@ export function DetailsSection() {
                 sx={{
                   fontSize: 9.5,
                   fontWeight: 600,
-                  letterSpacing: "0.16em",
+                  letterSpacing: "0.05em",
                   textTransform: "uppercase",
                   color: home.body,
                 }}
@@ -154,8 +154,8 @@ export function DetailsSection() {
               <Box sx={{ mt: { xs: 4, md: 5 }, pt: 2, borderTop: `1px solid ${home.line}` }}>
                 <Typography
                   sx={{
-                    fontFamily: "var(--font-display), Georgia, serif",
-                    fontStyle: "italic",
+                    fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+                    fontStyle: "normal",
                     fontSize: { xs: 24, md: 28 },
                     lineHeight: 1.3,
                     color: home.forest,
@@ -226,7 +226,7 @@ export function DetailsSection() {
                   <Box>
                     <Typography
                       sx={{
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: { xs: 22, md: 27 },
                         lineHeight: 1.1,
                         color: home.charcoal,

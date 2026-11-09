@@ -49,7 +49,7 @@ export function SectionHeading({
               gap: 1,
               px: 1,
               py: 0.4,
-              borderRadius: 0.5,
+              borderRadius: 0,
               fontSize: 11,
               letterSpacing: "0.2em",
               bgcolor: light ? "rgba(255,255,255,0.12)" : home.pale,

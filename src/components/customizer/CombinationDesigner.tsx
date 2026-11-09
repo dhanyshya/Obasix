@@ -139,7 +139,7 @@ export function CombinationDesigner({
             {layout.sections.map((section, index) => {
               const material = getCombinationMaterial(section.materialId);
               return (
-                <Paper key={section.id} variant="outlined" sx={{ borderRadius: "12px", p: 1.75 }}>
+                <Paper key={section.id} variant="outlined" sx={{ borderRadius: 0, p: 1.75 }}>
                   <Stack direction="row" spacing={1.5} sx={{ alignItems: "flex-start", justifyContent: "space-between" }}>
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="overline" color="primary" sx={{ fontSize: 11, lineHeight: 1.6 }}>

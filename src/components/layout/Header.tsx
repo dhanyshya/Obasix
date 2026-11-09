@@ -124,16 +124,17 @@ export function Header() {
 
   const navButtonSx = {
     color: brand.charcoal,
-    fontSize: { lg: 10.5, xl: 11 },
-    fontWeight: 600,
-    letterSpacing: "0.15em",
-    textTransform: "uppercase" as const,
-    px: { xs: 1.1, lg: 1.4, xl: 1.7 },
+    fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+    fontSize: { lg: 15.5, xl: 16 },
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
+    textTransform: "none" as const,
+    px: { xs: 1.1, lg: 1.5, xl: 1.9 },
     py: 1,
     minWidth: 0,
-    minHeight: 44,
+    minHeight: 48,
     borderRadius: 0,
-    borderBottom: "1px solid transparent",
+    borderBottom: "3px solid transparent",
     bgcolor: "transparent",
     transition: "color 0.18s ease, border-color 0.18s ease",
     "&:hover": {
@@ -141,7 +142,7 @@ export function Header() {
       color: brand.forest,
     },
     "&:focus-visible": {
-      outline: `2px solid ${brand.forest}`,
+      outline: `3px solid ${brand.signal}`,
       outlineOffset: 2,
     },
   } as const;
@@ -151,11 +152,11 @@ export function Header() {
     transition: "color 0.18s ease, background-color 0.18s ease",
     width: 40,
     height: 40,
-    borderRadius: 1,
-    "&:hover": { color: "primary.main", bgcolor: "primary.light" },
+    borderRadius: 0,
+    "&:hover": { color: "primary.main", bgcolor: brand.ivory },
     "&:focus-visible": {
-      outline: "2px solid",
-      outlineColor: "primary.main",
+      outline: "3px solid",
+      outlineColor: brand.signal,
       outlineOffset: 2,
     },
   } as const;
@@ -172,51 +173,36 @@ export function Header() {
         boxShadow: scrolled ? "0 6px 24px rgba(37,42,38,0.055)" : "none",
       }}
     >
-      <Box sx={{ bgcolor: brand.forestDeep, color: brand.ivory }}>
-        <Container
-          maxWidth={false}
-          sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 } }}
-        >
-          <Stack
-            direction="row"
-            sx={{
-              minHeight: 30,
-              alignItems: "center",
-              justifyContent: { xs: "center", sm: "space-between" },
-              gap: 2,
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: { xs: 9.5, sm: 10 },
-                fontWeight: 600,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "rgba(247,245,240,0.78)",
-                textAlign: "center",
-              }}
-            >
-              Made-to-measure boards, planned around your space
+      <Box aria-hidden sx={{ display: "grid", gridTemplateColumns: "6fr 1fr 2fr", height: 4 }}>
+        <Box sx={{ bgcolor: brand.forest }} />
+        <Box sx={{ bgcolor: brand.signal }} />
+        <Box sx={{ bgcolor: brand.action }} />
+      </Box>
+      <Box sx={{ bgcolor: brand.forestDeep, color: brand.white }}>
+        <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
+          <Stack direction="row" sx={{ minHeight: 34, alignItems: "center", justifyContent: { xs: "center", sm: "space-between" }, gap: 2 }}>
+            <Typography sx={{ fontSize: 12.5, color: "rgba(255,255,255,0.82)", textAlign: "center" }}>
+              Made in our Bawana factory, Delhi · Registered OEM on GeM
             </Typography>
-            <Box
-              component={NextLink}
-              href="/quote"
-              sx={{
-                display: { xs: "none", sm: "inline-flex" },
-                alignItems: "center",
-                minHeight: 32,
-                fontSize: 9.5,
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: brand.oak,
-                transition: "color 0.2s ease",
-                "&:hover": { color: brand.ivory },
-                "&:focus-visible": { outline: `1px solid ${brand.oak}`, outlineOffset: 2 },
-              }}
-            >
-              Talk to us
-            </Box>
+            <Stack direction="row" spacing={2.5} sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+              <Box component="a" href="tel:+919999044222" sx={{ fontSize: 12.5, color: "rgba(255,255,255,0.82)", fontVariantNumeric: "tabular-nums", "&:hover": { color: brand.white }, "&:focus-visible": { outline: `2px solid ${brand.signal}`, outlineOffset: 2 } }}>
+                +91 9999 044 222
+              </Box>
+              <Box
+                component={NextLink}
+                href="/quote"
+                sx={{
+                  fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: brand.signal,
+                  "&:hover": { color: brand.white },
+                  "&:focus-visible": { outline: `2px solid ${brand.signal}`, outlineOffset: 2 },
+                }}
+              >
+                Request a quote
+              </Box>
+            </Stack>
           </Stack>
         </Container>
       </Box>
@@ -225,10 +211,10 @@ export function Header() {
         <Toolbar
           disableGutters
           sx={{
-            minHeight: { xs: 58, sm: 64, md: 72 },
+            minHeight: { xs: 60, sm: 68, md: 80 },
             gap: { xs: 1, md: 2 },
             display: "grid",
-            gridTemplateColumns: "1fr auto 1fr",
+            gridTemplateColumns: { xs: "auto 1fr", lg: "1fr auto 1fr" },
             alignItems: "center",
           }}
         >
@@ -265,7 +251,7 @@ export function Header() {
                 height={182}
                 priority
                 sizes="(max-width: 900px) 108px, 146px"
-                style={{ display: "block", width: "clamp(108px, 11vw, 146px)", height: "auto" }}
+                style={{ display: "block", width: "clamp(100px, 12vw, 164px)", height: "auto" }}
               />
             </Box>
           </Stack>
@@ -305,9 +291,10 @@ export function Header() {
                     }
                     sx={{
                       ...navButtonSx,
+                      "&&": { fontWeight: 700, fontSize: { lg: 15.5, xl: 16 }, letterSpacing: "-0.01em", textTransform: "none" },
                       color: megaOpen || pathname.startsWith("/products") ? "primary.main" : "text.primary",
                       borderBottomColor:
-                        megaOpen || pathname.startsWith("/products") ? "primary.main" : "transparent",
+                        megaOpen || pathname.startsWith("/products") ? brand.signal : "transparent",
                     }}
                   >
                     {item.label}
@@ -325,7 +312,7 @@ export function Header() {
                     sx={{
                       ...navButtonSx,
                       color: active ? "primary.main" : "text.primary",
-                      borderBottomColor: active ? "primary.main" : "transparent",
+                      borderBottomColor: active ? brand.signal : "transparent",
                     }}
                   >
                     {item.label}
@@ -405,7 +392,7 @@ export function Header() {
               size="small"
               sx={iconBtnSx}
             >
-              <Badge badgeContent={itemCount > 0 ? itemCount : 0} color="primary" max={99}>
+              <Badge badgeContent={itemCount > 0 ? itemCount : 0} max={99} sx={{ "& .MuiBadge-badge": { bgcolor: brand.action, color: brand.white, fontWeight: 700 } }}>
                 <ShoppingBagOutlinedIcon fontSize="small" />
               </Badge>
             </IconButton>
@@ -431,7 +418,7 @@ export function Header() {
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         slotProps={{
-          paper: { sx: { width: "min(100%, 360px)", bgcolor: "background.paper" } },
+          paper: { sx: { width: "min(100%, 380px)", bgcolor: "background.paper", borderTop: `6px solid ${brand.forest}` } },
         }}
       >
         <Box sx={{ px: 2.5, py: 2, borderBottom: 1, borderColor: "divider" }}>
@@ -488,7 +475,7 @@ export function Header() {
                       sx={{ transition: "transform 0.2s", transform: productsOpen ? "rotate(180deg)" : "none" }}
                     />
                   }
-                  sx={{ justifyContent: "space-between", py: 1.5, color: brand.charcoal, fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}
+                  sx={{ justifyContent: "space-between", py: 1.5, color: brand.charcoal, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontSize: 21, fontWeight: 800, fontVariationSettings: '"wdth" 92', letterSpacing: "-0.02em", textTransform: "none", borderBottom: `1px solid ${brand.line}`, borderRadius: 0, px: 1 }}
                 >
                   Collections
                 </Button>
@@ -504,7 +491,7 @@ export function Header() {
                 component={NextLink}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                sx={{ justifyContent: "flex-start", py: 1.5, color: brand.charcoal, fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}
+                sx={{ justifyContent: "flex-start", py: 1.5, color: brand.charcoal, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontSize: 21, fontWeight: 800, fontVariationSettings: '"wdth" 92', letterSpacing: "-0.02em", textTransform: "none", borderBottom: `1px solid ${brand.line}`, borderRadius: 0, px: 1 }}
               >
                 {item.label}
               </Button>

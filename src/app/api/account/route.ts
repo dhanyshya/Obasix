@@ -4,6 +4,8 @@ import { normalizeCartLines, toCartItems } from "@/lib/auth/cart";
 import { authDatabase } from "@/lib/auth/db";
 import { hashPassword, passwordError, verifyPassword } from "@/lib/auth/password";
 import { readSession, sameOrigin } from "@/lib/auth/session";
+import { commerceMode } from "@/lib/commerce/mode";
+import { listDemoOrdersForUser } from "@/lib/commerce/order-store";
 
 export const runtime = "nodejs";
 
@@ -46,8 +48,9 @@ export async function GET() {
     configurations,
     quotes,
     cart,
-    orders: [],
-    ordersAvailable: false,
+    orders: commerceMode() === "demo" ? listDemoOrdersForUser(user.id) : [],
+    ordersAvailable: commerceMode() === "demo",
+    ordersMode: commerceMode(),
   });
 }
 

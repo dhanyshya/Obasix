@@ -128,9 +128,11 @@ export function ProductActions({
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr 1.7fr",
-          alignItems: "stretch",
-          gap: { xs: 0.4, sm: 0.5 },
+          gridTemplateColumns: "auto 1fr",
+          alignItems: "center",
+          columnGap: 2.25,
+          rowGap: 0.75,
+          "& > :first-child": { gridColumn: "1 / -1" },
         }}
       >
         {showCart ? (
@@ -174,11 +176,11 @@ export function ProductActions({
             onClick={onNavigating}
             sx={productCardActionOutlineSx}
           >
-            Visualise Your Space
+            Visualise on your wall
           </Button>
         ) : (
           <Button size="small" variant="outlined" disabled sx={productCardActionOutlineSx}>
-            Visualise Your Space
+            Visualise on your wall
           </Button>
         )}
       </Box>

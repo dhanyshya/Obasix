@@ -44,7 +44,7 @@ export function CustomProjectsSection() {
             </Box>
           </Reveal>
           <Box>
-            <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+            <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
               Custom projects
             </Typography>
             <Typography variant="h2" sx={{ mt: 1.5, fontSize: { xs: "2rem", md: "2.5rem" }, maxWidth: 420 }}>
@@ -74,7 +74,7 @@ export function WhyObasixSection() {
     <Box component="section" sx={{ py: { xs: 10, md: 12 }, bgcolor: "background.paper", borderTop: 1, borderColor: "divider" }}>
       <Container>
         <Reveal>
-          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
             Why OBASIX
           </Typography>
           <Typography variant="h2" sx={{ mt: 1.5, fontSize: { xs: "2rem", md: "2.5rem" }, maxWidth: 520 }}>
@@ -97,7 +97,7 @@ export function WhyObasixSection() {
         >
           {whyPoints.map((point, index) => (
             <Box key={point.title} sx={{ borderTop: 1, borderColor: "divider", pt: 2.5 }}>
-              <Typography variant="caption" sx={{ color: "text.secondary", letterSpacing: "0.14em" }}>
+              <Typography variant="caption" sx={{ color: "text.secondary", letterSpacing: "0.05em" }}>
                 {String(index + 1).padStart(2, "0")}
               </Typography>
               <Typography variant="h6" sx={{ mt: 1, fontSize: "1.1rem" }}>
@@ -136,7 +136,7 @@ export function SupportCTASection() {
           }}
         >
           <Box>
-            <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+            <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
               Support
             </Typography>
             <Typography variant="h3" sx={{ mt: 1.5, fontSize: { xs: "1.75rem", md: "2.25rem" }, maxWidth: 480 }}>

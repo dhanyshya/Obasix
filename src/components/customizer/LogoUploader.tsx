@@ -51,7 +51,7 @@ export function LogoUploader({
           variant="outlined"
           sx={{
             borderStyle: "dashed",
-            borderRadius: "12px",
+            borderRadius: 0,
             bgcolor: "background.default",
             px: 2,
             py: 3,

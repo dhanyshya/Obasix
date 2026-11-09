@@ -34,7 +34,7 @@ export function SpaceSelector({
                 height: "100%",
                 overflow: "hidden",
                 textAlign: "left",
-                borderRadius: 2,
+                borderRadius: 0,
                 border: 1,
                 borderColor: selected ? "primary.main" : "divider",
                 boxShadow: selected ? 3 : 0,

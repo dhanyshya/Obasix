@@ -24,7 +24,7 @@ export function WishlistPanel() {
 
   return (
     <Box>
-      <Typography component="h1" variant="h4">
+      <Typography component="h1" variant="h2" sx={{ fontSize: { xs: 34, md: 46 } }}>
         Wishlist
       </Typography>
       {!loaded ? (

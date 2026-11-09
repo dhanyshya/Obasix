@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -8,13 +9,38 @@ import Typography from "@mui/material/Typography";
 import EventBusyOutlinedIcon from "@mui/icons-material/EventBusyOutlined";
 import Link from "@/components/Link";
 import { OrderPlacedCelebration } from "@/components/checkout/OrderPlacedCelebration";
-import { findDemoOrder } from "@/lib/commerce/demo-orders";
+import { findDemoOrder, type DemoOrder } from "@/lib/commerce/demo-orders";
 import { brandTokens } from "@/theme/brandTokens";
 
 export function ConfirmationExperience() {
   const params = useSearchParams();
   const orderId = params.get("order") ?? "";
-  const order = orderId.startsWith("OBX-DEMO-") ? findDemoOrder(orderId) : undefined;
+  const [order, setOrder] = useState<DemoOrder | null | undefined>(undefined);
+
+  useEffect(() => {
+    let active = true;
+    const local = orderId.startsWith("OBX-DEMO-") ? findDemoOrder(orderId) : undefined;
+    if (local) {
+      setOrder(local);
+      return;
+    }
+    if (!orderId.startsWith("OBX-DEMO-")) {
+      setOrder(null);
+      return;
+    }
+    // Another tab or device: the server only returns the order to the signed-in account that placed it.
+    fetch(`/api/commerce/orders?id=${encodeURIComponent(orderId)}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { order?: DemoOrder } | null) => active && setOrder(body?.order ?? null))
+      .catch(() => active && setOrder(null));
+    return () => {
+      active = false;
+    };
+  }, [orderId]);
+
+  if (order === undefined) {
+    return <Box sx={{ minHeight: "50vh" }} aria-busy="true" />;
+  }
 
   if (order) {
     return <OrderPlacedCelebration order={order} />;
@@ -31,7 +57,7 @@ export function ConfirmationExperience() {
           component="h1"
           sx={{
             mt: 2.5,
-            fontFamily: 'var(--font-display), Georgia, serif',
+            fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
             fontWeight: 500,
             fontSize: { xs: "1.75rem", md: "2.25rem" },
             letterSpacing: "-0.02em",
@@ -51,7 +77,7 @@ export function ConfirmationExperience() {
           }}
         >
           {orderId
-            ? "This browser does not have that demo reference. Refreshing a saved demo confirmation does not create another one, and no success screen is shown without a real order."
+            ? "This reference was not found for this browser or account. Use Track Order with the email or phone from checkout."
             : "This page never treats an order number in the address as proof of payment. The cart stays unchanged until the order service confirms an order."}
         </Typography>
         <Box

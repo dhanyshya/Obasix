@@ -52,7 +52,7 @@ export const home = {
   } as const,
 
   display: {
-    fontFamily: 'var(--font-display), Georgia, serif',
+    fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
     fontWeight: 500,
     letterSpacing: "-0.026em",
     lineHeight: 0.98,
@@ -60,7 +60,7 @@ export const home = {
   } as const,
 
   h2: {
-    fontFamily: 'var(--font-display), Georgia, serif',
+    fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
     fontWeight: 500,
     fontSize: { xs: "2.5rem", sm: "3.25rem", md: "4.15rem", lg: "4.75rem" },
     letterSpacing: "-0.03em",
@@ -69,7 +69,7 @@ export const home = {
   } as const,
 
   h3: {
-    fontFamily: 'var(--font-display), Georgia, serif',
+    fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
     fontWeight: 500,
     fontSize: { xs: "1.75rem", md: "2.35rem" },
     letterSpacing: "-0.02em",
@@ -94,7 +94,7 @@ export const home = {
   } as const,
 
   heading: {
-    fontFamily: 'var(--font-display), Georgia, serif',
+    fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
     fontSize: { xs: "1.6rem", md: "2.05rem" },
     letterSpacing: "-0.028em",
     lineHeight: 1.15,
@@ -104,7 +104,7 @@ export const home = {
   } as const,
 
   pageTitle: {
-    fontFamily: 'var(--font-display), Georgia, serif',
+    fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
     fontSize: { xs: "1.85rem", md: "2.35rem" },
     letterSpacing: "-0.03em",
     lineHeight: 1.1,

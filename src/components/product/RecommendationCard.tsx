@@ -24,14 +24,14 @@ export function RecommendationCard({
         width: "100%",
         flexDirection: "column",
         gap: 1.25,
-        p: 1.5,
+        p: 2,
         border: 1,
         borderColor: "divider",
-        borderRadius: 1,
         bgcolor: "background.paper",
-        transition: "border-color 0.2s",
-        "&:hover": { borderColor: "primary.main" },
-        "&:hover .rec-title": { color: "primary.main" },
+        boxShadow: "inset 0 3px 0 transparent",
+        transition: "box-shadow 200ms cubic-bezier(0.16,1,0.3,1), border-color 200ms",
+        "&:hover": { borderColor: "#B9BFB9", boxShadow: "inset 0 3px 0 #EE6A1F" },
+        "&:hover .rec-title": { textDecoration: "underline", textUnderlineOffset: 3 },
       }}
     >
       <Box
@@ -49,20 +49,17 @@ export function RecommendationCard({
         <Box
           sx={{
             position: "relative",
-            width: 64,
-            height: 64,
+            width: 72,
+            height: 72,
             flexShrink: 0,
             overflow: "hidden",
-            borderRadius: 0.5,
-            bgcolor: "#FFFFFF",
-            border: "1px solid",
-            borderColor: "divider",
+            bgcolor: "#F2F3F0",
           }}
         >
           <Image src={item.images[0]} alt={item.name} fill className="object-contain p-1" sizes="64px" />
         </Box>
         <Box sx={{ minWidth: 0 }}>
-          <Typography className="rec-title" variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>
+          <Typography className="rec-title" variant="subtitle2" noWrap sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "-0.01em" }}>
             {item.shortName}
           </Typography>
           <Typography

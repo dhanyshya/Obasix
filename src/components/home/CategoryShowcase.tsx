@@ -45,7 +45,7 @@ export function CategoryShowcase() {
     <Box component="section" sx={{ bgcolor: "background.default", py: { xs: 6, md: 8 } }}>
       <Container>
         <Box sx={{ maxWidth: 672 }}>
-          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
             Categories
           </Typography>
           <Typography variant="h2" sx={{ mt: 1, fontSize: { xs: "1.875rem", md: "2.35rem" }, letterSpacing: "-0.03em" }}>
@@ -63,7 +63,7 @@ export function CategoryShowcase() {
                 component="article"
                 sx={{
                   height: "100%",
-                  borderRadius: 0.5,
+                  borderRadius: 0,
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   "&:hover": { transform: "translateY(-4px)", boxShadow: 3 },
                   "&:hover .category-img": { transform: "scale(1.04)" },

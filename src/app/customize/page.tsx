@@ -25,6 +25,7 @@ import {
 import { defaultFeatureIds } from "@/lib/features";
 import type { CustomizerState, FrameType, Product } from "@/lib/types";
 import { ProductConfigurator } from "@/components/customizer/ProductConfigurator";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import { useCart } from "@/context/CartContext";
 import { buildCustomizeHref, formatPrice } from "@/lib/format";
 
@@ -160,17 +161,26 @@ function CustomizeContent() {
   return (
     <Box
       sx={{
-        bgcolor: "#FFFFFF",
+        bgcolor: "#F2F3F0",
         pb: { xs: 16, lg: 8 },
       }}
     >
+      {configuratorReady ? (
+        <PageMasthead
+          code="Studio"
+          title="Design your board"
+          lede="Pick the size, surface, frame and extras. The preview updates as you go. Listed sizes keep catalogue pricing; custom sizes and combination layouts are quoted."
+          crumbs={[{ href: "/products", label: "Collections" }, { label: "Design your board" }]}
+          compact
+        />
+      ) : null}
       <Box
         sx={{
           width: "100%",
-          maxWidth: 1280,
+          maxWidth: 1440,
           mx: "auto",
-          px: { xs: 2.5, md: 4 },
-          py: { xs: 3, md: 4 },
+          px: { xs: 2, sm: 4, md: 6, lg: 8 },
+          py: { xs: 3, md: 5 },
         }}
       >
         {resolved.status === "missing" || resolved.status === "invalid" ? (
@@ -260,7 +270,7 @@ function SelectProductState({
   choices: Product[];
 }) {
   return (
-    <Paper component="section" variant="outlined" sx={{ borderRadius: "16px", p: { xs: 3, md: 4 } }}>
+    <Paper component="section" variant="outlined" sx={{ borderRadius: 0, p: { xs: 3, md: 4 } }}>
       <Button
         component={Link}
         href="/products"
@@ -271,13 +281,11 @@ function SelectProductState({
         Back to Products
       </Button>
       <Typography
-        variant="h5"
         component="h1"
-        sx={{ mt: 2, color: "text.primary", fontWeight: 600 }}
+        sx={{ mt: 2, color: "text.primary", fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontSize: { xs: "2rem", md: "2.75rem" }, letterSpacing: "-0.03em", lineHeight: 1 }}
       >
         {title}
       </Typography>
-      <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1, maxWidth: 672, lineHeight: 1.7 }}>
         {message}
       </Typography>
@@ -293,7 +301,7 @@ function SelectProductState({
                 height: "100%",
                 overflow: "hidden",
                 textAlign: "left",
-                borderRadius: "10px",
+                borderRadius: 0,
                 border: 1,
                 borderColor: "divider",
                 bgcolor: "background.paper",
@@ -329,7 +337,7 @@ function SelectProductState({
 
 function NotCustomizableState({ product }: { product: Product }) {
   return (
-    <Paper component="section" variant="outlined" sx={{ borderRadius: "16px", p: { xs: 3, md: 4 } }}>
+    <Paper component="section" variant="outlined" sx={{ borderRadius: 0, p: { xs: 3, md: 4 } }}>
       <Stack direction={{ xs: "column", md: "row" }} spacing={2.5} sx={{ alignItems: { md: "flex-start" } }}>
         <Box
           sx={{
@@ -340,7 +348,7 @@ function NotCustomizableState({ product }: { product: Product }) {
             maxWidth: 200,
             flexShrink: 0,
             overflow: "hidden",
-            borderRadius: "10px",
+            borderRadius: 0,
             bgcolor: "background.default",
           }}
         >

@@ -34,7 +34,7 @@ export function ProductQuickView({
       aria-labelledby="product-quick-view-title"
       slotProps={{
         paper: {
-          sx: { borderRadius: 1, bgcolor: "background.paper" },
+          sx: { borderRadius: 0, bgcolor: "background.paper" },
         },
       }}
     >
@@ -74,7 +74,7 @@ export function ProductQuickView({
             ) : null}
           </Box>
           <Box>
-            <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.14em" }}>
+            <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
               {product.series ?? product.category.replace(/-/g, " ")}
             </Typography>
             <Typography id="product-quick-view-title" variant="h4" sx={{ mt: 1, fontSize: { xs: "1.4rem", md: "1.75rem" } }}>

@@ -99,7 +99,7 @@ export function SizeSelector({
           <Paper
             variant="outlined"
             sx={{
-              borderRadius: "12px",
+              borderRadius: 0,
               borderColor: useCustomSize ? "primary.main" : "divider",
               bgcolor: useCustomSize ? "primary.light" : "background.paper",
               px: 1.5,

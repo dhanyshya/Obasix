@@ -7,6 +7,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Link from "@/components/Link";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import { getSolutionProducts, getVisibleSolutions } from "@/data/solutions";
 
 export const metadata = { title: "Solutions" };
@@ -16,41 +17,12 @@ export default function SolutionsPage() {
 
   return (
     <Box sx={{ overflowX: "hidden", bgcolor: "background.paper" }}>
-      <Box component="section" sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Container sx={{ py: { xs: 6, md: 8 } }}>
-          <Typography
-            variant="overline"
-            sx={{
-              display: "inline-flex",
-              px: 1,
-              py: 0.35,
-              borderRadius: 0.5,
-              bgcolor: "primary.light",
-              color: "primary.main",
-              fontSize: 11,
-              letterSpacing: "0.2em",
-            }}
-          >
-            Solutions
-          </Typography>
-          <Typography
-            variant="h1"
-            sx={{
-              mt: 2,
-              maxWidth: 768,
-              fontSize: { xs: "2.25rem", md: "3rem" },
-              letterSpacing: "-0.03em",
-              color: "text.primary",
-            }}
-          >
-            What do you need for this space?
-          </Typography>
-          <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
-          <Typography sx={{ mt: 2, maxWidth: 576, fontSize: { xs: 16, md: 18 }, lineHeight: 1.7, color: "text.secondary" }}>
-            Choose a space. See the OBASIX boards and accessories listed for it.
-          </Typography>
-        </Container>
-      </Box>
+      <PageMasthead
+        code="Spaces"
+        title="What do you need for this space?"
+        lede="Choose a space. See the OBASIX boards and accessories listed for it."
+        crumbs={[{ href: "/", label: "Home" }, { label: "Spaces" }]}
+      />
 
       <Box component="section" sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "background.default" }}>
         <Container sx={{ py: { xs: 4, md: 6 } }}>
@@ -62,7 +34,7 @@ export default function SolutionsPage() {
                   <Card
                     sx={{
                       height: "100%",
-                      borderRadius: 0.5,
+                      borderRadius: 0,
                       transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
                       "&:hover": {
                         transform: "translateY(-2px)",
@@ -113,7 +85,7 @@ export default function SolutionsPage() {
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{ mt: 2, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.14em", color: "text.secondary" }}
+                          sx={{ mt: 2, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}
                         >
                           {count} {count === 1 ? "product" : "products"}
                         </Typography>

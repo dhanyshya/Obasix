@@ -26,6 +26,7 @@ import {
 } from "@/data/catalogue";
 import { CompleteYourBoard } from "@/components/product/CompleteYourBoard";
 import { ProductActions } from "@/components/product/ProductActions";
+import { CompareToggle } from "@/components/compare/CompareToggle";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { RecommendationCard } from "@/components/product/RecommendationCard";
 import { formatPrice } from "@/lib/format";
@@ -66,32 +67,34 @@ export default function ProductDetailPage({
             <ProductGallery images={product.images} alt={product.name} />
           </Grid>
           <Grid size={{ xs: 12, lg: 6 }}>
+            <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap", pb: 1.5, borderBottom: "3px solid", borderColor: "text.primary" }}>
+              <Typography sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: "0.05em", bgcolor: "#164E3B", color: "#FFFFFF", px: 1.25, py: 0.4 }}>
+                {product.sku}
+              </Typography>
+              <Typography sx={{ fontSize: 14, color: "text.secondary", textTransform: "capitalize" }}>
+                {product.series ? `${product.series} series` : product.category.replace(/-/g, " ")}
+              </Typography>
+            </Box>
             <Typography
-              variant="overline"
-              sx={{
-                display: "inline-flex",
-                px: 1,
-                py: 0.35,
-                borderRadius: 0.5,
-                bgcolor: "primary.light",
-                color: "primary.main",
-                fontWeight: 700,
-              }}
-            >
-              {product.series ?? product.category.replace(/-/g, " ")} · {product.sku}
-            </Typography>
-            <Typography
-              variant="h3"
               component="h1"
-              sx={{ mt: 0.5, fontSize: { xs: 30, md: 38 }, color: "text.primary" }}
+              sx={{
+                mt: 2,
+                fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+                fontWeight: 800,
+                fontVariationSettings: '"wdth" 90',
+                fontSize: { xs: 32, md: 44 },
+                letterSpacing: "-0.035em",
+                lineHeight: 1,
+                color: "text.primary",
+                textWrap: "balance",
+              }}
             >
               {product.name}
             </Typography>
-            <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
             <Typography color="text.secondary" sx={{ mt: 2, lineHeight: 1.7 }}>
               {product.description}
             </Typography>
-            <Typography variant="h4" component="p" sx={{ mt: 3, fontWeight: 700 }}>
+            <Typography component="p" sx={{ mt: 3, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontSize: { xs: 34, md: 42 }, letterSpacing: "-0.03em", fontVariantNumeric: "tabular-nums", color: "text.primary" }}>
               {formatPrice(product.price)}
               {product.compareAtPrice && (
                 <Box
@@ -128,22 +131,42 @@ export default function ProductDetailPage({
 
             {product.sizes.length > 0 && (
               <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
                   Size
                 </Typography>
                 <ToggleButtonGroup
                   exclusive
                   size="small"
                   color="primary"
+                  sx={{
+                    flexWrap: "wrap",
+                    gap: 1,
+                    "& .MuiToggleButtonGroup-grouped": { borderRadius: 0, "&:not(:first-of-type)": { ml: 0, borderLeft: "2px solid" } },
+                    "& .MuiToggleButton-root": {
+                      minWidth: 88,
+                      minHeight: 48,
+                      fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+                      fontWeight: 700,
+                      fontSize: 15,
+                      textTransform: "none",
+                      color: "text.primary",
+                      borderColor: "text.primary",
+                      borderWidth: 2,
+                    },
+                    "& .MuiToggleButton-root.Mui-selected, & .MuiToggleButton-root.Mui-selected:hover": {
+                      bgcolor: "text.primary",
+                      color: "#FFFFFF",
+                      boxShadow: "inset 0 -4px 0 #EE6A1F",
+                    },
+                  }}
                   value={sizeId}
                   onChange={(_, next: string | null) => {
                     if (next) setSizeId(next);
                   }}
                   aria-label="Size"
-                  sx={{ flexWrap: "wrap", gap: 1, "& .MuiToggleButtonGroup-grouped": { border: 1, borderColor: "divider", borderRadius: 1 } }}
                 >
                   {product.sizes.map((size) => (
-                    <ToggleButton key={size.id} value={size.id} sx={{ px: 1.75, textTransform: "none", fontWeight: 600 }}>
+                    <ToggleButton key={size.id} value={size.id} sx={{ px: 2 }}>
                       {size.label}
                     </ToggleButton>
                   ))}
@@ -166,6 +189,9 @@ export default function ProductDetailPage({
 
             <Box sx={{ mt: 4 }}>
               <ProductActions product={product} sizeId={sizeId} quantity={quantity} variant="detail" />
+              <Box sx={{ mt: 1 }}>
+                <CompareToggle productId={product.id} size="medium" />
+              </Box>
               <Button
                 component={Link}
                 variant="text"

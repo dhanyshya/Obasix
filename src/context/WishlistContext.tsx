@@ -4,7 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -21,6 +23,27 @@ const WishlistContext = createContext<WishlistContextValue | null>(null);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [ids, setIdsState] = useState<string[]>([]);
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem("obasix-wishlist-v1") ?? "[]") as unknown;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from browser storage
+      if (Array.isArray(saved) && saved.length) setIdsState((prev) => (prev.length ? prev : saved.map(String).slice(0, 40)));
+    } catch {
+      // Storage unavailable.
+    }
+    hydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    try {
+      window.localStorage.setItem("obasix-wishlist-v1", JSON.stringify(ids));
+    } catch {
+      // ignore
+    }
+  }, [ids]);
 
   const toggle = useCallback((productId: string) => {
     setIdsState((prev) =>

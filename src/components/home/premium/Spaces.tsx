@@ -156,7 +156,7 @@ export function Spaces() {
                     sx={{
                       fontSize: 8.5,
                       fontWeight: 700,
-                      letterSpacing: "0.19em",
+                      letterSpacing: "0.05em",
                       textTransform: "uppercase",
                       color: "rgba(255,255,255,0.72)",
                     }}
@@ -175,7 +175,7 @@ export function Spaces() {
                     <Typography
                       component="h3"
                       sx={{
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: { xs: 19, md: 23 },
                         lineHeight: 1.1,
                         letterSpacing: "-0.02em",
@@ -210,8 +210,8 @@ export function Spaces() {
         >
           <Typography
             sx={{
-              fontFamily: "var(--font-display), Georgia, serif",
-              fontStyle: "italic",
+              fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+              fontStyle: "normal",
               fontSize: { xs: 21, md: 25 },
               color: home.charcoal,
             }}

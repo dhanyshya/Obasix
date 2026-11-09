@@ -347,7 +347,7 @@ export function ProductFinder() {
               </Typography>
 
               <Box key={current.id} className="finder-step" sx={{ mt: 4 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: "0.18em", fontWeight: 600 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: "0.05em", fontWeight: 600 }}>
                   {String(step + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}
                 </Typography>
                 <Typography variant="h4" component="h2" sx={{ mt: 1.5, fontSize: { xs: 24, md: 30 } }}>
@@ -755,7 +755,7 @@ function Option({
           <Box
             component="span"
             style={{ backgroundColor: swatch }}
-            sx={{ display: "inline-block", width: 14, height: 14, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 0.25 }}
+            sx={{ display: "inline-block", width: 14, height: 14, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 0 }}
           />
         ) : undefined
       }
@@ -886,7 +886,7 @@ function Summary({
       variant="outlined"
       sx={{
         p: 2.5,
-        borderRadius: 1,
+        borderRadius: 0,
         display: "flex",
         flexDirection: "column",
         height: { xs: "auto", md: "100%" },
@@ -907,7 +907,7 @@ function Summary({
           {count} products match
         </Typography>
       </Stack>
-      <Box sx={{ mt: 2, overflow: "hidden", border: 1, borderColor: "divider", borderRadius: 0.5 }}>
+      <Box sx={{ mt: 2, overflow: "hidden", border: 1, borderColor: "divider", borderRadius: 0 }}>
         <BoardVisual filters={filters} preferred={preferred} compact />
       </Box>
       <Box
@@ -995,7 +995,7 @@ function ResultCard({ product }: { product: Product }) {
     <Paper
       component="article"
       variant="outlined"
-      sx={{ display: "flex", height: "100%", flexDirection: "column", borderRadius: 1, overflow: "hidden" }}
+      sx={{ display: "flex", height: "100%", flexDirection: "column", borderRadius: 0, overflow: "hidden" }}
     >
       <Box sx={{ position: "relative", aspectRatio: "5 / 4", bgcolor: "background.default" }}>
         {product.images[0] ? (

@@ -19,7 +19,7 @@ export function ProductGrid({
         sx={{
           border: "1px dashed",
           borderColor: "divider",
-          borderRadius: 1.5,
+          borderRadius: 0,
           bgcolor: "background.paper",
           px: 3,
           py: 8,

@@ -77,7 +77,7 @@ export function ProductFilters({
   maxPrice: number;
 }) {
   return (
-    <Paper component="aside" variant="outlined" sx={{ p: 2.5, borderRadius: 1.5 }}>
+    <Paper component="aside" variant="outlined" sx={{ p: 2.5, borderRadius: 0 }}>
       <Stack spacing={3}>
         <Field label="Search">
           <TextField

@@ -25,9 +25,9 @@ export function SetupBuilder({
     <Paper
       component="section"
       variant="outlined"
-      sx={{ borderRadius: 2, p: { xs: 2.5, md: 4 }, boxShadow: 1 }}
+      sx={{ borderRadius: 0, p: { xs: 2.5, md: 4 }, boxShadow: 1 }}
     >
-      <Typography variant="overline" sx={{ color: "warning.main", fontWeight: 700, letterSpacing: "0.14em" }}>
+      <Typography variant="overline" sx={{ color: "warning.main", fontWeight: 700, letterSpacing: "0.05em" }}>
         Build Your Setup
       </Typography>
       <Typography variant="h2" sx={{ mt: 1, fontSize: { xs: "1.5rem", md: "1.875rem" }, fontWeight: 700 }}>
@@ -48,9 +48,9 @@ export function SetupBuilder({
             <Stack
               direction="row"
               spacing={2}
-              sx={{ alignItems: "center", border: 1, borderColor: "divider", borderRadius: 1.25, p: 1.5 }}
+              sx={{ alignItems: "center", border: 1, borderColor: "divider", borderRadius: 0, p: 1.5 }}
             >
-              <Box sx={{ position: "relative", height: 64, width: 64, flexShrink: 0, overflow: "hidden", borderRadius: 0.75 }}>
+              <Box sx={{ position: "relative", height: 64, width: 64, flexShrink: 0, overflow: "hidden", borderRadius: 0 }}>
                 <Image src={product.images[0]} alt="" fill className="object-cover" sizes="64px" />
               </Box>
               <Box sx={{ minWidth: 0, flex: 1 }}>

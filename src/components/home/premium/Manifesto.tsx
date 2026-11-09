@@ -54,7 +54,7 @@ export function Manifesto() {
                 }}
               >
                 Not more objects.
-                <Box component="span" sx={{ display: "block", fontStyle: "italic", color: home.forest }}>
+                <Box component="span" sx={{ display: "block", fontStyle: "normal", color: home.forest }}>
                   Better surfaces.
                 </Box>
               </Typography>
@@ -86,7 +86,7 @@ export function Manifesto() {
                   >
                     <Typography
                       sx={{
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: 15,
                         color: home.forest,
                       }}
@@ -97,7 +97,7 @@ export function Manifesto() {
                       component="h3"
                       sx={{
                         mt: 0.85,
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: { xs: 18, md: 20 },
                         lineHeight: 1.18,
                         color: home.charcoal,

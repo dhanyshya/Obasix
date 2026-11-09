@@ -177,6 +177,8 @@ export function AIChatbot() {
               alignItems: "center",
               justifyContent: "center",
               animation: "obasixFloat 3.2s ease-in-out infinite",
+              "&:hover, &:focus-visible": { animationPlayState: "paused" },
+              "@media (prefers-reduced-motion: reduce)": { animation: "none" },
               transition:
                 "background 0.25s ease, box-shadow 0.25s ease, opacity 0.2s ease",
               "&:hover": {
@@ -403,7 +405,7 @@ export function AIChatbot() {
                   maxWidth: "92%",
                   px: 1.5,
                   py: 1.15,
-                  borderRadius: "14px",
+                  borderRadius: 0,
                   fontSize: 13.5,
                   lineHeight: 1.65,
                   animation: "obasixMsgIn 0.3s ease both",
@@ -505,7 +507,7 @@ export function AIChatbot() {
                     variant="contained"
                     sx={{
                       mt: 1.25,
-                      borderRadius: "10px",
+                      borderRadius: 0,
                       px: 1.5,
                       py: 0.9,
                       fontSize: 12,
@@ -530,7 +532,7 @@ export function AIChatbot() {
                 border: 1,
                 borderColor: brandTokens.line,
                 bgcolor: brandTokens.white,
-                borderRadius: "14px",
+                borderRadius: 0,
                 px: 1.5,
                 py: 1.1,
                 ...floatKeyframes,
@@ -569,7 +571,7 @@ export function AIChatbot() {
                   sx={{
                     fontSize: 10,
                     fontWeight: 700,
-                    letterSpacing: "0.12em",
+                    letterSpacing: "0.05em",
                     textTransform: "uppercase",
                     color: brandTokens.forest,
                   }}
@@ -597,7 +599,7 @@ export function AIChatbot() {
                       border: `1px solid ${chatBeige}`,
                       bgcolor: brandTokens.white,
                       color: brandTokens.forest,
-                      borderRadius: "10px",
+                      borderRadius: 0,
                       fontSize: 11.5,
                       fontWeight: 600,
                       lineHeight: 1.3,
@@ -688,7 +690,7 @@ export function AIChatbot() {
               flex: 1,
               border: `1px solid ${chatBeige}`,
               bgcolor: chatIvory,
-              borderRadius: "10px",
+              borderRadius: 0,
               px: 1.35,
               py: 0.85,
               fontSize: 13.5,
@@ -702,7 +704,7 @@ export function AIChatbot() {
             sx={{
               height: 40,
               width: 40,
-              borderRadius: "10px",
+              borderRadius: 0,
               bgcolor: brandTokens.forest,
               color: brandTokens.white,
               "&:hover": { bgcolor: brandTokens.forestDark },

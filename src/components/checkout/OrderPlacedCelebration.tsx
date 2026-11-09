@@ -117,7 +117,7 @@ function formatAddress(order: DemoOrder) {
 const labelSx = {
   fontSize: 11,
   fontWeight: 600,
-  letterSpacing: "0.14em",
+  letterSpacing: "0.05em",
   textTransform: "uppercase",
   color: brandTokens.muted,
 } as const;
@@ -263,7 +263,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
             component="h1"
             sx={{
               mt: 1,
-              fontFamily: 'var(--font-display), Georgia, serif',
+              fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
               fontWeight: 500,
               letterSpacing: "-0.02em",
               lineHeight: 1.08,
@@ -468,7 +468,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
                 component="h2"
                 sx={{
                   mt: 0.5,
-                  fontFamily: 'var(--font-display), Georgia, serif',
+                  fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
                   fontWeight: 500,
                   fontSize: { xs: 20, md: 23 },
                   color: brandTokens.charcoal,
@@ -528,7 +528,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
                         mt: 0.25,
                         fontSize: 9.5,
                         fontWeight: 700,
-                        letterSpacing: "0.12em",
+                        letterSpacing: "0.05em",
                         textTransform: "uppercase",
                         color: done ? brandTokens.forest : "#A9ACA4",
                       }}
@@ -610,7 +610,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
                       sx={{
                         fontSize: 10,
                         fontWeight: 700,
-                        letterSpacing: "0.12em",
+                        letterSpacing: "0.05em",
                         textTransform: "uppercase",
                         mt: 0.25,
                         color: done ? brandTokens.forest : "#A9ACA4",
@@ -646,7 +646,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
               height: 52,
               px: 4,
               fontSize: "0.74rem",
-              letterSpacing: "0.14em",
+              letterSpacing: "0.05em",
             }}
           >
             Track My Order
@@ -661,7 +661,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
               height: 52,
               px: 4,
               fontSize: "0.74rem",
-              letterSpacing: "0.14em",
+              letterSpacing: "0.05em",
               borderColor: brandTokens.forest,
               color: brandTokens.forest,
               "&:hover": { borderColor: brandTokens.forestDark, bgcolor: brandTokens.paleGreen },
@@ -687,7 +687,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
               height: 52,
               px: 3,
               fontSize: "0.74rem",
-              letterSpacing: "0.14em",
+              letterSpacing: "0.05em",
               color: brandTokens.forest,
               "&:hover": { bgcolor: brandTokens.paleGreen },
             }}

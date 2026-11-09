@@ -103,7 +103,7 @@ export function ProfilePanel() {
 
   return (
     <Stack spacing={4}>
-      <Typography component="h1" variant="h4">
+      <Typography component="h1" variant="h2" sx={{ fontSize: { xs: 34, md: 46 } }}>
         Profile
       </Typography>
       {error ? <Alert severity="error">{error}</Alert> : null}
@@ -130,7 +130,7 @@ export function ProfilePanel() {
           </Button>
         </Stack>
       </Paper>
-      <Paper variant="outlined" component="section" sx={{ p: 2 }}>
+      <Paper variant="outlined" component="section" sx={{ p: { xs: 2.5, md: 3.5 } }}>
         <Typography component="h2" variant="subtitle1" sx={{ fontWeight: 600 }}>
           Saved addresses
         </Typography>

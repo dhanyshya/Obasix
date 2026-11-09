@@ -29,7 +29,7 @@ interface WallSceneProps {
 
 const badgeSx = {
   position: "absolute",
-  borderRadius: 0.5,
+  borderRadius: 0,
   px: 1,
   py: 0.5,
   fontSize: 10,
@@ -172,7 +172,7 @@ export function WallScene({
               height: 6,
               width: "55%",
               transform: "translateX(-50%)",
-              borderRadius: 0.25,
+              borderRadius: 0,
             }}
             style={{ backgroundColor: frameSwatch }}
           />
@@ -231,7 +231,7 @@ export function WallScene({
                 component="span"
                 sx={{
                   display: "block",
-                  borderRadius: 0.5,
+                  borderRadius: 0,
                   bgcolor: "rgba(255,255,255,0.9)",
                   px: 0.75,
                   py: 0.25,
@@ -277,7 +277,7 @@ export function WallScene({
               height: { xs: 12, sm: 16 },
               width: "40%",
               transform: "translateX(-50%)",
-              borderRadius: 0.25,
+              borderRadius: 0,
               border: "1px solid rgba(0,0,0,0.2)",
               boxShadow: 2,
             }}
@@ -298,7 +298,7 @@ export function WallScene({
             height: "18%",
             width: "8%",
             transform: "translateX(-50%)",
-            borderRadius: 0.25,
+            borderRadius: 0,
             bgcolor: "#333",
           }}
         />
@@ -315,7 +315,7 @@ export function WallScene({
           aspectRatio: "16 / 10",
           width: "100%",
           overflow: "hidden",
-          borderRadius: 2,
+          borderRadius: 0,
           bgcolor: "background.default",
         },
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
@@ -443,7 +443,7 @@ export function WallScene({
           <Typography
             variant="body2"
             sx={{
-              borderRadius: 1.25,
+              borderRadius: 0,
               bgcolor: "rgba(255,255,255,0.9)",
               px: 2,
               py: 1,

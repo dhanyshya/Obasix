@@ -12,9 +12,6 @@ import Grid from "@mui/material/Grid";
 import MuiLink from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
-import Step from "@mui/material/Step";
-import StepButton from "@mui/material/StepButton";
-import Stepper from "@mui/material/Stepper";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
@@ -378,7 +375,7 @@ export function ProductConfigurator({
         <Box sx={{ minWidth: 0 }}>
           <Typography
             variant="overline"
-            sx={{ display: "block", fontSize: 10, letterSpacing: "0.14em", color: "primary.main", fontWeight: 700 }}
+            sx={{ display: "block", fontSize: 12, letterSpacing: "0.04em", color: "#B0440C", fontWeight: 700 }}
           >
             Order summary
           </Typography>
@@ -389,7 +386,7 @@ export function ProductConfigurator({
             {product.sku}
           </Typography>
         </Box>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, flexShrink: 0, color: "text.primary" }}>
+        <Typography sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontSize: 24, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums", flexShrink: 0, color: "text.primary" }}>
           {listedTotal !== undefined ? formatPrice(listedTotal) : "Request a Quote"}
         </Typography>
       </Stack>
@@ -457,9 +454,9 @@ export function ProductConfigurator({
           gap: { xs: 3, lg: 4 },
           gridTemplateColumns: "minmax(0, 1fr)",
           [DESKTOP_MQ]: {
-            gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 0.95fr)",
+            gridTemplateColumns: "minmax(0, 1.12fr) minmax(400px, 0.88fr)",
           },
-          [XL_MQ]: { columnGap: 5 },
+          [XL_MQ]: { columnGap: 4 },
         }}
       >
         {/* Left: option steps */}
@@ -469,7 +466,12 @@ export function ProductConfigurator({
             display: "flex",
             flexDirection: "column",
             gap: 3,
-            pb: { xs: 12, lg: 4 },
+            bgcolor: "#FFFFFF",
+            borderTop: "6px solid #164E3B",
+            px: { xs: 2, sm: 3, lg: 3.5 },
+            pt: { xs: 2.5, lg: 3 },
+            pb: { xs: 14, lg: 3.5 },
+            mx: { xs: -2, sm: 0 },
           }}
         >
           <Box component="header">
@@ -490,8 +492,8 @@ export function ProductConfigurator({
                   height: 64,
                   flexShrink: 0,
                   overflow: "hidden",
-                  borderRadius: "12px",
-                  bgcolor: "primary.light",
+                  borderRadius: 0,
+                  bgcolor: "#F2F3F0",
                 }}
               >
                 {product.images[0] ? (
@@ -506,7 +508,7 @@ export function ProductConfigurator({
                 ) : null}
               </Box>
               <Box sx={{ minWidth: 0 }}>
-                <Typography variant="h6" component="h2" sx={{ fontSize: { xs: "1.25rem", md: "1.35rem" } }}>
+                <Typography component="h2" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontVariationSettings: '"wdth" 92', letterSpacing: "-0.02em", lineHeight: 1.05, color: "#141917", fontSize: { xs: "1.4rem", md: "1.6rem" } }}>
                   {product.shortName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: 13 }}>
@@ -532,38 +534,55 @@ export function ProductConfigurator({
 
           {!boardPickerOpen ? (
             <Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.25, fontSize: 13 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, fontSize: 13.5 }}>
                 Step {Math.max(1, activeGuideIndex + 1)} of {GUIDE_STEPS.length}:{" "}
                 <Box component="span" sx={{ fontWeight: 700, color: "text.primary" }}>
                   {GUIDE_STEPS[Math.max(0, activeGuideIndex)]?.label}
                 </Box>
               </Typography>
-              <Stepper
-                nonLinear
-                activeStep={activeGuideIndex}
+              <Box
+                component="ol"
                 aria-label="Customization steps"
-                sx={{
-                  flexWrap: "wrap",
-                  rowGap: 1,
-                  "& .MuiStepLabel-label": { fontSize: 12.5, fontWeight: 600 },
-                  "& .MuiStepIcon-root.Mui-active, & .MuiStepIcon-root.Mui-completed": {
-                    color: "primary.main",
-                  },
-                }}
+                sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gridTemplateColumns: `repeat(${GUIDE_STEPS.length}, minmax(0, 1fr))`, gap: 0.5 }}
               >
-                {GUIDE_STEPS.map((item, index) => (
-                  <Step key={item.id} completed={activeGuideIndex > index}>
-                    <StepButton
-                      color="inherit"
-                      aria-current={item.id === step ? "step" : undefined}
-                      onClick={() => setStep(item.id)}
-                      sx={{ py: 0.5, px: 0.75 }}
-                    >
-                      {item.short}
-                    </StepButton>
-                  </Step>
-                ))}
-              </Stepper>
+                {GUIDE_STEPS.map((item, index) => {
+                  const current = item.id === step;
+                  const done = activeGuideIndex > index;
+                  return (
+                    <Box component="li" key={item.id} sx={{ minWidth: 0 }}>
+                      <ButtonBase
+                        type="button"
+                        aria-current={current ? "step" : undefined}
+                        onClick={() => setStep(item.id)}
+                        sx={{
+                          width: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "flex-start",
+                          gap: 0.5,
+                          pt: 1,
+                          pb: 0.75,
+                          borderTop: "4px solid",
+                          borderColor: current || done ? "#EE6A1F" : "#DCDFDA",
+                          color: current ? "#141917" : "#3F4843",
+                          textAlign: "left",
+                          transition: "border-color 200ms cubic-bezier(0.16,1,0.3,1), color 160ms",
+                          "&:hover": { color: "#141917", borderColor: current || done ? "#EE6A1F" : "#B9BFB9" },
+                          "&.Mui-focusVisible": { outline: "3px solid #EE6A1F", outlineOffset: 2 },
+                        }}
+                      >
+                        <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 600, fontSize: 11.5, letterSpacing: "0.04em", fontVariantNumeric: "tabular-nums", color: done ? "#B0440C" : "inherit" }}>
+                          {done ? "✓ " : ""}
+                          {String(index + 1).padStart(2, "0")}
+                        </Box>
+                        <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: current ? 800 : 700, fontSize: { xs: 12.5, sm: 14 }, letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>
+                          {item.short}
+                        </Box>
+                      </ButtonBase>
+                    </Box>
+                  );
+                })}
+              </Box>
             </Box>
           ) : null}
 
@@ -657,7 +676,7 @@ export function ProductConfigurator({
                           width: 44,
                           height: 44,
                           flexShrink: 0,
-                          borderRadius: "6px",
+                          borderRadius: 0,
                           border: "1px solid",
                           borderColor: "divider",
                           background:
@@ -795,7 +814,7 @@ export function ProductConfigurator({
                               variant="outlined"
                               sx={{
                                 height: "100%",
-                                borderRadius: "12px",
+                                borderRadius: 0,
                                 p: 1.5,
                                 borderColor: selected ? "primary.main" : "divider",
                                 bgcolor: selected ? "primary.light" : "background.paper",
@@ -826,7 +845,7 @@ export function ProductConfigurator({
                                         height: 48,
                                         flexShrink: 0,
                                         overflow: "hidden",
-                                        borderRadius: "6px",
+                                        borderRadius: 0,
                                         bgcolor: "background.default",
                                       }}
                                     >
@@ -869,7 +888,7 @@ export function ProductConfigurator({
                 ) : (
                   <Paper
                     variant="outlined"
-                    sx={{ mb: 3, borderRadius: "12px", bgcolor: "background.default", px: 2, py: 1.5 }}
+                    sx={{ mb: 3, borderRadius: 0, bgcolor: "background.default", px: 2, py: 1.5 }}
                   >
                     <Typography variant="caption" color="text.secondary">
                       No catalogue accessories are listed for this board.
@@ -925,7 +944,7 @@ export function ProductConfigurator({
                 title="Review & Quote"
                 helper="Confirm your configuration. The live preview and summary already reflect your selections."
               >
-                <Paper variant="outlined" sx={{ borderRadius: "10px", p: 2, borderColor: "divider" }}>
+                <Paper variant="outlined" sx={{ borderRadius: 0, p: 2, borderColor: "divider" }}>
                   <Stack component="dl" spacing={1} sx={{ m: 0, fontSize: 14 }}>
                     <SummaryRow label="Product" value={`${product.shortName} (${product.sku})`} />
                     <SummaryRow label="Size" value={sizeLabel} />
@@ -970,7 +989,7 @@ export function ProductConfigurator({
                   onClick={goNext}
                   disabled={step === "size" && !customSizeValid}
                   endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
-                  sx={{ borderRadius: 0.5, px: 2.5, py: 1, fontWeight: 600 }}
+                  sx={{ borderRadius: 0, px: 2.5, py: 1, fontWeight: 600 }}
                 >
                   {step === "accessories" ? "Review configuration" : "Continue"}
                 </Button>
@@ -991,6 +1010,7 @@ export function ProductConfigurator({
             minWidth: 0,
             [DESKTOP_MQ]: {
               display: "block",
+              order: -1,
               position: "sticky",
               top: "calc(var(--header-h, 88px) + 16px)",
               alignSelf: "start",
@@ -998,9 +1018,20 @@ export function ProductConfigurator({
           }}
         >
           <Stack spacing={2}>
-            <BoardPreview {...previewProps} showDetails={false} />
+            <Box
+              sx={{
+                position: "relative",
+                p: { lg: 3, xl: 4 },
+                bgcolor: "#E6E8E3",
+                backgroundImage:
+                  "linear-gradient(rgba(20,25,23,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(20,25,23,0.06) 1px, transparent 1px)",
+                backgroundSize: "32px 32px",
+              }}
+            >
+              <BoardPreview {...previewProps} showDetails={false} />
+            </Box>
             {!boardPickerOpen ? (
-              <Paper variant="outlined" sx={{ borderRadius: "12px", borderColor: "divider", px: 2.5, py: 2 }}>
+              <Paper variant="outlined" sx={{ borderRadius: 0, borderColor: "divider", px: 3, py: 2.5 }}>
                 {summaryBlock}
               </Paper>
             ) : null}
@@ -1018,10 +1049,9 @@ export function ProductConfigurator({
           right: 0,
           bottom: "var(--mobile-nav-h, 0px)",
           zIndex: 40,
-          borderTop: 1,
-          borderColor: "divider",
-          bgcolor: "rgba(255,255,255,0.95)",
-          backdropFilter: "blur(8px)",
+          borderTop: "4px solid #EE6A1F",
+          bgcolor: "#FFFFFF",
+          boxShadow: "0 -18px 40px -24px rgba(11,46,34,0.45)",
           [DESKTOP_MQ]: { display: "none" },
         }}
       >
@@ -1048,7 +1078,7 @@ export function ProductConfigurator({
             >
               Summary
             </Typography>
-            <Typography component="span" variant="body2" sx={{ fontWeight: 600, display: "block", mt: 0.25 }}>
+            <Typography component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontSize: 19, letterSpacing: "-0.02em", display: "block", mt: 0.25, color: "#141917" }}>
               {listedTotal !== undefined ? formatPrice(listedTotal) : "Request a quote"}
               <Box component="span" sx={{ ml: 1, fontWeight: 400, color: "text.secondary" }}>
                 · {sizeLabel}
@@ -1078,10 +1108,10 @@ function StepPanel({
 }) {
   return (
     <Box component="section">
-      <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 600 }}>
+      <Typography component="h3" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontSize: { xs: 22, md: 24 }, letterSpacing: "-0.02em", lineHeight: 1.1, color: "#141917" }}>
         {title}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: 13, lineHeight: 1.6 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75, fontSize: 14, lineHeight: 1.6, maxWidth: 520 }}>
         {helper}
       </Typography>
       <Box sx={{ mt: 2 }}>{children}</Box>

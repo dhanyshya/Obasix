@@ -70,7 +70,7 @@ export function IdeasInMotionSection() {
             <Box sx={{ maxWidth: 520 }}>
               <Typography
                 variant="overline"
-                sx={{ color: "primary.main", letterSpacing: "0.16em" }}
+                sx={{ color: "primary.main", letterSpacing: "0.05em" }}
               >
                 COLLECTION STUDY
               </Typography>

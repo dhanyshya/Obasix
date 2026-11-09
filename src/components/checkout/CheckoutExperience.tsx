@@ -5,25 +5,23 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useId, useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
-import MuiLink from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Link from "@/components/Link";
 import { PurchaseSteps } from "@/components/checkout/PurchaseSteps";
 import { colours, featureOptions, frames, getProductById } from "@/data/catalogue";
 import { useCart } from "@/context/CartContext";
 import { useCheckoutDraft } from "@/context/CheckoutDraftContext";
 import { formatPrice } from "@/lib/format";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import type { CartItem } from "@/lib/types";
 
 type Address = {
@@ -144,9 +142,9 @@ export function CheckoutExperience() {
             sx={{
               mx: "auto",
               maxWidth: 576,
-              border: "1px dashed",
+              border: "1px solid",
               borderColor: "divider",
-              borderRadius: 1.5,
+              borderRadius: 0,
               bgcolor: "background.paper",
               px: 3,
               py: 8,
@@ -185,7 +183,7 @@ export function CheckoutExperience() {
         >
           <Box sx={{ minWidth: 0 }}>
             <Box component="form" onSubmit={onContinue} noValidate>
-              <Paper variant="outlined" sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: 1.5 }}>
+              <Paper variant="outlined" sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: 0 }}>
                 <Stack spacing={4} divider={<Divider flexItem />}>
                   <Box component="section">
                     <Typography variant="h5" component="h2">
@@ -284,7 +282,7 @@ export function CheckoutExperience() {
             <Paper
               component="aside"
               variant="outlined"
-              sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: 1.5, height: "fit-content", position: { lg: "sticky" }, top: { lg: 112 } }}
+              sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: 0, height: "fit-content", position: { lg: "sticky" }, top: { lg: 112 } }}
             >
               <Typography variant="h6" component="h2">
                 Order summary
@@ -331,34 +329,27 @@ export function CheckoutExperience() {
 
 function CheckoutHeader() {
   return (
-    <Box component="section" sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "background.paper", py: 5 }}>
-      <Container>
-        <Breadcrumbs aria-label="Breadcrumb" separator={<NavigateNextIcon fontSize="small" />} sx={{ fontSize: 14 }}>
-          <MuiLink component={Link} href="/" color="text.secondary" underline="hover">
-            Home
-          </MuiLink>
-          <MuiLink component={Link} href="/cart" color="text.secondary" underline="hover">
-            Cart
-          </MuiLink>
-          <Typography variant="body2" color="text.primary" aria-current="page" sx={{ fontWeight: 600 }}>
-            Checkout
-          </Typography>
-        </Breadcrumbs>
-        <Typography variant="h3" component="h1" sx={{ mt: 2, fontSize: { xs: 34, md: 46 } }}>
-          Checkout
-        </Typography>
-        <Typography color="text.secondary" sx={{ mt: 1.5, maxWidth: 672 }}>
-          <MuiLink component={Link} href="/login?next=/checkout" sx={{ fontWeight: 600 }} underline="always">
-            Sign in
-          </MuiLink>{" "}
-          to keep this cart with your account. You can also continue as a guest.
-        </Typography>
-        <Typography color="text.secondary" sx={{ mt: 1.5, maxWidth: 672 }}>
-          Review your OBASIX setup and your contact details. Payment starts only on the next step, and only when the server can reach a provider.
-        </Typography>
-        <PurchaseSteps current={0} />
-      </Container>
-    </Box>
+    <PageMasthead
+      code="Step 01 · Checkout"
+      title="Checkout"
+      crumbs={[{ href: "/", label: "Home" }, { href: "/cart", label: "Cart" }, { label: "Checkout" }]}
+      compact
+      lede={
+        <>
+          <Box component="p" sx={{ m: 0 }}>
+            <Box component={Link} href="/login?next=/checkout" sx={{ color: "#fff", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 4 }}>
+              Sign in
+            </Box>{" "}
+            to keep this cart with your account. You can also continue as a guest.
+          </Box>
+          <Box component="p" sx={{ m: 0, mt: 1 }}>
+            Review your OBASIX setup and your contact details. Payment starts only on the next step, and only when the server can reach a provider.
+          </Box>
+        </>
+      }
+    >
+      <PurchaseSteps current={0} tone="dark" />
+    </PageMasthead>
   );
 }
 
@@ -373,7 +364,7 @@ function SummaryLine({ item }: { item: CartItem }) {
 
   return (
     <Box component="li" sx={{ display: "grid", gridTemplateColumns: "72px 1fr", gap: 1.5 }}>
-      <Box sx={{ position: "relative", height: 72, overflow: "hidden", borderRadius: 0.5, bgcolor: "background.default" }}>
+      <Box sx={{ position: "relative", height: 72, overflow: "hidden", borderRadius: 0, bgcolor: "background.default" }}>
         {product.images[0] ? (
           <Image src={product.images[0]} alt="" fill className="object-contain p-1" sizes="72px" />
         ) : null}

@@ -1,17 +1,15 @@
-import {
-  Collections,
-  ExploreProducts,
-  PremiumHero,
-  TrendingProducts,
-} from "@/components/home/premium";
+import { DirectoryHero } from "@/components/home/directory/DirectoryHero";
+import { Bestsellers, CodeBand, Maker, RangeDirectory, Wayfinding } from "@/components/home/directory/HomeSections";
 
 export default function HomePage() {
   return (
-    <div style={{ backgroundColor: "#FFFFFF" }}>
-      <PremiumHero />
-      <Collections />
-      <ExploreProducts />
-      <TrendingProducts />
-    </div>
+    <>
+      <DirectoryHero />
+      <CodeBand />
+      <RangeDirectory />
+      <Bestsellers />
+      <Maker />
+      <Wayfinding />
+    </>
   );
 }

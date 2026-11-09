@@ -29,7 +29,7 @@ export function Closing() {
           left: "50%",
           bottom: { xs: "-0.26em", md: "-0.3em" },
           transform: "translateX(-50%)",
-          fontFamily: "var(--font-display), Georgia, serif",
+          fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
           fontSize: { xs: "6.6rem", sm: "11rem", md: "18rem", lg: "23rem" },
           lineHeight: 0.7,
           letterSpacing: "0.06em",
@@ -67,7 +67,7 @@ export function Closing() {
                 }}
               >
                 Let&apos;s make your next space{" "}
-                <Box component="span" sx={{ fontStyle: "italic", color: home.oak }}>
+                <Box component="span" sx={{ fontStyle: "normal", color: home.oak }}>
                   the best one yet.
                 </Box>
               </Typography>
@@ -109,10 +109,10 @@ export function Closing() {
                   justifyContent: "space-between",
                 }}
               >
-                <Typography sx={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(247,245,240,0.45)" }}>
+                <Typography sx={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "rgba(247,245,240,0.45)" }}>
                   Homes · Offices · Schools · Commercial
                 </Typography>
-                <Typography sx={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(247,245,240,0.45)" }}>
+                <Typography sx={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "rgba(247,245,240,0.45)" }}>
                   Studio consultations by appointment
                 </Typography>
               </Box>

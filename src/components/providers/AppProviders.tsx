@@ -10,6 +10,8 @@ import { CheckoutDraftProvider } from "@/context/CheckoutDraftContext";
 import { AIChatProvider } from "@/context/AIChatContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { CompareProvider } from "@/context/CompareContext";
+import { CompareTray } from "@/components/compare/CompareTray";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
@@ -20,7 +22,12 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <CheckoutDraftProvider>
             <WishlistProvider>
               <AuthProvider>
-                <AIChatProvider>{children}</AIChatProvider>
+                <CompareProvider>
+                  <AIChatProvider>
+                    {children}
+                    <CompareTray />
+                  </AIChatProvider>
+                </CompareProvider>
               </AuthProvider>
             </WishlistProvider>
           </CheckoutDraftProvider>

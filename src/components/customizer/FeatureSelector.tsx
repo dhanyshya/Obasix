@@ -36,7 +36,7 @@ export function FeatureSelector({
               key={feature.id}
               variant="outlined"
               sx={{
-                borderRadius: "12px",
+                borderRadius: 0,
                 px: 1.5,
                 py: 0.75,
                 borderColor: feature.selected ? "primary.main" : "divider",

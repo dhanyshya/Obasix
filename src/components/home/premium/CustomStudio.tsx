@@ -67,7 +67,7 @@ export function CustomStudio() {
                 }}
               >
                 Built for your space.
-                <Box component="span" sx={{ display: "block", fontStyle: "italic", color: home.forest }}>
+                <Box component="span" sx={{ display: "block", fontStyle: "normal", color: home.forest }}>
                   Finished by you.
                 </Box>
               </Typography>
@@ -139,7 +139,7 @@ export function CustomStudio() {
                     py: 0.55,
                     fontSize: 9,
                     fontWeight: 700,
-                    letterSpacing: "0.18em",
+                    letterSpacing: "0.05em",
                     textTransform: "uppercase",
                     color: home.forest,
                   }}
@@ -162,7 +162,7 @@ export function CustomStudio() {
                     <Typography
                       sx={{
                         mt: 0.5,
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: 20,
                         color: home.charcoal,
                       }}
@@ -228,7 +228,7 @@ export function CustomStudio() {
                 >
                   <Typography
                     sx={{
-                      fontFamily: "var(--font-display), Georgia, serif",
+                      fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                       fontSize: 15,
                       color: home.forest,
                     }}

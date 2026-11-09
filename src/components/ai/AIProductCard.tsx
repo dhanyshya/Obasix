@@ -30,7 +30,7 @@ export function AIProductCard({
   const featureLine = product.features.slice(0, 2).join(" · ");
 
   return (
-    <Paper variant="outlined" sx={{ mt: 1.5, overflow: "hidden", borderRadius: 0, boxShadow: 1 }}>
+    <Paper variant="outlined" sx={{ mt: 1.5, overflow: "hidden", borderRadius: "16px", boxShadow: 1 }}>
       <Box sx={{ position: "relative", aspectRatio: "16 / 10", bgcolor: "background.default" }}>
         <Image
           src={product.images[0]}

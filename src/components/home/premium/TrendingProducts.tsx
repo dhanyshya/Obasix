@@ -46,7 +46,7 @@ export function TrendingProducts() {
                   width: "100%",
                   bgcolor: home.white,
                   border: `1px solid ${home.line}`,
-                  borderRadius: 0,
+                  borderRadius: "16px",
                   overflow: "hidden",
                   transition: "border-color 0.25s ease, box-shadow 0.25s ease",
                   "&:hover": {

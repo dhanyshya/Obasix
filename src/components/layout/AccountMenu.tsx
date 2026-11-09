@@ -49,7 +49,7 @@ export function AccountMenu({ overHero, mobile = false }: { overHero?: boolean; 
           fontSize: 13.5,
           minWidth: 0,
           px: 1,
-          borderRadius: 0,
+          borderRadius: "16px",
           transition: "color 0.18s ease",
           "&:hover": { bgcolor: "transparent", color: "primary.main" },
           "&:focus-visible": {
@@ -92,7 +92,7 @@ export function AccountMenu({ overHero, mobile = false }: { overHero?: boolean; 
         onClick={(event) => setAnchorEl(event.currentTarget)}
         sx={{
           color: overHero ? "#fff" : "text.primary",
-          borderRadius: 0,
+          borderRadius: "16px",
           px: 0.75,
           "&:focus-visible": {
             outline: "2px solid",

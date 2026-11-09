@@ -55,7 +55,7 @@ function AccessoryCard({
         flexDirection: "column",
         border: 1,
         borderColor: selected ? "primary.main" : "divider",
-        borderRadius: 0,
+        borderRadius: "16px",
         bgcolor: "background.paper",
         overflow: "hidden",
         transition: "border-color 0.2s ease, box-shadow 0.2s ease",
@@ -100,7 +100,7 @@ function AccessoryCard({
               top: 4,
               left: 4,
               bgcolor: "rgba(255,255,255,0.92)",
-              borderRadius: 0,
+              borderRadius: "16px",
               p: 0.5,
             }}
           />
@@ -286,7 +286,7 @@ export function CompleteYourBoard({ product }: { product: Product }) {
         pt: { xs: 4, md: 5 },
         pb: { xs: 1, md: 2 },
         px: { xs: 2, md: 3 },
-        borderRadius: 0,
+        borderRadius: "16px",
         border: 1,
         borderColor: "divider",
         bgcolor: "background.default",

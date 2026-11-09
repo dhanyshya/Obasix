@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Link from "@/components/Link";
 import { Reveal } from "@/components/motion/Reveal";
-import { Roundel, SignArrow, SignTick, StripeSpine, pageMax, pagePad, signType } from "@/components/home/directory/sign";
+import { Roundel, SignArrow, SignTick, pageMax, pagePad, signType } from "@/components/home/directory/sign";
 import { colours, frames, getProductById, products } from "@/data/catalogue";
 import { company } from "@/data/company";
 import { images } from "@/data/images";
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
 };
 
-const peach = "#FFC59E";
+const peach = "#164E3B";
 
 const principles = [
   {
@@ -67,8 +67,7 @@ const featured = ["smwbpcb90120", "cmwb90120", "pwmwb90120", "scuv90120"].map((i
 function Label({ children, light }: { children: React.ReactNode; light?: boolean }) {
   return (
     <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.25 }}>
-      <Box aria-hidden sx={{ width: 10, height: 10, bgcolor: brand.signal }} />
-      <Typography component="p" sx={{ ...signType.code, fontSize: 13, textTransform: "uppercase", color: light ? peach : brand.signalInk }}>
+      <Typography component="p" sx={{ ...signType.code, fontSize: 13, textTransform: "uppercase", color: light ? peach : brand.forest }}>
         {children}
       </Typography>
     </Box>
@@ -87,15 +86,18 @@ function SectionHead({ label, title, body, light, action }: { label: string; tit
       <Box>
         {body ? <Typography sx={{ color: light ? "rgba(255,255,255,0.8)" : brand.body, fontSize: { md: 17 }, maxWidth: 520 }}>{body}</Typography> : null}
         {action ? (
-          <Box component={Link} href={action.href} sx={{ mt: 2, display: "inline-flex", alignItems: "center", gap: 1, ...signType.plate, fontSize: 16, color: light ? brand.white : brand.charcoal, borderBottom: `2px solid ${brand.signal}`, pb: 0.5, "&:hover svg": { transform: "translateX(4px)" }, "& svg": { transition: "transform 220ms cubic-bezier(0.16,1,0.3,1)" } }}>
+          <Box component={Link} href={action.href} sx={{ mt: 2, display: "inline-flex", alignItems: "center", gap: 1, ...signType.plate, fontSize: 16, color: light ? brand.white : brand.charcoal, "&:hover svg": { transform: "translateX(4px)" }, "& svg": { transition: "transform 220ms cubic-bezier(0.16,1,0.3,1)" } }}>
             {action.label}
-            <SignArrow size={16} color={brand.signal} />
+            <SignArrow size={16} color={brand.forest} />
           </Box>
         ) : null}
       </Box>
     </Box>
   );
 }
+
+const onDarkPrimarySx = { backgroundColor: "#FFFFFF !important", borderColor: "#FFFFFF !important", color: "#1B1D1C !important", WebkitTextFillColor: "#1B1D1C !important", "&:hover": { backgroundColor: "#ECECE8 !important" } } as const;
+const onDarkGhostSx = { display: "inline-flex", alignItems: "center", px: 3, minHeight: 52, borderRadius: 99, border: "1px solid rgba(255,255,255,0.35)", color: "#FFFFFF", fontWeight: 600, "&:hover": { bgcolor: "rgba(255,255,255,0.08)" } } as const;
 
 const ghostButtonSx = { "&&": { color: brand.white, borderColor: "rgba(255,255,255,0.5)", bgcolor: "transparent" }, "&&:hover": { borderColor: brand.white, bgcolor: "rgba(255,255,255,0.08)" } } as const;
 
@@ -111,14 +113,14 @@ export default function AboutPage() {
   return (
     <Box sx={{ bgcolor: brand.ivory, overflowX: "hidden" }}>
       {/* 1. Masthead: statement + workspace photograph */}
-      <Box component="section" aria-labelledby="about-title" sx={{ bgcolor: brand.forestDeep, color: brand.white }}>
+      <Box component="section" aria-labelledby="about-title" sx={{ bgcolor: brand.white, color: brand.charcoal }}>
         <Box sx={{ ...pageMax, ...pagePad, pt: { xs: 5, md: 8 }, pb: { xs: 5, md: 8 }, display: "grid", gap: { xs: 5, md: 6, lg: 8 }, gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.15fr) minmax(0, 1fr)" }, alignItems: "center" }}>
           <Box>
-            <Label light>About OBASIX</Label>
-            <Typography id="about-title" component="h1" sx={{ ...signType.mega, mt: 2.5, color: brand.white, maxWidth: "12ch", textWrap: "balance" }}>
+            <Label>About OBASIX</Label>
+            <Typography id="about-title" component="h1" sx={{ ...signType.mega, mt: 2.5, color: brand.charcoal, maxWidth: "12ch", textWrap: "balance" }}>
               Boards for working spaces, made in Delhi.
             </Typography>
-            <Typography sx={{ mt: 3, maxWidth: 540, color: "rgba(255,255,255,0.82)", fontSize: { xs: 16, md: 18 }, lineHeight: 1.65 }}>
+            <Typography sx={{ mt: 3, maxWidth: 540, color: "#4A4F4C", fontSize: { xs: 16, md: 18 }, lineHeight: 1.65 }}>
               OBASIX makes whiteboards, notice boards, stands and accessories at our factory in Bawana, Delhi, for the places where people work, learn and decide.
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 4 }}>
@@ -131,11 +133,11 @@ export default function AboutPage() {
             </Box>
           </Box>
           <Box sx={{ position: "relative" }}>
-            <Box sx={{ position: "relative", aspectRatio: { xs: "4 / 3", md: "4 / 5" }, overflow: "hidden" }}>
+            <Box sx={{ position: "relative", aspectRatio: { xs: "4 / 3", md: "4 / 5" }, overflow: "hidden", borderRadius: "28px" }}>
               <Image src={images.heroWorkspace} alt="A whiteboard in a meeting space" fill priority sizes="(max-width: 900px) 100vw, 45vw" style={{ objectFit: "cover" }} />
             </Box>
             {hero ? (
-              <Box component={Link} href={`/products/${hero.id}`} sx={{ position: { md: "absolute" }, left: { md: -48 }, bottom: { md: 32 }, display: "flex", gap: 2, alignItems: "center", bgcolor: brand.white, color: brand.charcoal, p: 2, pr: 3, maxWidth: { md: 360 }, boxShadow: "0 30px 60px -24px rgba(0,0,0,0.5)", "&:hover .t": { textDecoration: "underline", textUnderlineOffset: 3 } }}>
+              <Box component={Link} href={`/products/${hero.id}`} sx={{ position: { md: "absolute" }, left: { md: -48 }, bottom: { md: 32 }, display: "flex", gap: 2, alignItems: "center", bgcolor: brand.white, color: brand.charcoal, p: 2, pr: 3, maxWidth: { md: 360 }, boxShadow: "0 24px 60px -24px rgba(20,25,23,0.3)", borderRadius: "20px", backdropFilter: "blur(16px)", "&:hover .t": { textDecoration: "underline", textUnderlineOffset: 3 } }}>
                 <Box sx={{ position: "relative", width: 72, height: 72, flexShrink: 0, bgcolor: brand.ivory }}>
                   <Image src={hero.images[0]} alt="" fill sizes="72px" style={{ objectFit: "contain", padding: 6 }} />
                 </Box>
@@ -149,17 +151,16 @@ export default function AboutPage() {
           </Box>
         </Box>
         {/* Fact rail */}
-        <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.14)" }}>
+        <Box sx={{ borderTop: "1px solid #E5E5E0" }}>
           <Box component="dl" sx={{ ...pageMax, ...pagePad, m: 0, display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" } }}>
             {stats.map((s, i) => (
-              <Box key={s.label} sx={{ display: "flex", flexDirection: "column-reverse", justifyContent: "flex-end", py: { xs: 2.5, md: 3.5 }, pl: { md: i ? 3 : 0 }, borderLeft: { md: i ? "1px solid rgba(255,255,255,0.14)" : 0 }, borderTop: { xs: i > 1 ? "1px solid rgba(255,255,255,0.14)" : 0, md: 0 } }}>
-                <Box component="dt" sx={{ mt: 0.75, color: "rgba(255,255,255,0.75)", fontSize: 14.5 }}>{s.label}</Box>
-                <Box component="dd" sx={{ m: 0, ...signType.title, fontSize: { xs: "2.25rem", md: "3rem" }, color: brand.white, fontVariantNumeric: "tabular-nums" }}>{s.value}</Box>
+              <Box key={s.label} sx={{ display: "flex", flexDirection: "column-reverse", justifyContent: "flex-end", py: { xs: 2.5, md: 3.5 }, pl: { md: i ? 3 : 0 }, borderLeft: { md: i ? "1px solid #E5E5E0" : 0 }, borderTop: { xs: i > 1 ? "1px solid #E5E5E0" : 0, md: 0 } }}>
+                <Box component="dt" sx={{ mt: 0.75, color: "#4A4F4C", fontSize: 14.5 }}>{s.label}</Box>
+                <Box component="dd" sx={{ m: 0, ...signType.title, fontSize: { xs: "2.25rem", md: "3rem" }, color: brand.charcoal, fontVariantNumeric: "tabular-nums" }}>{s.value}</Box>
               </Box>
             ))}
           </Box>
         </Box>
-        <StripeSpine height={6} />
       </Box>
 
       {/* 2. Principles */}
@@ -170,7 +171,7 @@ export default function AboutPage() {
             {principles.map((p, i) => (
               <Reveal key={p.title} delay={i * 80}>
                 <Box sx={{ pt: 3, pb: { xs: 4, md: 0 }, pr: { md: 5 }, pl: { md: i ? 4 : 0 }, borderLeft: { md: i ? `1px solid ${brand.line}` : 0 }, height: "100%" }}>
-                  <Typography sx={{ ...signType.code, fontSize: 13, color: brand.signalInk }}>{String(i + 1).padStart(2, "0")}</Typography>
+                  <Typography sx={{ ...signType.code, fontSize: 13, color: brand.forest }}>{String(i + 1).padStart(2, "0")}</Typography>
                   <Typography component="h3" sx={{ ...signType.plate, fontSize: { xs: 24, md: 27 }, mt: 1.5, color: brand.charcoal }}>{p.title}</Typography>
                   <Typography sx={{ mt: 1.5 }}>{p.body}</Typography>
                 </Box>
@@ -187,7 +188,7 @@ export default function AboutPage() {
           <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: { xs: 1.5, md: 2 }, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "repeat(3, 1fr)" } }}>
             {range.map((r, i) => (
               <Box component="li" key={r.title}>
-                <Box component={Link} href={r.href} sx={{ display: "flex", flexDirection: "column", height: "100%", bgcolor: brand.white, color: brand.charcoal, boxShadow: "inset 0 4px 0 transparent", transition: "box-shadow 220ms cubic-bezier(0.16,1,0.3,1)", "&:hover": { boxShadow: `inset 0 4px 0 ${brand.signal}` }, "&:hover img": { transform: "scale(1.04)" }, "&:hover svg": { transform: "translateX(4px)" } }}>
+                <Box component={Link} href={r.href} sx={{ display: "flex", flexDirection: "column", height: "100%", bgcolor: brand.white, color: brand.charcoal, boxShadow: "0 0 0 transparent", transition: "box-shadow 220ms cubic-bezier(0.16,1,0.3,1)", "&:hover": { boxShadow: "0 24px 48px -28px rgba(20,25,23,0.35)" }, "&:hover img": { transform: "scale(1.04)" }, "&:hover svg": { transform: "translateX(4px)" } }}>
                   <Box sx={{ position: "relative", aspectRatio: "16 / 10", overflow: "hidden", bgcolor: brand.white, borderBottom: `1px solid ${brand.line}` }}>
                     <Image src={r.image} alt="" fill sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw" style={{ objectFit: "contain", padding: "8%", transition: "transform 500ms cubic-bezier(0.16,1,0.3,1)" }} />
                   </Box>
@@ -197,7 +198,7 @@ export default function AboutPage() {
                       <Typography component="h3" sx={{ ...signType.plate, fontSize: 21 }}>{r.title}</Typography>
                       <Typography sx={{ mt: 0.75, fontSize: 15 }}>{r.body}</Typography>
                     </Box>
-                    <SignArrow size={20} color={brand.signal} sx={{ mt: 0.5, transition: "transform 220ms cubic-bezier(0.16,1,0.3,1)" }} />
+                    <SignArrow size={20} color={brand.forest} sx={{ mt: 0.5, transition: "transform 220ms cubic-bezier(0.16,1,0.3,1)" }} />
                   </Box>
                 </Box>
               </Box>
@@ -207,14 +208,14 @@ export default function AboutPage() {
       </Box>
 
       {/* 4. Studio */}
-      <Box component="section" id="studio" sx={{ bgcolor: brand.forestDeep, color: brand.white, py: { xs: 8, md: 12 }, scrollMarginTop: 100 }}>
+      <Box component="section" id="studio" sx={{ bgcolor: brand.ivory, color: brand.charcoal, py: { xs: 8, md: 12 }, scrollMarginTop: 100 }}>
         <Box sx={{ ...pageMax, ...pagePad, display: "grid", gap: { xs: 6, md: 8 }, gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1fr) minmax(0, 1fr)" }, alignItems: "start" }}>
           <Box sx={{ position: { md: "sticky" }, top: { md: 120 } }}>
-            <Label light>The studio</Label>
-            <Typography component="h2" sx={{ ...signType.title, mt: 2, color: brand.white, maxWidth: "13ch" }}>
+            <Label>The studio</Label>
+            <Typography component="h2" sx={{ ...signType.title, mt: 2, color: brand.charcoal, maxWidth: "13ch" }}>
               Made to your size, frame and finish.
             </Typography>
-            <Typography sx={{ mt: 2.5, maxWidth: 480, color: "rgba(255,255,255,0.8)", fontSize: { md: 17 } }}>
+            <Typography sx={{ mt: 2.5, maxWidth: 480, color: "#4A4F4C", fontSize: { md: 17 } }}>
               Design a board in the browser, see it on your own wall, then send it to us for a quote.
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 4 }}>
@@ -226,13 +227,13 @@ export default function AboutPage() {
               </Button>
             </Box>
           </Box>
-          <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, borderTop: "2px solid rgba(255,255,255,0.25)" }}>
+          <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, borderTop: "2px solid #E5E5E0" }}>
             {studio.map((s, i) => (
-              <Box component="li" key={s.title} sx={{ display: "flex", gap: 2.5, py: 3, borderBottom: "1px solid rgba(255,255,255,0.14)" }}>
+              <Box component="li" key={s.title} sx={{ display: "flex", gap: 2.5, py: 3, borderBottom: "1px solid #E5E5E0" }}>
                 <Roundel>{String(i + 1).padStart(2, "0")}</Roundel>
                 <Box>
-                  <Typography component="h3" sx={{ ...signType.plate, fontSize: { xs: 21, md: 24 }, color: brand.white }}>{s.title}</Typography>
-                  <Typography sx={{ mt: 0.75, color: "rgba(255,255,255,0.78)" }}>{s.body}</Typography>
+                  <Typography component="h3" sx={{ ...signType.plate, fontSize: { xs: 21, md: 24 }, color: brand.charcoal }}>{s.title}</Typography>
+                  <Typography sx={{ mt: 0.75, color: "#4A4F4C" }}>{s.body}</Typography>
                 </Box>
               </Box>
             ))}
@@ -269,14 +270,14 @@ export default function AboutPage() {
           <SectionHead label="Spaces" title="Built around the room." action={{ href: "/solutions", label: "See every space" }} />
           <Box sx={{ display: "grid", gap: { xs: 1.5, md: 2 }, gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" } }}>
             {spaces.map((s, i) => (
-              <Box key={s.name} component={Link} href={s.href} sx={{ position: "relative", display: "block", aspectRatio: { xs: "4 / 3", md: "3 / 4" }, overflow: "hidden", color: brand.white, "&:hover img": { transform: "scale(1.04)" }, "&:hover .bar": { transform: "scaleX(1)" } }}>
+              <Box key={s.name} component={Link} href={s.href} sx={{ borderRadius: "28px", position: "relative", display: "block", aspectRatio: { xs: "4 / 3", md: "3 / 4" }, overflow: "hidden", color: brand.white, "&:hover img": { transform: "scale(1.04)" }, "&:hover .bar": { transform: "scaleX(1)" } }}>
                 <Image src={s.image} alt="" fill sizes="(max-width: 900px) 100vw, 33vw" style={{ objectFit: "cover", transition: "transform 700ms cubic-bezier(0.16,1,0.3,1)" }} />
                 <Box sx={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11,46,34,0.92) 0%, rgba(11,46,34,0.05) 60%)" }} />
                 <Box sx={{ position: "absolute", left: 0, right: 0, bottom: 0, p: { xs: 2.5, md: 3 } }}>
                   <Typography sx={{ ...signType.code, fontSize: 12.5, color: peach }}>{String(i + 1).padStart(2, "0")}</Typography>
                   <Typography component="h3" sx={{ ...signType.plate, fontSize: { xs: 26, md: 30 }, color: brand.white, mt: 0.5 }}>{s.name}</Typography>
                   <Typography sx={{ color: "rgba(255,255,255,0.85)", mt: 0.5 }}>{s.line}</Typography>
-                  <Box className="bar" sx={{ mt: 2, height: 3, bgcolor: brand.signal, transform: "scaleX(0.18)", transformOrigin: "left", transition: "transform 420ms cubic-bezier(0.16,1,0.3,1)" }} />
+                  <Box className="bar" sx={{ mt: 2, height: 3, bgcolor: "#FFFFFF", transform: "scaleX(0.18)", transformOrigin: "left", transition: "transform 420ms cubic-bezier(0.16,1,0.3,1)" }} />
                 </Box>
               </Box>
             ))}
@@ -331,14 +332,14 @@ export default function AboutPage() {
       </Box>
 
       {/* 8. Programmes + closing */}
-      <Box component="section" id="start-project" aria-labelledby="start-title" sx={{ bgcolor: brand.forestDeep, color: brand.white, scrollMarginTop: 100 }}>
-        <StripeSpine height={6} />
-        <Box sx={{ ...pageMax, ...pagePad, py: { xs: 8, md: 12 } }}>
+      <Box component="section" id="start-project" aria-labelledby="start-title" sx={{ bgcolor: brand.white, pb: { xs: 6, md: 10 }, scrollMarginTop: 100 }}>
+        <Box sx={{ ...pageMax, px: { xs: 1.5, sm: 3, md: 4 } }}>
+        <Box sx={{ bgcolor: brand.forestDeep, color: brand.white, borderRadius: { xs: "28px", md: "40px" }, px: { xs: 3, md: 8 }, py: { xs: 7, md: 10 } }}>
           <Label light>Work with us</Label>
           <Typography id="start-title" component="h2" sx={{ ...signType.mega, mt: 2, color: brand.white, maxWidth: "14ch" }}>
             Let&apos;s plan your space.
           </Typography>
-          <Box sx={{ mt: { xs: 5, md: 7 }, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, borderTop: "2px solid rgba(255,255,255,0.25)" }}>
+          <Box sx={{ mt: { xs: 5, md: 7 }, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, borderTop: "1px solid rgba(255,255,255,0.18)" }}>
             {company.programmes.map((p, i) => (
               <Box key={p.title} sx={{ py: 3.5, pr: { md: 4 }, pl: { md: i ? 4 : 0 }, borderLeft: { md: i ? "1px solid rgba(255,255,255,0.14)" : 0 }, borderBottom: { xs: "1px solid rgba(255,255,255,0.14)", md: 0 }, display: "flex", flexDirection: "column" }}>
                 <Typography component="h3" sx={{ ...signType.plate, fontSize: 22, color: brand.white }}>{p.title}</Typography>
@@ -347,24 +348,25 @@ export default function AboutPage() {
                   component={p.external ? "a" : Link}
                   href={p.href}
                   {...(p.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                  sx={{ mt: 2.5, alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 1, ...signType.plate, fontSize: 15.5, color: peach, borderBottom: `2px solid ${brand.signal}`, pb: 0.5, "&:hover": { color: brand.white } }}
+                  sx={{ mt: 2.5, alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 1, ...signType.plate, fontSize: 15.5, color: peach, "&:hover": { color: brand.white, textDecoration: "underline", textUnderlineOffset: 4 } }}
                 >
                   {p.cta}
-                  <SignArrow size={15} color={brand.signal} />
-                  {p.external ? <Box component="span" sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}> (opens in a new tab)</Box> : null}
+                  <SignArrow size={15} />
+                  {p.external ? <Box component="span" sx={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", whiteSpace: "nowrap", clip: "rect(0 0 0 0)" }}> (opens in a new tab)</Box> : null}
                 </Box>
               </Box>
             ))}
           </Box>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: { xs: 5, md: 7 } }}>
-            <Button component={Link} href="/quote" variant="contained" size="large" endIcon={<SignArrow size={18} />}>
+            <Button component={Link} href="/quote" variant="contained" size="large" sx={onDarkPrimarySx}>
               Start a project
             </Button>
-            <Button component="a" href={`tel:${company.phone}`} variant="outlined" size="large" sx={ghostButtonSx}>
+            <Box component="a" href={`tel:${company.phone}`} sx={onDarkGhostSx}>
               Call {company.phoneDisplay}
-            </Button>
+            </Box>
           </Box>
         </Box>
+      </Box>
       </Box>
     </Box>
   );

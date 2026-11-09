@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Link from "@/components/Link";
-import { getBoardProducts, getProductById, products as catalogueProducts } from "@/data/catalogue";
+import { colours, frames, getBoardProducts, getProductById, products as catalogueProducts } from "@/data/catalogue";
 import {
   decodeLayout,
   defaultCombinationLayout,
@@ -120,8 +120,8 @@ function CustomizeContent() {
     setState(
       stateFromProduct(product, {
         ...(sizeId && product.sizes.some((size) => size.id === sizeId) ? { sizeId } : {}),
-        ...(frameId && frameId === product.frame ? { frameId } : {}),
-        ...(colourId && product.colours.includes(colourId) ? { colourId } : {}),
+        ...(frameId && frames.some((f) => f.id === frameId) ? { frameId } : {}),
+        ...(colourId && colours.some((c) => c.id === colourId) ? { colourId } : {}),
         ...(features ? { features: features.split(",").filter(Boolean) } : {}),
         ...(branding ? { branding: branding === "true" } : {}),
         ...(quantity ? { quantity: Number(quantity) || 1 } : {}),
@@ -169,7 +169,7 @@ function CustomizeContent() {
         <PageMasthead
           code="Studio"
           title="Design your board"
-          lede="Pick the size, surface, frame and extras. The preview updates as you go. Listed sizes keep catalogue pricing; custom sizes and combination layouts are quoted."
+          lede="Any size, any frame and colour, two or three surfaces on one board, double-sided, your logo — and room to describe anything else. Listed configurations go straight to cart; custom builds are quoted."
           crumbs={[{ href: "/products", label: "Collections" }, { label: "Design your board" }]}
           compact
         />
@@ -222,6 +222,10 @@ function CustomizeContent() {
                   !product.customizable ||
                   state.useCustomSize ||
                   product.price <= 0 ||
+                  state.frameId !== product.frame ||
+                  !product.colours.includes(state.colourId) ||
+                  (state.backMaterialId && state.backMaterialId !== "none") ||
+                  Boolean(state.notes?.trim()) ||
                   combinationRequiresQuote(
                     state.combinationLayout ?? defaultCombinationLayout(product),
                   )
@@ -270,7 +274,7 @@ function SelectProductState({
   choices: Product[];
 }) {
   return (
-    <Paper component="section" variant="outlined" sx={{ borderRadius: 0, p: { xs: 3, md: 4 } }}>
+    <Paper component="section" variant="outlined" sx={{ borderRadius: "16px", p: { xs: 3, md: 4 } }}>
       <Button
         component={Link}
         href="/products"
@@ -282,7 +286,7 @@ function SelectProductState({
       </Button>
       <Typography
         component="h1"
-        sx={{ mt: 2, color: "text.primary", fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontSize: { xs: "2rem", md: "2.75rem" }, letterSpacing: "-0.03em", lineHeight: 1 }}
+        sx={{ mt: 2, color: "text.primary", fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 600, fontSize: { xs: "2rem", md: "2.75rem" }, letterSpacing: "-0.03em", lineHeight: 1 }}
       >
         {title}
       </Typography>
@@ -301,7 +305,7 @@ function SelectProductState({
                 height: "100%",
                 overflow: "hidden",
                 textAlign: "left",
-                borderRadius: 0,
+                borderRadius: "16px",
                 border: 1,
                 borderColor: "divider",
                 bgcolor: "background.paper",
@@ -337,7 +341,7 @@ function SelectProductState({
 
 function NotCustomizableState({ product }: { product: Product }) {
   return (
-    <Paper component="section" variant="outlined" sx={{ borderRadius: 0, p: { xs: 3, md: 4 } }}>
+    <Paper component="section" variant="outlined" sx={{ borderRadius: "16px", p: { xs: 3, md: 4 } }}>
       <Stack direction={{ xs: "column", md: "row" }} spacing={2.5} sx={{ alignItems: { md: "flex-start" } }}>
         <Box
           sx={{
@@ -348,7 +352,7 @@ function NotCustomizableState({ product }: { product: Product }) {
             maxWidth: 200,
             flexShrink: 0,
             overflow: "hidden",
-            borderRadius: 0,
+            borderRadius: "16px",
             bgcolor: "background.default",
           }}
         >

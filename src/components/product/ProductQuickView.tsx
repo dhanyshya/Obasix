@@ -34,7 +34,7 @@ export function ProductQuickView({
       aria-labelledby="product-quick-view-title"
       slotProps={{
         paper: {
-          sx: { borderRadius: 0, bgcolor: "background.paper" },
+          sx: { borderRadius: "16px", bgcolor: "background.paper" },
         },
       }}
     >

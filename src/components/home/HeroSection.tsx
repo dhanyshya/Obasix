@@ -167,7 +167,7 @@ export function HeroSection() {
                   endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
                   sx={{
                     ...home.primaryBtn,
-                    borderRadius: 0,
+                    borderRadius: "16px",
                     px: 2.75,
                     py: 1.4,
                     fontSize: 15,
@@ -184,7 +184,7 @@ export function HeroSection() {
                   sx={{
                     ...home.linkBtn,
                     px: 0.25,
-                    borderRadius: 0,
+                    borderRadius: "16px",
                     alignSelf: { xs: "flex-start", sm: "center" },
                     "& .MuiButton-endIcon": { ml: 0.5 },
                   }}

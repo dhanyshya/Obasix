@@ -191,7 +191,7 @@ export function BoardPreview({
                       left: 8,
                       right: 8,
                       bottom: 8,
-                      borderRadius: 0,
+                      borderRadius: "16px",
                       bgcolor: "rgba(41,45,43,0.72)",
                       color: "#fff",
                       px: 1,
@@ -247,7 +247,7 @@ export function BoardPreview({
               display: "flex",
               alignItems: "center",
               gap: 1,
-              borderRadius: 0,
+              borderRadius: "16px",
               border: "1px solid",
               borderColor: "divider",
               bgcolor: "rgba(255,255,255,0.95)",
@@ -324,7 +324,7 @@ export function BoardPreview({
               width: "42%",
               height: 7,
               transform: "translateX(-50%)",
-              borderRadius: 0,
+              borderRadius: "16px",
               backgroundColor: frameSwatch,
               boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
             }}
@@ -409,7 +409,7 @@ export function BoardPreview({
         variant="outlined"
         sx={{
           overflow: "hidden",
-          borderRadius: 0,
+          borderRadius: "16px",
           borderColor: "divider",
           bgcolor: "#FFFFFF",
         }}
@@ -507,7 +507,7 @@ export function BoardPreview({
         maxWidth="lg"
         fullWidth
         aria-label="Fullscreen board preview"
-        slotProps={{ paper: { sx: { borderRadius: 0, overflow: "hidden" } } }}
+        slotProps={{ paper: { sx: { borderRadius: "16px", overflow: "hidden" } } }}
       >
         <DialogTitle
           sx={{

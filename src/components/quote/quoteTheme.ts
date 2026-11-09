@@ -2,7 +2,7 @@
 export const quoteTheme = {
   ivory: "#F2F3F0",
   beige: "#E6E8E3",
-  oak: "#EE6A1F",
+  oak: "#1B1D1C",
   forest: "#164E3B",
   forestDeep: "#0B2E22",
   charcoal: "#141917",

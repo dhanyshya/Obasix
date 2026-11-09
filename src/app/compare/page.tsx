@@ -54,13 +54,13 @@ export default function ComparePage() {
     >
       {products.length ? (
         <Box sx={{ display: "flex", justifyContent: { md: "flex-end" } }}>
-          <Button onClick={clear} variant="outlined" sx={{ "&&": { color: "#fff", borderColor: "rgba(255,255,255,0.5)", bgcolor: "transparent" } }}>
+          <Button onClick={clear} variant="outlined">
             Clear all
           </Button>
         </Box>
       ) : null}
     </PageMasthead>
-    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 7 }, px: { xs: 2, sm: 3 } }}>
+    <Container sx={{ py: { xs: 4, md: 7 } }}>
 
       {products.length < 2 ? (
         <Box sx={{ mt: 5, p: { xs: 3, md: 5 }, border: 1, borderColor: "divider", textAlign: "center", bgcolor: "background.paper" }}>
@@ -77,7 +77,7 @@ export default function ComparePage() {
       ) : null}
 
       {products.length ? (
-        <Box sx={{ mt: 4, overflowX: "auto", border: 1, borderColor: "divider", borderRadius: 0 }} tabIndex={0} aria-label="Comparison table, scroll sideways on small screens">
+        <Box sx={{ mt: 4, overflowX: "auto", border: 1, borderColor: "divider", borderRadius: "16px" }} tabIndex={0} aria-label="Comparison table, scroll sideways on small screens">
           <Box component="table" sx={{ width: "100%", minWidth: 180 + products.length * 200, borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
               <tr>
@@ -86,7 +86,7 @@ export default function ComparePage() {
                 </Box>
                 {products.map((p) => (
                   <Box component="th" scope="col" key={p.id} sx={{ p: 2, textAlign: "left", verticalAlign: "top", fontWeight: 400 }}>
-                    <Box sx={{ position: "relative", aspectRatio: "4 / 3", borderRadius: 0, overflow: "hidden", bgcolor: "primary.light" }}>
+                    <Box sx={{ position: "relative", aspectRatio: "4 / 3", borderRadius: "16px", overflow: "hidden", bgcolor: "primary.light" }}>
                       {p.images[0] ? <Image src={p.images[0]} alt="" fill sizes="220px" style={{ objectFit: "cover" }} /> : null}
                       <IconButton
                         size="small"

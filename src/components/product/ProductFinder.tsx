@@ -755,7 +755,7 @@ function Option({
           <Box
             component="span"
             style={{ backgroundColor: swatch }}
-            sx={{ display: "inline-block", width: 14, height: 14, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 0 }}
+            sx={{ display: "inline-block", width: 14, height: 14, border: "1px solid rgba(0,0,0,0.12)", borderRadius: "16px" }}
           />
         ) : undefined
       }
@@ -886,7 +886,7 @@ function Summary({
       variant="outlined"
       sx={{
         p: 2.5,
-        borderRadius: 0,
+        borderRadius: "16px",
         display: "flex",
         flexDirection: "column",
         height: { xs: "auto", md: "100%" },
@@ -907,7 +907,7 @@ function Summary({
           {count} products match
         </Typography>
       </Stack>
-      <Box sx={{ mt: 2, overflow: "hidden", border: 1, borderColor: "divider", borderRadius: 0 }}>
+      <Box sx={{ mt: 2, overflow: "hidden", border: 1, borderColor: "divider", borderRadius: "16px" }}>
         <BoardVisual filters={filters} preferred={preferred} compact />
       </Box>
       <Box
@@ -995,7 +995,7 @@ function ResultCard({ product }: { product: Product }) {
     <Paper
       component="article"
       variant="outlined"
-      sx={{ display: "flex", height: "100%", flexDirection: "column", borderRadius: 0, overflow: "hidden" }}
+      sx={{ display: "flex", height: "100%", flexDirection: "column", borderRadius: "16px", overflow: "hidden" }}
     >
       <Box sx={{ position: "relative", aspectRatio: "5 / 4", bgcolor: "background.default" }}>
         {product.images[0] ? (

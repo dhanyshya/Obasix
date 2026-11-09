@@ -16,7 +16,7 @@ export function CategoryCard({ category }: { category: CategoryCardType }) {
         display: "block",
         position: "relative",
         overflow: "hidden",
-        borderRadius: 0,
+        borderRadius: "16px",
         "&:hover img": { transform: "scale(1.05)" },
       }}
     >

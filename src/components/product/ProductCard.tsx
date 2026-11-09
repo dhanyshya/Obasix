@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -16,7 +15,6 @@ import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { ProductActions } from "./ProductActions";
 import { CompareToggle } from "@/components/compare/CompareToggle";
-import { productCardDetailsButtonSx } from "./productCardButtonStyles";
 
 const categoryLabel: Record<string, string> = {
   "magnetic-whiteboard": "Magnetic Whiteboard",
@@ -72,8 +70,10 @@ export function ProductCard({
           aspectRatio: "1 / 1",
           overflow: "hidden",
           bgcolor: "#FFFFFF",
-          outline: "1px solid #DCDFDA",
-          outlineOffset: -1,
+          border: "1px solid #E5E5E0",
+          borderRadius: "20px",
+          transition: "box-shadow 300ms cubic-bezier(0.16,1,0.3,1)",
+          "article:hover &": { boxShadow: "0 24px 48px -28px rgba(20,25,23,0.3)" },
           flexShrink: 0,
         }}
       >
@@ -84,7 +84,7 @@ export function ProductCard({
             fill
             className="pc-image object-contain"
             style={{ transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)", padding: "9%" }}
-            sizes="(max-width: 600px) 100vw, (max-width: 1200px) 33vw, 25vw"
+            sizes="(max-width: 600px) 50vw, (max-width: 1200px) 33vw, 25vw"
             onError={() => setImgFailed(true)}
           />
         ) : (
@@ -112,9 +112,10 @@ export function ProductCard({
           size="small"
           sx={{
             position: "absolute",
-            right: 8,
-            top: 8,
-            bgcolor: "rgba(255,255,255,0.96)",
+            right: 12,
+            top: 12,
+            bgcolor: "rgba(255,255,255,0.9)",
+            backdropFilter: "blur(8px)",
             color: wished ? "#C8282E" : "text.secondary",
             boxShadow: "0 1px 4px rgba(37,42,38,0.08)",
             "&:hover": { bgcolor: "#FFFFFF" },
@@ -136,8 +137,8 @@ export function ProductCard({
             size="small"
             sx={{
               position: "absolute",
-              left: 8,
-              top: 8,
+              left: 12,
+              top: 12,
               opacity: { xs: 1, md: 0 },
               transition: "opacity 0.2s ease",
               bgcolor: "rgba(255,255,255,0.96)",
@@ -156,7 +157,7 @@ export function ProductCard({
         ) : null}
       </Box>
 
-      <Box sx={{ position: "relative", height: 3, bgcolor: "#141917" }}>
+      <Box sx={{ display: "none" }}>
         <Box
           className="pc-rule"
           aria-hidden
@@ -171,15 +172,15 @@ export function ProductCard({
           }}
         />
       </Box>
-      <Box sx={{ display: "flex", flex: 1, flexDirection: "column", pt: 1.5, minWidth: 0 }}>
+      <Box sx={{ display: "flex", flex: 1, flexDirection: "column", pt: 2, px: 0.5, minWidth: 0 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5, alignItems: "baseline" }}>
           <Typography
             sx={{
               fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
-              fontWeight: 600,
-              fontSize: 12,
-              letterSpacing: "0.05em",
-              color: "#164E3B",
+              fontWeight: 500,
+              fontSize: 12.5,
+              letterSpacing: "0.01em",
+              color: "#6B706D",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -198,30 +199,28 @@ export function ProductCard({
             mt: 0.75,
             minHeight: "2.3em",
             fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
-            fontWeight: 700,
-            fontVariationSettings: '"wdth" 94',
-            fontSize: { xs: "1.15rem", md: "1.2rem" },
-            lineHeight: 1.15,
-            letterSpacing: "-0.02em",
+            fontWeight: 600,
+            fontSize: { xs: "0.95rem", md: "1.1rem" },
+            lineHeight: 1.25,
+            letterSpacing: "-0.015em",
             color: "text.primary",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             "&:hover": { textDecoration: "underline", textUnderlineOffset: 4 },
-            "&:focus-visible": { outline: "3px solid #EE6A1F", outlineOffset: 2 },
+            "&:focus-visible": { outline: "2px solid #164E3B", outlineOffset: 2 },
           }}
         >
           {product.shortName}
         </Typography>
-        <Typography sx={{ mt: 0.5, fontSize: 13, color: "text.secondary" }}>{label}</Typography>
-        <Box sx={{ mt: 1.25, display: "flex", alignItems: "baseline", gap: 1 }}>
+                <Box sx={{ mt: 1.25, display: "flex", alignItems: "baseline", gap: 1 }}>
           <Typography
             sx={{
               fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
-              fontWeight: 800,
-              fontSize: "1.45rem",
-              letterSpacing: "-0.02em",
+              fontWeight: 500,
+              fontSize: { xs: "1.05rem", md: "1.2rem" },
+              letterSpacing: "-0.015em",
               fontVariantNumeric: "tabular-nums",
               color: "text.primary",
             }}
@@ -238,10 +237,10 @@ export function ProductCard({
         <Box sx={{ mt: "auto", pt: 1.75 }}>
           <ProductActions product={product} variant="card" />
         </Box>
-        <Box sx={{ mt: 0.25, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-          <Button component={Link} href={`/products/${product.id}`} size="small" variant="outlined" sx={productCardDetailsButtonSx}>
+        <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", columnGap: 1 }}>
+          <Box component={Link} href={`/products/${product.id}`} sx={{ fontSize: 14, fontWeight: 500, color: "#164E3B", py: 0.75, "&:hover": { textDecoration: "underline", textUnderlineOffset: 3 } }}>
             {detailsLabel}
-          </Button>
+          </Box>
           <CompareToggle productId={product.id} />
         </Box>
       </Box>

@@ -49,7 +49,7 @@ export function AccountOverview() {
       </Box>
       <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" } }}>
         {shortcuts.map((item) => (
-          <Paper key={item.href} variant="outlined" component={NextLink} href={item.href} sx={{ p: 2.5, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "-0.01em", color: "text.primary", boxShadow: "inset 0 3px 0 transparent", transition: "box-shadow 200ms cubic-bezier(0.16,1,0.3,1)", "&:hover": { boxShadow: "inset 0 3px 0 #EE6A1F" } }}>
+          <Paper key={item.href} variant="outlined" component={NextLink} href={item.href} sx={{ p: 2.5, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "-0.01em", color: "text.primary", boxShadow: "0 0 0 transparent", transition: "box-shadow 200ms cubic-bezier(0.16,1,0.3,1)", "&:hover": { boxShadow: "0 24px 48px -28px rgba(20,25,23,0.35)" } }}>
             {item.label}
           </Paper>
         ))}

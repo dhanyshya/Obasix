@@ -123,29 +123,28 @@ export function AuthCard({ title, children }: { title: string; children: ReactNo
       >
         <Box
           sx={{
-            bgcolor: brandTokens.forestDeep,
-            color: brandTokens.white,
+            bgcolor: brandTokens.ivory,
+            color: brandTokens.charcoal,
             px: { xs: 2.5, sm: 4, md: 5 },
             py: { xs: 4, md: 6 },
             display: "flex",
             flexDirection: "column",
-            borderTop: `6px solid ${brandTokens.signal}`,
+            borderRadius: { sm: "28px 0 0 28px" },
           }}
         >
-          <Typography sx={{ fontFamily: display, fontWeight: 600, fontSize: 13, letterSpacing: "0.04em", color: "#FFC59E" }}>
-            OBASIX ACCOUNT
+          <Typography sx={{ fontFamily: display, fontWeight: 500, fontSize: 14, color: "#164E3B" }}>
+            OBASIX account
           </Typography>
           <Typography
             component="h1"
             sx={{
               mt: 1.5,
               fontFamily: display,
-              fontWeight: 800,
-              fontVariationSettings: '"wdth" 90',
-              letterSpacing: "-0.035em",
+              fontWeight: 600,
+                            letterSpacing: "-0.035em",
               lineHeight: 0.98,
               fontSize: { xs: "2.25rem", md: "3.1rem" },
-              color: brandTokens.white,
+              color: brandTokens.charcoal,
             }}
           >
             {title}
@@ -155,10 +154,10 @@ export function AuthCard({ title, children }: { title: string; children: ReactNo
               <Box
                 component="li"
                 key={perk}
-                sx={{ display: "flex", gap: 1.5, alignItems: "center", py: 1.25, borderTop: "1px solid rgba(255,255,255,0.16)", color: "rgba(255,255,255,0.86)", fontSize: 15 }}
+                sx={{ display: "flex", gap: 1.5, alignItems: "center", py: 1.25, borderTop: "1px solid #E5E5E0", color: "#4A4F4C", fontSize: 15 }}
               >
                 <Box component="svg" viewBox="0 0 24 24" aria-hidden sx={{ width: 18, height: 18, flexShrink: 0 }}>
-                  <path d="M3.5 12.5l5.5 5.5L21 4.5" stroke={brandTokens.signal} strokeWidth="3" strokeLinecap="square" fill="none" />
+                  <path d="M3.5 12.5l5.5 5.5L21 4.5" stroke={brandTokens.forest} strokeWidth="3" strokeLinecap="square" fill="none" />
                 </Box>
                 {perk}
               </Box>
@@ -171,8 +170,9 @@ export function AuthCard({ title, children }: { title: string; children: ReactNo
           sx={{
             p: { xs: 2.5, sm: 4, md: 6 },
             bgcolor: "#FFFFFF",
-            borderRadius: 0,
-            boxShadow: { sm: "0 30px 60px -30px rgba(11,46,34,0.25)" },
+            borderRadius: { xs: 0, sm: "0 28px 28px 0" },
+            boxShadow: "none",
+            border: { sm: `1px solid ${brandTokens.line}` },
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",

@@ -66,7 +66,7 @@ function SmartSpaceContent() {
                   {recommended.map((product) =>
                     product ? (
                       <Grid key={product.id} size={{ xs: 12, md: 6, xl: 3 }}>
-                        <Card sx={{ height: "100%", borderRadius: 0 }}>
+                        <Card sx={{ height: "100%", borderRadius: "16px" }}>
                           <CardActionArea
                             component={Link}
                             href={`/products/${product.id}`}

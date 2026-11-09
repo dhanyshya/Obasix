@@ -121,7 +121,7 @@ export function MadeToFitSection() {
                     variant={active ? "contained" : "outlined"}
                     size="small"
                     onClick={() => setSelectedId(item.id)}
-                    sx={{ borderRadius: 0 }}
+                    sx={{ borderRadius: "16px" }}
                   >
                     {item.shortName}
                   </Button>

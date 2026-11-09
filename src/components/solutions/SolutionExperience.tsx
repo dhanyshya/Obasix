@@ -10,7 +10,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { ProductCard } from "@/components/product/ProductCard";
 import { ProductActions } from "@/components/product/ProductActions";
 import { ProductQuickView } from "@/components/product/ProductQuickView";
-import { Roundel, SignArrow, StripeSpine, pageMax, pagePad, signType } from "@/components/home/directory/sign";
+import { Roundel, SignArrow, pageMax, pagePad, signType } from "@/components/home/directory/sign";
 import { getProductCategoryLabel } from "@/data/catalogue";
 import { getSolutionProducts, getVisibleSolutions, type SolutionFocus } from "@/data/solutions";
 import { formatPrice } from "@/lib/format";
@@ -92,12 +92,6 @@ function matchesFilter(product: Product, filter: SolutionFilter) {
   return true;
 }
 
-const peach = "#FFC59E";
-
-const ghostButtonSx = {
-  "&&": { color: brand.white, borderColor: "rgba(255,255,255,0.5)", bgcolor: "transparent" },
-  "&&:hover": { borderColor: brand.white, bgcolor: "rgba(255,255,255,0.08)" },
-} as const;
 
 /** Filter tab: plate with an orange underline when selected. */
 const tabSx = (selected: boolean) => ({
@@ -111,10 +105,10 @@ const tabSx = (selected: boolean) => ({
   ...signType.plate,
   fontSize: 15,
   color: selected ? brand.charcoal : brand.body,
-  boxShadow: selected ? `inset 0 -3px 0 ${brand.signal}` : "inset 0 -3px 0 transparent",
+  boxShadow: selected ? "inset 0 -2px 0 currentColor" : "inset 0 -2px 0 transparent",
   transition: "color 160ms, box-shadow 200ms cubic-bezier(0.16,1,0.3,1)",
-  "&:hover": { color: brand.charcoal, boxShadow: selected ? `inset 0 -3px 0 ${brand.signal}` : `inset 0 -3px 0 ${brand.line}` },
-  "&:focus-visible": { outline: `3px solid ${brand.signal}`, outlineOffset: -3 },
+  "&:hover": { color: brand.charcoal, boxShadow: selected ? "inset 0 -2px 0 currentColor" : "inset 0 -2px 0 #D6D6D0" },
+  "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: -3 },
 });
 
 export function SolutionExperience({ solution }: { solution: SolutionView }) {
@@ -138,9 +132,9 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
   return (
     <Box sx={{ overflowX: "clip", bgcolor: brand.ivory }}>
       {/* 1. Full-bleed room photograph with the space's sign */}
-      <Box component="section" aria-labelledby="solution-hero-heading" sx={{ position: "relative", bgcolor: brand.forestDeep, color: brand.white, minHeight: { xs: 520, md: 620 }, display: "flex", alignItems: "flex-end" }}>
+      <Box component="section" aria-labelledby="solution-hero-heading" sx={{ position: "relative", overflow: "hidden", borderRadius: { xs: "0 0 28px 28px", md: "0 0 40px 40px" }, bgcolor: brand.forestDeep, color: brand.white, minHeight: { xs: 520, md: 620 }, display: "flex", alignItems: "flex-end" }}>
         <Image src={solution.image} alt={`${solution.name} interior`} fill priority sizes="100vw" style={{ objectFit: "cover" }} />
-        <Box aria-hidden sx={{ position: "absolute", inset: 0, background: { xs: "linear-gradient(to top, rgba(11,46,34,0.96) 30%, rgba(11,46,34,0.35) 100%)", md: "linear-gradient(90deg, rgba(11,46,34,0.95) 0%, rgba(11,46,34,0.8) 38%, rgba(11,46,34,0.05) 75%)" } }} />
+        <Box aria-hidden sx={{ position: "absolute", inset: 0, background: { xs: "linear-gradient(to top, rgba(10,14,12,0.85) 35%, rgba(10,14,12,0.2) 100%)", md: "linear-gradient(90deg, rgba(10,14,12,0.78) 0%, rgba(10,14,12,0.45) 40%, rgba(10,14,12,0) 72%)" } }} />
         <Box sx={{ ...pageMax, ...pagePad, position: "relative", width: "100%", pt: { xs: 14, md: 10 }, pb: { xs: 5, md: 8 } }}>
           <Box component="nav" aria-label="Breadcrumb" sx={{ display: "flex", alignItems: "center", gap: 1, ...signType.code, fontSize: 12.5 }}>
             <Box component={NextLink} href="/solutions" sx={{ color: "rgba(255,255,255,0.8)", "&:hover": { color: brand.white, textDecoration: "underline" } }}>Spaces</Box>
@@ -148,8 +142,7 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
             <Box component="span" aria-current="page" sx={{ color: brand.white }}>{solution.name}</Box>
           </Box>
           <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.25, mt: 3 }}>
-            <Box aria-hidden sx={{ width: 10, height: 10, bgcolor: brand.signal }} />
-            <Typography sx={{ ...signType.code, fontSize: 13, color: peach, textTransform: "uppercase" }}>
+            <Typography sx={{ ...signType.code, fontSize: 13, color: "rgba(255,255,255,0.85)" }}>
               {solution.name} · {products.length} {products.length === 1 ? "product" : "products"}
             </Typography>
           </Box>
@@ -160,16 +153,15 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
             {solution.summary}
           </Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 4 }}>
-            <Button component={NextLink} href="#space-products" variant="contained" size="large" endIcon={<SignArrow size={18} />}>
+            <Button component={NextLink} href="#space-products" variant="contained" size="large" sx={{ backgroundColor: "#FFFFFF !important", borderColor: "#FFFFFF !important", color: "#1B1D1C !important", WebkitTextFillColor: "#1B1D1C !important", "&:hover": { backgroundColor: "#ECECE8 !important" } }}>
               See the boards
             </Button>
-            <Button component={NextLink} href={`/customize?application=${application}`} variant="outlined" size="large" sx={ghostButtonSx}>
+            <Box component={NextLink} href={`/customize?application=${application}`} sx={{ display: "inline-flex", alignItems: "center", px: 3, minHeight: 52, borderRadius: 99, border: "1px solid rgba(255,255,255,0.4)", color: brand.white, fontWeight: 600, "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}>
               Design for this space
-            </Button>
+            </Box>
           </Box>
         </Box>
       </Box>
-      <StripeSpine height={6} />
 
       {/* 2. Focus directory: what the room is for */}
       {focuses.length > 1 ? (
@@ -202,11 +194,13 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
                       pl: 0.75,
                       pr: 2,
                       py: 0.75,
-                      bgcolor: selected ? brand.forestDeep : brand.ivory,
+                      borderRadius: 99,
+                      "--roundel-on": brand.charcoal,
+                      bgcolor: selected ? brand.charcoal : brand.ivory,
                       color: selected ? brand.white : brand.charcoal,
                       transition: "background-color 200ms cubic-bezier(0.16,1,0.3,1), color 200ms",
-                      "&:hover": { bgcolor: selected ? brand.forestDeep : "#E6E8E3" },
-                      "&:focus-visible": { outline: `3px solid ${brand.signal}`, outlineOffset: 2 },
+                      "&:hover": { bgcolor: selected ? brand.charcoal : "#EBEBE6" },
+                      "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: 2 },
                       "& > span:first-of-type": selected ? {} : { borderColor: brand.line, color: brand.charcoal },
                     }}
                   >
@@ -222,9 +216,9 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
 
       {/* 3. Products */}
       <Box component="section" id="space-products" aria-label="Recommended products" sx={{ ...pageMax, ...pagePad, py: { xs: 5, md: 8 }, scrollMarginTop: 96 }}>
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 2, md: 3 }, alignItems: { md: "flex-end" }, justifyContent: "space-between", borderBottom: `2px solid ${brand.charcoal}` }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 2, md: 3 }, alignItems: { md: "flex-end" }, justifyContent: "space-between", borderBottom: `1px solid ${brand.line}` }}>
           <Box sx={{ pb: { md: 2 } }}>
-            <Typography sx={{ ...signType.code, fontSize: 13, color: brand.signalInk }}>RECOMMENDED FOR {solution.name.toUpperCase()}</Typography>
+            <Typography sx={{ fontSize: 14, fontWeight: 500, color: brand.forest }}>Recommended for {solution.name.toLowerCase()}</Typography>
             <Typography component="h2" sx={{ ...signType.title, fontSize: { xs: "2rem", md: "2.6rem" }, mt: 1, color: brand.charcoal }}>
               {visible.length} {visible.length === 1 ? "product" : "products"}
             </Typography>
@@ -243,10 +237,10 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
         {lead ? (
           <Box key={`${focus}-${filter}`} className="finder-step">
             {/* Lead product: the board to start with */}
-            <Box component="article" aria-label={`Start here: ${lead.shortName}`} sx={{ mt: { xs: 3, md: 4 }, display: "grid", gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.1fr) minmax(0, 1fr)" }, bgcolor: brand.white }}>
+            <Box component="article" aria-label={`Start here: ${lead.shortName}`} sx={{ mt: { xs: 3, md: 4 }, borderRadius: "28px", overflow: "hidden", border: `1px solid ${brand.line}`, display: "grid", gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.1fr) minmax(0, 1fr)" }, bgcolor: brand.white }}>
               <Box component={NextLink} href={`/products/${lead.id}`} aria-label={lead.shortName} sx={{ position: "relative", display: "block", aspectRatio: { xs: "4 / 3", md: "auto" }, minHeight: { md: 420 }, borderRight: { md: `1px solid ${brand.line}` }, "&:hover img": { transform: "scale(1.03)" } }}>
                 {lead.images[0] ? <Image src={lead.images[0]} alt="" fill sizes="(max-width: 900px) 100vw, 55vw" style={{ objectFit: "contain", padding: "8%", transition: "transform 600ms cubic-bezier(0.16,1,0.3,1)" }} /> : null}
-                <Box sx={{ position: "absolute", top: 0, left: 0, px: 1.75, py: 1, bgcolor: brand.signal, color: brand.charcoal, ...signType.plate, fontSize: 14 }}>Start here</Box>
+                <Box sx={{ position: "absolute", top: 0, left: 0, px: 1.75, py: 1, bgcolor: brand.charcoal, color: brand.white, borderRadius: 99, fontSize: 13.5, fontWeight: 500, m: 2 }}>Start here</Box>
               </Box>
               <Box sx={{ p: { xs: 2.5, md: 5 }, display: "flex", flexDirection: "column", gap: 1.5 }}>
                 <Typography sx={{ ...signType.code, fontSize: 12.5, color: brand.forest }}>{lead.sku} · {getProductCategoryLabel(lead)}</Typography>
@@ -257,7 +251,7 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
                 {lead.sizes.length ? (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
                     {lead.sizes.map((size) => (
-                      <Box key={size.id} sx={{ px: 1.25, py: 0.5, border: `1px solid ${brand.line}`, ...signType.code, fontSize: 12.5, color: brand.charcoal }}>{size.label}</Box>
+                      <Box key={size.id} sx={{ px: 1.5, py: 0.5, borderRadius: 99, border: `1px solid ${brand.line}`, fontSize: 13.5, color: brand.charcoal }}>{size.label}</Box>
                     ))}
                   </Box>
                 ) : null}
@@ -277,7 +271,7 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
             </Box>
 
             {rest.length ? (
-              <Box sx={{ mt: { xs: 2, md: 3 }, display: "grid", gap: { xs: 1.5, md: 2 }, gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))", xl: "repeat(4, minmax(0, 1fr))" } }}>
+              <Box sx={{ mt: { xs: 2, md: 3 }, display: "grid", gap: { xs: 1.5, md: 2 }, gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))", xl: "repeat(4, minmax(0, 1fr))" } }}>
                 {rest.map((product, index) => (
                   <Reveal key={product.id} delay={Math.min(index * 40, 240)} sx={{ height: "100%" }}>
                     <ProductCard product={product} onQuickView={setQuick} />
@@ -287,7 +281,7 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
             ) : null}
           </Box>
         ) : (
-          <Box sx={{ mt: 4, p: { xs: 4, md: 6 }, bgcolor: brand.white, borderTop: `6px solid ${brand.forest}` }}>
+          <Box sx={{ mt: 4, p: { xs: 4, md: 6 }, bgcolor: brand.white, borderTop: 0 }}>
             <Typography component="h3" sx={{ ...signType.plate, fontSize: 24, color: brand.charcoal }}>No products in this selection yet</Typography>
             <Typography sx={{ mt: 1 }}>Try another filter or focus to see more OBASIX products.</Typography>
             <Button
@@ -305,25 +299,25 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
       </Box>
 
       {/* 4. Next steps */}
-      <Box component="section" aria-labelledby="space-next" sx={{ bgcolor: brand.forestDeep, color: brand.white }}>
+      <Box component="section" aria-labelledby="space-next" sx={{ bgcolor: brand.ivory, color: brand.charcoal }}>
         <Box sx={{ ...pageMax, ...pagePad, py: { xs: 7, md: 10 } }}>
-          <Typography id="space-next" component="h2" sx={{ ...signType.title, color: brand.white, maxWidth: "16ch" }}>
+          <Typography id="space-next" component="h2" sx={{ ...signType.title, color: brand.charcoal, maxWidth: "16ch" }}>
             Need it to a different size?
           </Typography>
-          <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, mt: { xs: 4, md: 6 }, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, borderTop: "2px solid rgba(255,255,255,0.25)" }}>
+          <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, mt: { xs: 4, md: 6 }, display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, borderTop: "2px solid #E5E5E0" }}>
             {[
               { href: `/customize?application=${application}`, title: "Design your board", body: "Choose size, frame, colour and features." },
               { href: "/visualize", title: "See it on your wall", body: "Place a board on a photo of your room." },
               { href: "/quote", title: "Request a quote", body: "Bulk, custom and institutional orders." },
             ].map((step, i) => (
-              <Box component="li" key={step.title} sx={{ borderBottom: { xs: "1px solid rgba(255,255,255,0.14)", md: 0 }, borderLeft: { md: i ? "1px solid rgba(255,255,255,0.14)" : 0 } }}>
-                <Box component={NextLink} href={step.href} sx={{ display: "flex", gap: 2, alignItems: "flex-start", py: 3, px: { md: i ? 3.5 : 0 }, pr: { md: 3.5 }, color: brand.white, "&:hover svg": { transform: "translateX(4px)" }, "&:hover .t": { textDecoration: "underline", textUnderlineOffset: 4 } }}>
+              <Box component="li" key={step.title} sx={{ borderBottom: { xs: "1px solid #E5E5E0", md: 0 }, borderLeft: { md: i ? "1px solid #E5E5E0" : 0 } }}>
+                <Box component={NextLink} href={step.href} sx={{ display: "flex", gap: 2, alignItems: "flex-start", py: 3, px: { md: i ? 3.5 : 0 }, pr: { md: 3.5 }, color: brand.charcoal, "&:hover svg": { transform: "translateX(4px)" }, "&:hover .t": { textDecoration: "underline", textUnderlineOffset: 4 } }}>
                   <Roundel>{String(i + 1).padStart(2, "0")}</Roundel>
                   <Box sx={{ flex: 1 }}>
-                    <Typography className="t" sx={{ ...signType.plate, fontSize: 21, color: brand.white }}>{step.title}</Typography>
-                    <Typography sx={{ mt: 0.5, color: "rgba(255,255,255,0.78)" }}>{step.body}</Typography>
+                    <Typography className="t" sx={{ ...signType.plate, fontSize: 21, color: brand.charcoal }}>{step.title}</Typography>
+                    <Typography sx={{ mt: 0.5, color: "#4A4F4C" }}>{step.body}</Typography>
                   </Box>
-                  <SignArrow size={20} color={brand.signal} sx={{ mt: 1, transition: "transform 220ms cubic-bezier(0.16,1,0.3,1)" }} />
+                  <SignArrow size={20} color={brand.forest} sx={{ mt: 1, transition: "transform 220ms cubic-bezier(0.16,1,0.3,1)" }} />
                 </Box>
               </Box>
             ))}
@@ -335,12 +329,12 @@ export function SolutionExperience({ solution }: { solution: SolutionView }) {
       {others.length ? (
         <Box component="nav" aria-label="Other spaces" sx={{ bgcolor: brand.white }}>
           <Box sx={{ ...pageMax, ...pagePad, py: { xs: 5, md: 7 } }}>
-            <Typography sx={{ ...signType.code, fontSize: 13, color: brand.muted }}>OTHER SPACES</Typography>
+            <Typography sx={{ fontSize: 14, fontWeight: 500, color: brand.muted }}>Other spaces</Typography>
             <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
               {others.map((s) => (
-                <Box key={s.id} component={NextLink} href={`/solutions/${s.id}`} sx={{ display: "inline-flex", alignItems: "center", gap: 1, px: 2, py: 1.25, border: `1px solid ${brand.line}`, ...signType.plate, fontSize: 16, color: brand.charcoal, transition: "border-color 160ms, box-shadow 200ms", "&:hover": { borderColor: brand.charcoal, boxShadow: `inset 0 -3px 0 ${brand.signal}` } }}>
+                <Box key={s.id} component={NextLink} href={`/solutions/${s.id}`} sx={{ display: "inline-flex", alignItems: "center", gap: 1, px: 2.25, py: 1.25, borderRadius: 99, border: `1px solid ${brand.line}`, fontWeight: 500, fontSize: 15.5, color: brand.charcoal, transition: "border-color 160ms, box-shadow 200ms", "&:hover": { borderColor: brand.charcoal } }}>
                   {s.name}
-                  <SignArrow size={14} color={brand.signal} />
+                  <SignArrow size={14} />
                 </Box>
               ))}
             </Box>

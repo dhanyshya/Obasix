@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Link from "@/components/Link";
 import { brandTokens as brand } from "@/theme/brandTokens";
-import { SignArrow, StripeSpine, pageMax, pagePad, signType } from "@/components/home/directory/sign";
+import { pageMax, pagePad, signType } from "@/components/home/directory/sign";
 
 type Crumb = { href?: string; label: string };
 
@@ -29,45 +29,32 @@ export function PageMasthead({
   children?: React.ReactNode;
   compact?: boolean;
 }) {
-  const dark = tone === "dark";
-  const fg = dark ? brand.white : brand.charcoal;
-  const soft = dark ? "rgba(255,255,255,0.8)" : brand.body;
+  void tone;
+  const fg = brand.charcoal;
+  const soft = brand.body;
 
   return (
-    <Box component="section" sx={{ bgcolor: dark ? brand.forestDeep : brand.ivory, color: fg, position: "relative", overflow: "hidden" }}>
-      {/* Faint ruled grid, like a sign-shop layout board */}
-      <Box
-        aria-hidden
-        sx={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          backgroundImage: `linear-gradient(${dark ? "rgba(255,255,255,0.045)" : "rgba(20,25,23,0.045)"} 1px, transparent 1px), linear-gradient(90deg, ${dark ? "rgba(255,255,255,0.045)" : "rgba(20,25,23,0.045)"} 1px, transparent 1px)`,
-          backgroundSize: "48px 48px",
-          maskImage: "linear-gradient(90deg, transparent 0%, #000 55%, #000 100%)",
-        }}
-      />
+    <Box component="section" sx={{ bgcolor: brand.white, color: fg, borderBottom: `1px solid ${brand.line}` }}>
       <Box
         sx={{
           ...pageMax,
           ...pagePad,
-          position: "relative",
-          pt: compact ? { xs: 3.5, md: 5 } : { xs: 4.5, md: 7 },
-          pb: compact ? { xs: 3.5, md: 5 } : { xs: 5, md: 8 },
+          pt: compact ? { xs: 4, md: 6 } : { xs: 5, md: 9 },
+          pb: compact ? { xs: 4, md: 6 } : { xs: 5, md: 9 },
           display: "grid",
-          gap: { xs: 3, md: 6 },
-          gridTemplateColumns: children ? { xs: "1fr", md: "minmax(0, 1.4fr) minmax(0, 1fr)" } : "1fr",
+          gap: { xs: 3.5, md: 8 },
+          gridTemplateColumns: children ? { xs: "1fr", md: "minmax(0, 1.25fr) minmax(0, 1fr)" } : "1fr",
           alignItems: "end",
         }}
       >
         <Box sx={{ minWidth: 0 }}>
           {crumbs?.length ? (
-            <Box component="nav" aria-label="Breadcrumb" sx={{ mb: 2.5 }}>
+            <Box component="nav" aria-label="Breadcrumb" sx={{ mb: { xs: 2.5, md: 3.5 } }}>
               <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1 }}>
                 {crumbs.map((crumb, i) => (
-                  <Box component="li" key={crumb.label} sx={{ display: "inline-flex", alignItems: "center", gap: 1, ...signType.code, fontSize: 12.5, color: soft }}>
+                  <Box component="li" key={crumb.label} sx={{ display: "inline-flex", alignItems: "center", gap: 1, fontSize: 13.5, color: brand.muted }}>
                     {crumb.href ? (
-                      <Box component={Link} href={crumb.href} sx={{ color: soft, "&:hover": { color: fg, textDecoration: "underline", textUnderlineOffset: 3 } }}>
+                      <Box component={Link} href={crumb.href} sx={{ color: brand.muted, transition: "color 160ms", "&:hover": { color: fg } }}>
                         {crumb.label}
                       </Box>
                     ) : (
@@ -75,7 +62,7 @@ export function PageMasthead({
                         {crumb.label}
                       </Box>
                     )}
-                    {i < crumbs.length - 1 ? <SignArrow size={12} color={dark ? "rgba(255,255,255,0.5)" : brand.muted} /> : null}
+                    {i < crumbs.length - 1 ? <Box component="span" aria-hidden sx={{ color: "#B5B5AE" }}>/</Box> : null}
                   </Box>
                 ))}
               </Box>
@@ -83,26 +70,22 @@ export function PageMasthead({
           ) : null}
 
           {code ? (
-            <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.25, mb: 2 }}>
-              <Box aria-hidden sx={{ width: 10, height: 10, bgcolor: brand.signal }} />
-              <Typography component="p" sx={{ ...signType.code, fontSize: 13, color: dark ? "#FFC59E" : brand.signalInk, textTransform: "uppercase" }}>
-                {code}
-              </Typography>
-            </Box>
+            <Typography component="p" sx={{ fontSize: 14, fontWeight: 500, color: brand.forest, mb: 1.5 }}>
+              {code}
+            </Typography>
           ) : null}
 
-          <Typography component="h1" sx={{ ...signType.title, fontSize: compact ? { xs: "2rem", sm: "2.5rem", md: "3rem" } : signType.title.fontSize, color: fg, maxWidth: "18ch", textWrap: "balance" }}>
+          <Typography component="h1" sx={{ ...signType.title, fontSize: compact ? { xs: "2.1rem", sm: "2.6rem", md: "3.25rem" } : { xs: "2.4rem", sm: "3.2rem", md: "4.25rem" }, color: fg, maxWidth: "20ch", textWrap: "balance" }}>
             {title}
           </Typography>
           {lede ? (
-            <Typography component="div" sx={{ mt: 2, maxWidth: 600, color: soft, fontSize: { xs: 15.5, md: 17.5 }, lineHeight: 1.6 }}>
+            <Typography component="div" sx={{ mt: 2, maxWidth: 620, color: soft, fontSize: { xs: 16, md: 18 }, lineHeight: 1.6 }}>
               {lede}
             </Typography>
           ) : null}
         </Box>
         {children ? <Box sx={{ minWidth: 0 }}>{children}</Box> : null}
       </Box>
-      <StripeSpine height={4} />
     </Box>
   );
 }

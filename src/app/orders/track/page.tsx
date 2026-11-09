@@ -23,7 +23,7 @@ export default function TrackOrderPage() {
       />
       <Box sx={{ maxWidth: 720, mx: "auto", px: { xs: 2, sm: 4 }, py: { xs: 4, md: 7 } }}>
         <PurchaseSteps current={3} />
-        <Box sx={{ mt: 3, bgcolor: brand.white, borderTop: `6px solid ${brand.forest}`, p: { xs: 2.5, md: 4 } }}>
+        <Box sx={{ mt: 3, bgcolor: brand.white, borderTop: 0, p: { xs: 2.5, md: 4 } }}>
           <Suspense fallback={<Typography variant="body2" color="text.secondary">Loading tracking…</Typography>}>
             <TrackOrder />
           </Suspense>

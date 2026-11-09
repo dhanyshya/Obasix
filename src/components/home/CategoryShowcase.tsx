@@ -63,7 +63,7 @@ export function CategoryShowcase() {
                 component="article"
                 sx={{
                   height: "100%",
-                  borderRadius: 0,
+                  borderRadius: "16px",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   "&:hover": { transform: "translateY(-4px)", boxShadow: 3 },
                   "&:hover .category-img": { transform: "scale(1.04)" },

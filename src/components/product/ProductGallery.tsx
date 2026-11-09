@@ -22,7 +22,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
           overflow: "hidden",
           border: 1,
           borderColor: "divider",
-          borderRadius: 0,
+          borderRadius: "16px",
           bgcolor: "background.paper",
           cursor: zoomed ? "zoom-out" : "zoom-in",
         }}
@@ -64,7 +64,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
               position: "relative",
               aspectRatio: "1 / 1",
               overflow: "hidden",
-              borderRadius: 0,
+              borderRadius: "16px",
               border: 2,
               borderColor: active === index ? "primary.main" : "transparent",
             }}

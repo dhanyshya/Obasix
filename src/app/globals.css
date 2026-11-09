@@ -5,9 +5,9 @@
   --brand-primary: #164E3B;
   --brand-secondary: #C8282E;
   --brand-accent: #EE6A1F;
-  --brand-background: #F2F3F0;
+  --brand-background: #F5F5F2;
   --brand-text: #3F4843;
-  --brand-charcoal: #141917;
+  --brand-charcoal: #1B1D1C;
   --brand-beige: #EDE7DC;
   --brand-oak: #C9A477;
   --brand-pale: #EEF2ED;
@@ -40,10 +40,10 @@
   --background: var(--brand-background);
   --foreground: var(--brand-text);
 
-  --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 2px;
-  --radius-brand: 2px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-brand: 16px;
 
   --shadow-sm: 0 1px 2px rgba(37, 42, 38, 0.05);
   --shadow-md: 0 18px 40px rgba(37, 42, 38, 0.08);
@@ -745,7 +745,7 @@ a:hover .image-zoom {
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand-accent);
+  outline: 2px solid var(--brand-primary);
   outline-offset: 3px;
   box-shadow: none;
 }
@@ -755,8 +755,8 @@ a:hover .image-zoom {
 .MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):hover,
 .MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):active,
 .MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning).Mui-selected {
-  background-color: #C8282E !important;
-  border-color: #C8282E !important;
+  background-color: #164E3B !important;
+  border-color: #164E3B !important;
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
   opacity: 1 !important;
@@ -764,19 +764,19 @@ a:hover .image-zoom {
 }
 
 .MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):hover {
-  background-color: #A11E23 !important;
-  border-color: #A11E23 !important;
+  background-color: #0F3A2B !important;
+  border-color: #0F3A2B !important;
 }
 
 .MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning),
 .MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):focus-visible,
 .MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning).Mui-selected {
-  background-color: #FFFFFF !important;
-  border-color: #141917 !important;
-  border-width: 2px !important;
+  background-color: transparent !important;
+  border-color: rgba(27, 29, 28, 0.22) !important;
+  border-width: 1px !important;
   border-style: solid !important;
-  color: #141917 !important;
-  -webkit-text-fill-color: #141917 !important;
+  color: #1B1D1C !important;
+  -webkit-text-fill-color: #1B1D1C !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
@@ -784,14 +784,14 @@ a:hover .image-zoom {
 .MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):hover,
 .MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):active,
 .MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning).Mui-selected {
-  background-color: #141917 !important;
-  border-color: #141917 !important;
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
+  background-color: rgba(27, 29, 28, 0.05) !important;
+  border-color: rgba(27, 29, 28, 0.45) !important;
+  color: #1B1D1C !important;
+  -webkit-text-fill-color: #1B1D1C !important;
 }
 
 .MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):focus-visible {
-  box-shadow: 0 0 0 3px #EE6A1F !important;
+  box-shadow: 0 0 0 3px rgba(22, 78, 59, 0.35) !important;
 }
 
 .MuiButton-root.Mui-disabled,
@@ -809,16 +809,13 @@ a:hover .image-zoom {
 }
 
 .MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning) .MuiSvgIcon-root,
-.MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):hover .MuiSvgIcon-root,
-.MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):active .MuiSvgIcon-root,
-.MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning).Mui-selected .MuiSvgIcon-root,
 .MuiButton-pressed .MuiSvgIcon-root,
 .Mui-selected.MuiToggleButton-root .MuiSvgIcon-root {
   color: #FFFFFF !important;
   fill: #FFFFFF !important;
 }
 
-.MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):not(:hover):not(.Mui-selected) .MuiSvgIcon-root {
+.MuiButton-outlined:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning) .MuiSvgIcon-root {
   color: #141917 !important;
   fill: #141917 !important;
 }
@@ -838,10 +835,10 @@ a:hover .image-zoom {
 .MuiToggleButton-root:hover,
 .MuiToggleButton-root.Mui-selected,
 .MuiToggleButton-root.Mui-selected:hover {
-  background-color: #141917 !important;
-  border-color: #141917 !important;
-  color: #FFFFFF !important;
-  -webkit-text-fill-color: #FFFFFF !important;
+  background-color: rgba(27, 29, 28, 0.05) !important;
+  border-color: rgba(27, 29, 28, 0.45) !important;
+  color: #1B1D1C !important;
+  -webkit-text-fill-color: #1B1D1C !important;
 }
 
 .MuiButton-root:focus-visible {
@@ -871,4 +868,9 @@ a:hover .image-zoom {
     transition: none !important;
     transform: none !important;
   }
+}
+
+/* MUI fields draw their own focus state on the outline; skip the global ring on the inner element. */
+.MuiInputBase-input:focus-visible {
+  outline: none;
 }

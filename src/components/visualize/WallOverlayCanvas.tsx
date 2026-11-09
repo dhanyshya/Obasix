@@ -260,7 +260,7 @@ export function WallOverlayCanvas({
                     bgcolor: "#FFFFFF",
                     border: "2px solid",
                     borderColor: "primary.main",
-                    borderRadius: 0,
+                    borderRadius: "16px",
                     cursor:
                       corner === "nw" || corner === "se"
                         ? "nwse-resize"

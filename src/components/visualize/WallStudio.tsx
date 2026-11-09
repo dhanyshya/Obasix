@@ -437,7 +437,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
         lede={
           <>
             Try boards on this sample wall, or{" "}
-            <Box component={Link} href="/visualize" sx={{ color: "#FFFFFF", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 4 }}>
+            <Box component={Link} href="/visualize" sx={{ color: "#164E3B", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 4 }}>
               upload a photo of your own wall
             </Box>
             .
@@ -458,20 +458,20 @@ export function WallStudio({ wall }: { wall: WallModel }) {
               pt: 1.25,
               pb: 0.5,
               textAlign: "left" as const,
-              borderTop: "4px solid",
-              borderColor: active || done ? "#EE6A1F" : "rgba(255,255,255,0.22)",
-              color: active ? "#FFFFFF" : "rgba(255,255,255,0.72)",
-              "&:hover": { color: "#FFFFFF" },
-              "&.Mui-disabled": { opacity: 0.5, color: "rgba(255,255,255,0.72)" },
-              "&.Mui-focusVisible, &:focus-visible": { outline: "3px solid #EE6A1F", outlineOffset: 2 },
+              borderTop: "2px solid",
+              borderColor: active ? "#1B1D1C" : done ? "#164E3B" : "#E5E5E0",
+              color: active ? "#1B1D1C" : "#6B706D",
+              "&:hover": { color: "#1B1D1C" },
+              "&.Mui-disabled": { opacity: 0.5, color: "#6B706D" },
+              "&.Mui-focusVisible, &:focus-visible": { outline: "2px solid #164E3B", outlineOffset: 2 },
             };
             const inner = (
               <>
-                <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: "0.04em", color: done && !active ? "#FFC59E" : "inherit" }}>
+                <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 500, fontSize: 12.5, letterSpacing: "0", color: done && !active ? "#164E3B" : "inherit" }}>
                   {done && !active ? "✓ " : ""}
                   {`0${index + 1}`}
                 </Box>
-                <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: active ? 800 : 700, fontSize: { xs: 12, sm: 14.5 }, letterSpacing: "-0.01em", lineHeight: 1.15 }}>
+                <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: active ? 600 : 500, fontSize: { xs: 12, sm: 14.5 }, letterSpacing: "-0.01em", lineHeight: 1.15 }}>
                   {item.label}
                 </Box>
               </>
@@ -491,11 +491,11 @@ export function WallStudio({ wall }: { wall: WallModel }) {
             );
           })}
         </Box>
-        <ButtonBase type="button" onClick={askWallAI} sx={{ mt: 2.5, display: "inline-flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", "&.Mui-focusVisible": { outline: "3px solid #EE6A1F", outlineOffset: 2 } }}>
-          <Typography component="span" sx={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>
+        <ButtonBase type="button" onClick={askWallAI} sx={{ mt: 2.5, display: "inline-flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", "&.Mui-focusVisible": { outline: "2px solid #164E3B", outlineOffset: 2 } }}>
+          <Typography component="span" sx={{ fontSize: 13, color: "#6B706D" }}>
             Not sure what fits your space?
           </Typography>
-          <Typography component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 15.5, color: "#FFC59E", textDecoration: "underline", textUnderlineOffset: 4 }}>
+          <Typography component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 600, fontSize: 15.5, color: "#164E3B", textDecoration: "underline", textUnderlineOffset: 4 }}>
             Ask OBASIX AI
           </Typography>
         </ButtonBase>
@@ -513,7 +513,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
         }}
       >
         <Box sx={{ minWidth: 0 }}>
-          <Box ref={sceneRef} sx={{ position: "relative", minWidth: 0, bgcolor: "#141917", outline: { lg: "12px solid #141917" } }}>
+          <Box ref={sceneRef} sx={{ position: "relative", minWidth: 0, bgcolor: "#1B1D1C", borderRadius: { xs: "20px", md: "28px" }, overflow: "hidden" }}>
             <WallScene
               wall={wall}
               state={state}
@@ -524,7 +524,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
               comparePercent={comparePercent}
               zoom={zoom}
               onBoardOffsetChange={(x, y) => patch({ boardOffsetX: x, boardOffsetY: y })}
-              sx={{ minHeight: { xs: 240, lg: 520 }, borderRadius: 0 }}
+              sx={{ minHeight: { xs: 240, lg: 520 }, borderRadius: "16px" }}
             />
             <Stack spacing={0.5} sx={{ position: "absolute", right: 12, top: 12, zIndex: 30 }}>
               <CanvasButton label="Zoom in" onClick={() => setZoom((value) => Math.min(1.8, value + 0.2))}>
@@ -589,7 +589,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
           </Typography>
         </Box>
 
-        <Box component="aside" sx={{ minWidth: 0, bgcolor: "#FFFFFF", borderTop: "6px solid #164E3B", p: { xs: 2.5, md: 3.5 }, alignSelf: "start" }}>
+        <Box component="aside" sx={{ minWidth: 0, bgcolor: "#FFFFFF", borderTop: 0, p: { xs: 2.5, md: 3.5 }, alignSelf: "start" }}>
           <Box key={step} className="finder-step">
             {step === "board" ? (
               <Panel
@@ -1049,7 +1049,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
           right: 0,
           bottom: { xs: "var(--mobile-nav-h, 64px)", md: 0 },
           zIndex: 1000,
-          borderTop: "4px solid #EE6A1F",
+          borderTop: "1px solid #E5E5E0",
           bgcolor: "#FFFFFF",
           boxShadow: "0 -18px 40px -24px rgba(11,46,34,0.45)",
         }}
@@ -1132,7 +1132,7 @@ function choiceSx(selected: boolean, mode: "dark" | "outline" | "mist"): SxProps
         ? { bgcolor: "background.default", color: "text.primary", borderColor: "text.primary" }
         : { bgcolor: "transparent", color: "text.primary", borderColor: "text.primary" };
   return {
-    borderRadius: 0,
+    borderRadius: "16px",
     px: mode === "dark" ? 2 : 1.5,
     py: mode === "dark" ? 1.5 : 1,
     fontSize: 14,
@@ -1154,7 +1154,7 @@ function Panel({
 }) {
   return (
     <Box>
-      <Typography variant="h2" sx={{ fontSize: { xs: 24, md: 28 }, letterSpacing: "-0.025em", fontVariationSettings: '"wdth" 92' }}>
+      <Typography variant="h2" sx={{ fontSize: { xs: 24, md: 28 }, letterSpacing: "-0.025em" }}>
         {title}
       </Typography>
       <Typography variant="body2" sx={{ mt: 1, lineHeight: 1.7, color: "text.secondary" }}>
@@ -1277,7 +1277,7 @@ function CanvasButton({
       sx={{
         height: 32,
         width: 32,
-        borderRadius: 0,
+        borderRadius: "16px",
         fontSize: 14,
         bgcolor: "rgba(255,255,255,0.95)",
         color: "text.primary",

@@ -103,7 +103,7 @@ export function CartItem({ item }: { item: CartItemType }) {
             size="small"
             aria-label="Decrease quantity"
             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-            sx={{ border: 1, borderColor: "divider", borderRadius: 0, width: 36, height: 36 }}
+            sx={{ border: 1, borderColor: "divider", borderRadius: "16px", width: 36, height: 36 }}
           >
             <RemoveIcon fontSize="small" />
           </IconButton>
@@ -114,7 +114,7 @@ export function CartItem({ item }: { item: CartItemType }) {
             size="small"
             aria-label="Increase quantity"
             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-            sx={{ border: 1, borderColor: "divider", borderRadius: 0, width: 36, height: 36 }}
+            sx={{ border: 1, borderColor: "divider", borderRadius: "16px", width: 36, height: 36 }}
           >
             <AddIcon fontSize="small" />
           </IconButton>
@@ -122,7 +122,7 @@ export function CartItem({ item }: { item: CartItemType }) {
             size="small"
             aria-label="Remove item"
             onClick={() => removeItem(item.id)}
-            sx={{ ml: 0.5, borderRadius: 0, width: 36, height: 36, color: brand.muted, "&:hover": { color: brand.actionDark, bgcolor: "#FBECEC" } }}
+            sx={{ ml: 0.5, borderRadius: "16px", width: 36, height: 36, color: brand.muted, "&:hover": { color: brand.actionDark, bgcolor: "#FBECEC" } }}
           >
             <DeleteOutlineIcon fontSize="small" />
           </IconButton>

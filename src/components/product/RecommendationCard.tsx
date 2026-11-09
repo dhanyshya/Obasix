@@ -28,9 +28,9 @@ export function RecommendationCard({
         border: 1,
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: "inset 0 3px 0 transparent",
+        boxShadow: "0 0 0 transparent",
         transition: "box-shadow 200ms cubic-bezier(0.16,1,0.3,1), border-color 200ms",
-        "&:hover": { borderColor: "#B9BFB9", boxShadow: "inset 0 3px 0 #EE6A1F" },
+        "&:hover": { borderColor: "#B9BFB9", boxShadow: "0 24px 48px -28px rgba(20,25,23,0.35)" },
         "&:hover .rec-title": { textDecoration: "underline", textUnderlineOffset: 3 },
       }}
     >

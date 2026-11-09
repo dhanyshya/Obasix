@@ -31,7 +31,7 @@ export function CompareTray() {
         bottom: { xs: "calc(var(--mobile-nav-h, 64px) + 12px)", md: 24 },
         px: { xs: 1.5, sm: 2 },
         py: 1.25,
-        borderRadius: 0,
+        borderRadius: "16px",
         display: "flex",
         alignItems: "center",
         gap: 1.5,

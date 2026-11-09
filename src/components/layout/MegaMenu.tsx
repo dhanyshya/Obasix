@@ -70,7 +70,7 @@ export function MegaMenu({
                     px: 1,
                     fontSize: 14,
                     color: "text.primary",
-                    borderRadius: 0,
+                    borderRadius: "16px",
                     "&:hover": { bgcolor: "primary.light", color: "primary.main" },
                   }}
                 >
@@ -143,7 +143,7 @@ export function MegaMenu({
                     gap: 1.25,
                     alignItems: "center",
                     p: 0.75,
-                    borderRadius: 0,
+                    borderRadius: "16px",
                     color: "text.primary",
                     transition: "background-color 0.2s ease",
                     "&:hover": { bgcolor: "primary.light" },
@@ -198,7 +198,7 @@ export function MegaMenu({
             }}
           />
           <Box sx={{ position: "absolute", insetInline: 0, bottom: 0, p: 2.5, color: "#fff" }}>
-            <Typography variant="overline" sx={{ color: "#FFC59E", letterSpacing: "0.06em" }}>
+            <Typography variant="overline" sx={{ color: "#164E3B", letterSpacing: "0.06em" }}>
               01 / Experience
             </Typography>
             <Typography variant="h6" sx={{ mt: 0.75, fontSize: 18, color: "#fff", lineHeight: 1.25 }}>

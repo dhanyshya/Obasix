@@ -28,7 +28,7 @@ import { CompleteYourBoard } from "@/components/product/CompleteYourBoard";
 import { ProductActions } from "@/components/product/ProductActions";
 import { CompareToggle } from "@/components/compare/CompareToggle";
 import { ProductGallery } from "@/components/product/ProductGallery";
-import { RecommendationCard } from "@/components/product/RecommendationCard";
+import { ProductCard } from "@/components/product/ProductCard";
 import { formatPrice } from "@/lib/format";
 import { quoteBoardLabel } from "@/lib/quotes/schema";
 
@@ -61,14 +61,14 @@ export default function ProductDetailPage({
 
   return (
     <Box sx={{ bgcolor: "background.paper" }}>
-      <Container sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth={false} sx={{ maxWidth: 1320, px: { xs: 2.5, sm: 4, md: 6 }, py: { xs: 4, md: 8 } }}>
         <Grid container spacing={{ xs: 4, lg: 6 }}>
           <Grid size={{ xs: 12, lg: 6 }}>
             <ProductGallery images={product.images} alt={product.name} />
           </Grid>
           <Grid size={{ xs: 12, lg: 6 }}>
-            <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap", pb: 1.5, borderBottom: "3px solid", borderColor: "text.primary" }}>
-              <Typography sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: "0.05em", bgcolor: "#164E3B", color: "#FFFFFF", px: 1.25, py: 0.4 }}>
+            <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap" }}>
+              <Typography sx={{ fontSize: 13, fontWeight: 500, letterSpacing: "0.02em", bgcolor: "#EDF2EE", color: "#164E3B", px: 1.25, py: 0.4, borderRadius: 99 }}>
                 {product.sku}
               </Typography>
               <Typography sx={{ fontSize: 14, color: "text.secondary", textTransform: "capitalize" }}>
@@ -80,11 +80,10 @@ export default function ProductDetailPage({
               sx={{
                 mt: 2,
                 fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
-                fontWeight: 800,
-                fontVariationSettings: '"wdth" 90',
-                fontSize: { xs: 32, md: 44 },
+                fontWeight: 600,
+                fontSize: { xs: 30, md: 40 },
                 letterSpacing: "-0.035em",
-                lineHeight: 1,
+                lineHeight: 1.08,
                 color: "text.primary",
                 textWrap: "balance",
               }}
@@ -94,7 +93,7 @@ export default function ProductDetailPage({
             <Typography color="text.secondary" sx={{ mt: 2, lineHeight: 1.7 }}>
               {product.description}
             </Typography>
-            <Typography component="p" sx={{ mt: 3, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 800, fontSize: { xs: 34, md: 42 }, letterSpacing: "-0.03em", fontVariantNumeric: "tabular-nums", color: "text.primary" }}>
+            <Typography component="p" sx={{ mt: 3, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 500, fontSize: { xs: 30, md: 34 }, letterSpacing: "-0.025em", fontVariantNumeric: "tabular-nums", color: "text.primary" }}>
               {formatPrice(product.price)}
               {product.compareAtPrice && (
                 <Box
@@ -141,7 +140,7 @@ export default function ProductDetailPage({
                   sx={{
                     flexWrap: "wrap",
                     gap: 1,
-                    "& .MuiToggleButtonGroup-grouped": { borderRadius: 0, "&:not(:first-of-type)": { ml: 0, borderLeft: "2px solid" } },
+                    "& .MuiToggleButtonGroup-grouped": { borderRadius: "16px", "&:not(:first-of-type)": { ml: 0, borderLeft: "2px solid" } },
                     "& .MuiToggleButton-root": {
                       minWidth: 88,
                       minHeight: 48,
@@ -156,7 +155,7 @@ export default function ProductDetailPage({
                     "& .MuiToggleButton-root.Mui-selected, & .MuiToggleButton-root.Mui-selected:hover": {
                       bgcolor: "text.primary",
                       color: "#FFFFFF",
-                      boxShadow: "inset 0 -4px 0 #EE6A1F",
+                      boxShadow: "0 0 0 1.5px #1B1D1C",
                     },
                   }}
                   value={sizeId}
@@ -216,7 +215,7 @@ export default function ProductDetailPage({
 
         <Grid container spacing={{ xs: 4, lg: 6 }} sx={{ mt: { xs: 6, md: 8 } }}>
           <Grid size={{ xs: 12, lg: 4 }} component="section">
-            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 2, borderColor: "primary.main" }}>
+            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 1, borderColor: "divider", fontFamily: "var(--font-display), sans-serif", fontWeight: 600, letterSpacing: "-0.02em" }}>
               Specifications
             </Typography>
             <Table size="small" aria-label="Specifications">
@@ -236,7 +235,7 @@ export default function ProductDetailPage({
           </Grid>
 
           <Grid size={{ xs: 12, lg: 4 }} component="section">
-            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 2, borderColor: "primary.main" }}>
+            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 1, borderColor: "divider", fontFamily: "var(--font-display), sans-serif", fontWeight: 600, letterSpacing: "-0.02em" }}>
               Features
             </Typography>
             <Stack component="ul" spacing={1} sx={{ m: 0, mt: 2, p: 0, listStyle: "none" }}>
@@ -244,7 +243,7 @@ export default function ProductDetailPage({
                 <Stack key={f} component="li" direction="row" spacing={1.25}>
                   <Box
                     component="span"
-                    sx={{ mt: "8px", width: 6, height: 6, flexShrink: 0, borderRadius: "50%", bgcolor: "warning.main" }}
+                    sx={{ mt: "8px", width: 6, height: 6, flexShrink: 0, borderRadius: "50%", bgcolor: "text.primary" }}
                   />
                   <Typography variant="body2" color="text.secondary">
                     {f}
@@ -270,7 +269,7 @@ export default function ProductDetailPage({
           </Grid>
 
           <Grid size={{ xs: 12, lg: 4 }} component="section">
-            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 2, borderColor: "primary.main" }}>
+            <Typography variant="h6" component="h2" sx={{ pb: 1.5, borderBottom: 1, borderColor: "divider", fontFamily: "var(--font-display), sans-serif", fontWeight: 600, letterSpacing: "-0.02em" }}>
               What&apos;s Included
             </Typography>
             <Stack component="ul" spacing={1} sx={{ m: 0, mt: 2, p: 0, listStyle: "none" }}>
@@ -285,17 +284,15 @@ export default function ProductDetailPage({
 
         <CompleteYourBoard product={product} />
 
-        <Box component="section" sx={{ mt: { xs: 6, md: 8 } }}>
-          <Typography variant="h5" component="h2">
-            Related Products
+        <Box component="section" sx={{ mt: { xs: 8, md: 12 } }}>
+          <Typography component="h2" sx={{ fontFamily: "var(--font-display), sans-serif", fontWeight: 600, fontSize: { xs: 28, md: 36 }, letterSpacing: "-0.03em", color: "text.primary" }}>
+            You may also like
           </Typography>
-          <Grid container spacing={1.5} sx={{ mt: 2.5 }}>
+          <Box sx={{ mt: { xs: 3, md: 4 }, display: "grid", columnGap: { xs: 1.5, md: 3 }, rowGap: 4, gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", lg: "repeat(4, minmax(0, 1fr))" } }}>
             {related.map((item) => (
-              <Grid key={item.id} size={{ xs: 12, md: 6 }}>
-                <RecommendationCard item={item} />
-              </Grid>
+              <ProductCard key={item.id} product={item} />
             ))}
-          </Grid>
+          </Box>
         </Box>
       </Container>
     </Box>

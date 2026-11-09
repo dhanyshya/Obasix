@@ -2,107 +2,90 @@ import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import { brandTokens as brand } from "@/theme/brandTokens";
 
-/** Display lettering in the sign system: heavy, slightly condensed grotesk. */
+/** Display lettering: Inter Tight, medium weight, tight tracking — calm and modern. */
 export const signFont = "var(--font-display), Helvetica Neue, sans-serif";
 
 export const signType = {
   mega: {
     fontFamily: signFont,
-    fontWeight: 800,
-    fontVariationSettings: '"wdth" 88',
-    letterSpacing: "-0.04em",
-    lineHeight: 0.9,
-    fontSize: { xs: "3rem", sm: "4.25rem", md: "5.25rem", lg: "6rem" },
+    fontWeight: 600,
+    letterSpacing: "-0.045em",
+    lineHeight: 1.0,
+    fontSize: { xs: "2.75rem", sm: "4rem", md: "5rem", lg: "5.75rem" },
   },
   title: {
     fontFamily: signFont,
-    fontWeight: 800,
-    fontVariationSettings: '"wdth" 90',
+    fontWeight: 600,
     letterSpacing: "-0.035em",
-    lineHeight: 0.98,
-    fontSize: { xs: "2.25rem", sm: "2.9rem", md: "3.6rem" },
+    lineHeight: 1.05,
+    fontSize: { xs: "2rem", sm: "2.6rem", md: "3.25rem" },
   },
   plate: {
     fontFamily: signFont,
-    fontWeight: 700,
-    fontVariationSettings: '"wdth" 94',
-    letterSpacing: "-0.02em",
-    lineHeight: 1.05,
+    fontWeight: 600,
+    letterSpacing: "-0.015em",
+    lineHeight: 1.2,
   },
   code: {
-    fontFamily: signFont,
-    fontWeight: 600,
-    fontVariationSettings: '"wdth" 100',
-    letterSpacing: "0.04em",
+    fontFamily: "var(--font-body), sans-serif",
+    fontWeight: 500,
+    letterSpacing: "0.01em",
     fontVariantNumeric: "tabular-nums",
   },
 } as const;
 
-/**
- * The OBASIX arrow: drawn from the logo's check-mark stroke, angled into a wayfinding arrow.
- * One stroke weight across the system.
- */
+/** Fine arrow used for links and navigation. */
 export function SignArrow({ size = 24, color = "currentColor", sx }: { size?: number; color?: string; sx?: SxProps<Theme> }) {
   return (
-    <Box
-      component="svg"
-      viewBox="0 0 24 24"
-      aria-hidden
-      focusable="false"
-      sx={{ width: size, height: size, flexShrink: 0, display: "block", ...sx }}
-    >
-      <path d="M3 12.5h15.5" stroke={color} strokeWidth="2.6" strokeLinecap="square" fill="none" />
-      <path d="M12.5 5.5l7 7-7 7" stroke={color} strokeWidth="2.6" strokeLinecap="square" strokeLinejoin="miter" fill="none" />
+    <Box component="svg" viewBox="0 0 24 24" aria-hidden focusable="false" sx={{ width: size, height: size, flexShrink: 0, display: "block", ...sx }}>
+      <path d="M4 12h15M13 6l6 6-6 6" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </Box>
   );
 }
 
-/** The logo tick, used to mark a confirmed or current state. */
-export function SignTick({ size = 20, color = brand.action }: { size?: number; color?: string }) {
+/** Tick used to mark a confirmed or current state. */
+export function SignTick({ size = 20, color = brand.forest }: { size?: number; color?: string }) {
   return (
     <Box component="svg" viewBox="0 0 24 24" aria-hidden focusable="false" sx={{ width: size, height: size, flexShrink: 0, display: "block" }}>
-      <path d="M3.5 12.5l5.5 5.5L21 4.5" stroke={color} strokeWidth="3" strokeLinecap="square" strokeLinejoin="miter" fill="none" />
+      <path d="M5 12.5l4.5 4.5L19 7.5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </Box>
   );
 }
 
-/** Three-colour stripe spine taken from the logo: green field, orange "O", red lettering. */
-export function StripeSpine({ height = 6 }: { height?: number }) {
-  return (
-    <Box aria-hidden sx={{ display: "grid", gridTemplateColumns: "6fr 1fr 2fr", height }}>
-      <Box sx={{ bgcolor: brand.forest }} />
-      <Box sx={{ bgcolor: brand.signal }} />
-      <Box sx={{ bgcolor: brand.action }} />
-    </Box>
-  );
+/** Retired heavy stripe: now a hairline divider so existing placements stay quiet. */
+export function StripeSpine({ height = 1 }: { height?: number }) {
+  void height;
+  return <Box aria-hidden sx={{ height: "1px", bgcolor: "rgba(127,127,120,0.18)" }} />;
 }
 
-/** Numbered roundel, as on lobby directory boards. */
+/** Small numbered circle. */
 export function Roundel({ children, active }: { children: React.ReactNode; active?: boolean }) {
   return (
     <Box
       component="span"
       aria-hidden
       sx={{
-        width: { xs: 34, md: 40 },
-        height: { xs: 34, md: 40 },
+        width: { xs: 30, md: 34 },
+        height: { xs: 30, md: 34 },
         borderRadius: "50%",
         display: "inline-grid",
         placeItems: "center",
         flexShrink: 0,
-        border: `2px solid ${active ? brand.signal : "rgba(255,255,255,0.4)"}`,
-        bgcolor: active ? brand.signal : "transparent",
-        color: active ? brand.charcoal : brand.white,
-        ...signType.code,
-        fontSize: { xs: 13, md: 14 },
-        letterSpacing: 0,
-        transition: "background-color 220ms cubic-bezier(0.16,1,0.3,1), border-color 220ms cubic-bezier(0.16,1,0.3,1)",
+        border: "1px solid",
+        borderColor: active ? "currentColor" : "rgba(127,127,120,0.4)",
+        bgcolor: active ? "currentColor" : "transparent",
+        "& > span": { color: active ? "var(--roundel-on, #fff)" : "inherit" },
+        fontFamily: "var(--font-body), sans-serif",
+        fontWeight: 500,
+        fontSize: 12.5,
+        fontVariantNumeric: "tabular-nums",
+        transition: "background-color 220ms ease, border-color 220ms ease",
       }}
     >
-      {children}
+      <span>{children}</span>
     </Box>
   );
 }
 
-export const pagePad = { px: { xs: 2, sm: 4, md: 6, lg: 8 } } as const;
+export const pagePad = { px: { xs: 2.5, sm: 4, md: 6, lg: 8 } } as const;
 export const pageMax = { maxWidth: 1440, mx: "auto" } as const;

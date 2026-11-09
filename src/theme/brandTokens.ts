@@ -5,15 +5,19 @@
  * Keep in sync with globals.css.
  */
 export const brandTokens = {
+  /** Soft stage behind product photography. */
+  stage: "#FFFFFF",
+  /** Card / control corner radius. */
+  radius: 16,
   forest: "#164E3B",
   forestDark: "#0E3A2B",
-  forestDeep: "#0B2E22",
-  charcoal: "#141917",
-  body: "#3F4843",
-  muted: "#5F6862",
+  forestDeep: "#14211C",
+  charcoal: "#1B1D1C",
+  body: "#4A4F4C",
+  muted: "#6B706D",
   white: "#FFFFFF",
   /** Cool enamel ground (sign-panel grey), not cream. */
-  ivory: "#F2F3F0",
+  ivory: "#F5F5F2",
   /** Logo "O" orange: current zone, focus, wayfinding marks. */
   signal: "#EE6A1F",
   /** Text-safe orange for small text on white/ivory (≥4.5:1). */
@@ -24,8 +28,8 @@ export const brandTokens = {
   paper: "#FFFFFF",
   beige: "#EAE3D8",
   oak: "#C9A477",
-  line: "#DCDFDA",
-  paleGreen: "#EEF2ED",
+  line: "#E5E5E0",
+  paleGreen: "#EDF2EE",
   secondary: "#C45C4A",
   accent: "#C9A477",
 } as const;

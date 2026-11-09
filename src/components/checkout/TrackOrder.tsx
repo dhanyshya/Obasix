@@ -70,7 +70,7 @@ export function TrackOrder() {
       variant="outlined"
       onSubmit={onSubmit}
       noValidate
-      sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 0, width: "100%", boxSizing: "border-box" }}
+      sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: "16px", width: "100%", boxSizing: "border-box" }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField

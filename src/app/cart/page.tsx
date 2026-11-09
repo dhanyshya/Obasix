@@ -46,8 +46,8 @@ export default function CartPage() {
       >
         <Box sx={{ minWidth: 0 }}>
           {items.length === 0 ? (
-            <Box sx={{ bgcolor: brand.white, borderTop: `6px solid ${brand.forest}`, px: { xs: 3, md: 6 }, py: { xs: 6, md: 8 } }}>
-              <Typography sx={{ ...signType.code, fontSize: 13, color: brand.signalInk }}>00 ITEMS</Typography>
+            <Box sx={{ bgcolor: brand.white, borderTop: 0, px: { xs: 3, md: 6 }, py: { xs: 6, md: 8 } }}>
+              <Typography sx={{ ...signType.code, fontSize: 13, color: brand.forest }}>00 ITEMS</Typography>
               <Typography component="p" sx={{ ...signType.title, fontSize: { xs: "1.9rem", md: "2.4rem" }, mt: 1, color: brand.charcoal }}>
                 Your setup is empty
               </Typography>
@@ -94,20 +94,20 @@ export default function CartPage() {
           )}
         </Box>
 
-        <Box component="aside" aria-label="Setup summary" sx={{ position: { lg: "sticky" }, top: { lg: 112 }, bgcolor: brand.forestDeep, color: brand.white }}>
+        <Box component="aside" aria-label="Setup summary" sx={{ position: { lg: "sticky" }, top: { lg: 112 }, bgcolor: brand.white, color: brand.charcoal }}>
           <Box sx={{ px: 3, pt: 3, pb: 2.5 }}>
-            <Typography component="h2" sx={{ ...signType.plate, fontSize: 22, color: brand.white }}>
+            <Typography component="h2" sx={{ ...signType.plate, fontSize: 22, color: brand.charcoal }}>
               Setup summary
             </Typography>
-            <Box component="dl" sx={{ m: 0, mt: 2.5, display: "grid", gridTemplateColumns: "1fr auto", rowGap: 1.25, "& dt": { color: "rgba(255,255,255,0.75)", fontSize: 14.5 }, "& dd": { m: 0, textAlign: "right", fontVariantNumeric: "tabular-nums" } }}>
+            <Box component="dl" sx={{ m: 0, mt: 2.5, display: "grid", gridTemplateColumns: "1fr auto", rowGap: 1.25, "& dt": { color: "#4A4F4C", fontSize: 14.5 }, "& dd": { m: 0, textAlign: "right", fontVariantNumeric: "tabular-nums" } }}>
               <dt>Items</dt>
               <dd>{itemCount}</dd>
               <dt>Delivery</dt>
-              <dd style={{ color: "rgba(255,255,255,0.75)", fontSize: 14 }}>Confirmed at checkout</dd>
+              <dd style={{ color: "#4A4F4C", fontSize: 14 }}>Confirmed at checkout</dd>
             </Box>
-            <Box sx={{ mt: 2.5, pt: 2.5, borderTop: "1px solid rgba(255,255,255,0.2)", display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <Typography sx={{ color: "rgba(255,255,255,0.8)" }}>Subtotal</Typography>
-              <Typography component="p" sx={{ ...signType.plate, fontSize: 32, fontVariantNumeric: "tabular-nums", color: brand.white }}>
+            <Box sx={{ mt: 2.5, pt: 2.5, borderTop: "1px solid #E5E5E0", display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <Typography sx={{ color: "#4A4F4C" }}>Subtotal</Typography>
+              <Typography component="p" sx={{ ...signType.plate, fontSize: 32, fontVariantNumeric: "tabular-nums", color: brand.charcoal }}>
                 {formatPrice(subtotal)}
               </Typography>
             </Box>
@@ -127,11 +127,11 @@ export default function CartPage() {
               href="/quote"
               variant="outlined"
               fullWidth
-              sx={{ "&&": { color: brand.white, borderColor: "rgba(255,255,255,0.5)", bgcolor: "transparent" }, "&&:hover": { borderColor: brand.white, bgcolor: "rgba(255,255,255,0.08)" } }}
+              sx={{ "&&": { color: brand.charcoal, borderColor: "#4A4F4C", bgcolor: "transparent" }, "&&:hover": { borderColor: brand.white, bgcolor: "rgba(255,255,255,0.08)" } }}
             >
               Request Custom Quote
             </Button>
-            <Box component={Link} href="/products" sx={{ justifySelf: "center", mt: 0.5, py: 1, color: "#FFC59E", fontWeight: 600, fontSize: 14.5, textDecoration: "underline", textUnderlineOffset: 4 }}>
+            <Box component={Link} href="/products" sx={{ justifySelf: "center", mt: 0.5, py: 1, color: "#164E3B", fontWeight: 600, fontSize: 14.5, textDecoration: "underline", textUnderlineOffset: 4 }}>
               Continue shopping
             </Box>
           </Box>

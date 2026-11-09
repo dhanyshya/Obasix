@@ -437,20 +437,20 @@ export function SpaceVisualizer() {
                     pt: 1.25,
                     pb: 0.5,
                     textAlign: "left",
-                    borderTop: "4px solid",
-                    borderColor: active || done ? "#EE6A1F" : "rgba(255,255,255,0.22)",
-                    color: active ? "#FFFFFF" : "rgba(255,255,255,0.72)",
+                    borderTop: "2px solid",
+                    borderColor: active ? "#1B1D1C" : done ? "#164E3B" : "#E5E5E0",
+                    color: active ? "#1B1D1C" : "#6B706D",
                     opacity: locked ? 0.5 : 1,
                     transition: "border-color 200ms cubic-bezier(0.16,1,0.3,1), color 160ms",
-                    "&:hover": { color: "#FFFFFF" },
-                    "&.Mui-focusVisible": { outline: "3px solid #EE6A1F", outlineOffset: 2 },
+                    "&:hover": { color: "#1B1D1C" },
+                    "&.Mui-focusVisible": { outline: "2px solid #164E3B", outlineOffset: 2 },
                   }}
                 >
-                  <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 600, fontSize: 12, letterSpacing: "0.04em", color: done ? "#FFC59E" : "inherit" }}>
+                  <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 500, fontSize: 12.5, letterSpacing: "0", color: done ? "#164E3B" : "inherit" }}>
                     {done ? "✓ " : ""}
                     {item.number}
                   </Box>
-                  <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: active ? 800 : 700, fontSize: { xs: 12.5, sm: 15 }, letterSpacing: "-0.01em", lineHeight: 1.15 }}>
+                  <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: active ? 600 : 500, fontSize: { xs: 12.5, sm: 15 }, letterSpacing: "-0.01em", lineHeight: 1.15 }}>
                     {item.label}
                   </Box>
                 </ButtonBase>
@@ -474,7 +474,7 @@ export function SpaceVisualizer() {
               minWidth: 0,
               order: { xs: 2, lg: 1 },
               bgcolor: "#FFFFFF",
-              borderTop: "6px solid #164E3B",
+              borderTop: 0,
               p: { xs: 2.5, md: 3.5 },
               mx: { xs: -2, sm: 0 },
             }}
@@ -547,11 +547,11 @@ export function SpaceVisualizer() {
                           border: "2px solid",
                           borderColor: selected ? "#141917" : "#DCDFDA",
                           bgcolor: "#FFFFFF",
-                          boxShadow: selected ? "inset 0 -4px 0 #EE6A1F" : "none",
+                          boxShadow: selected ? "0 0 0 1.5px #1B1D1C" : "none",
                           overflow: "hidden",
                           transition: "border-color 160ms",
                           "&:hover": { borderColor: selected ? "#141917" : "#8A928C" },
-                          "&.Mui-focusVisible": { outline: "3px solid #EE6A1F", outlineOffset: 2 },
+                          "&.Mui-focusVisible": { outline: "2px solid #164E3B", outlineOffset: 2 },
                         }}
                       >
                         <Box
@@ -968,13 +968,16 @@ export function SpaceVisualizer() {
               position: { lg: "sticky" },
               top: { lg: 112 },
               display: { xs: "none", lg: "block" },
-              bgcolor: "#141917",
+              bgcolor: "#FFFFFF",
+              border: "1px solid #E5E5E0",
+              borderRadius: "28px",
+              overflow: "hidden",
               p: 1.5,
             }}
           >
             {previewPanel}
             {(step === "position" || step === "preview") && canPosition ? (
-              <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap", mt: 1.5, display: { xs: "none", lg: "flex" }, "& .MuiButton-root": { color: "#FFFFFF", borderColor: "rgba(255,255,255,0.4)" }, "& .MuiButton-contained": { bgcolor: "#EE6A1F", color: "#141917", borderColor: "#EE6A1F" } }}>
+              <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap", mt: 1.5, display: { xs: "none", lg: "flex" }, px: 1, pb: 1 }}>
                 <Button
                   size="small"
                   variant={compare ? "contained" : "outlined"}
@@ -1025,7 +1028,7 @@ function Panel({
     <Box>
       <Typography
         variant="h2"
-        sx={{ fontSize: { xs: "1.6rem", md: "1.9rem" }, color: "#141917", fontVariationSettings: '"wdth" 92' }}
+        sx={{ fontSize: { xs: "1.6rem", md: "1.9rem" }, color: "#141917" }}
       >
         {title}
       </Typography>

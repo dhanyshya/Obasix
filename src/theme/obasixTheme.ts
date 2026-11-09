@@ -46,28 +46,28 @@ export const obasixTheme = createTheme({
     fontFamily: 'var(--font-body), "Segoe UI", sans-serif',
     h1: {
       fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
-      fontWeight: 800,
+      fontWeight: 600,
       letterSpacing: "-0.035em",
       lineHeight: 0.95,
       color: brand.charcoal,
     },
     h2: {
       fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
-      fontWeight: 800,
+      fontWeight: 600,
       letterSpacing: "-0.03em",
       lineHeight: 1,
       color: brand.charcoal,
     },
     h3: {
       fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
-      fontWeight: 800,
+      fontWeight: 600,
       letterSpacing: "-0.018em",
       lineHeight: 1.1,
       color: brand.charcoal,
     },
     h4: {
       fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
-      fontWeight: 800,
+      fontWeight: 600,
       letterSpacing: "-0.015em",
       lineHeight: 1.15,
       color: brand.charcoal,
@@ -116,7 +116,7 @@ export const obasixTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 0,
+    borderRadius: 12,
   },
   shadows: [
     "none",
@@ -153,8 +153,8 @@ export const obasixTheme = createTheme({
           color: brand.body,
           fontFeatureSettings: '"ss01", "cv11"',
         },
-        "::selection": { backgroundColor: brand.signal, color: brand.white },
-        ":focus-visible": { outlineColor: brand.signal },
+        "::selection": { backgroundColor: brand.forest, color: brand.white },
+        ":focus-visible": { outlineColor: brand.forest },
         "html": { scrollbarColor: `${brand.forest} ${brand.ivory}`, accentColor: brand.forest, caretColor: brand.action },
         "a:not(.MuiButton-root):not(.MuiIconButton-root):not(.MuiToggleButton-root):not(.MuiButtonBase-root)":
           {
@@ -179,12 +179,12 @@ export const obasixTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: brand.white,
-          borderRadius: 0,
+          borderRadius: 12,
           transition: "box-shadow 160ms cubic-bezier(0.16,1,0.3,1)",
-          "& .MuiOutlinedInput-notchedOutline": { borderColor: "#B9BFB9" },
+          "& .MuiOutlinedInput-notchedOutline": { borderColor: "#D6D6D0" },
           "&:hover:not(.Mui-disabled):not(.Mui-error) .MuiOutlinedInput-notchedOutline": { borderColor: brand.charcoal },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: brand.forest, borderWidth: 2 },
-          "&.Mui-focused": { boxShadow: `0 0 0 3px rgba(238,106,31,0.22)` },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: brand.forest, borderWidth: 1.5 },
+          "&.Mui-focused": { boxShadow: `0 0 0 4px rgba(22,78,59,0.12)` },
         },
         input: { "&::placeholder": { color: brand.muted, opacity: 1 } },
       },
@@ -225,8 +225,7 @@ export const obasixTheme = createTheme({
     MuiAlert: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
-          borderLeft: "4px solid currentColor",
+          borderRadius: 14,
           alignItems: "flex-start",
           "& .MuiAlert-message": { color: brand.charcoal, lineHeight: 1.6 },
         },
@@ -240,15 +239,15 @@ export const obasixTheme = createTheme({
     },
     MuiDialog: {
       styleOverrides: {
-        paper: { borderRadius: 0, borderTop: `6px solid ${brand.forest}`, boxShadow: "0 40px 80px -30px rgba(11,46,34,0.45)" },
+        paper: { borderRadius: 24, boxShadow: "0 40px 100px -30px rgba(20,33,28,0.35)" },
       },
     },
     MuiBackdrop: {
-      styleOverrides: { root: { "&:not(.MuiBackdrop-invisible)": { backgroundColor: "rgba(11,46,34,0.55)" } } },
+      styleOverrides: { root: { "&:not(.MuiBackdrop-invisible)": { backgroundColor: "rgba(20,25,23,0.32)", backdropFilter: "blur(6px)" } } },
     },
     MuiDialogTitle: {
       styleOverrides: {
-        root: { fontFamily: 'var(--font-display), Helvetica Neue, sans-serif', fontWeight: 800, letterSpacing: "-0.02em", fontSize: "1.5rem" },
+        root: { fontFamily: 'var(--font-display), Helvetica Neue, sans-serif', fontWeight: 600, letterSpacing: "-0.025em", fontSize: "1.5rem" },
       },
     },
     MuiDrawer: {
@@ -256,23 +255,23 @@ export const obasixTheme = createTheme({
     },
     MuiMenu: {
       styleOverrides: {
-        paper: { borderRadius: 0, border: `1px solid ${brand.line}`, boxShadow: "0 18px 40px -18px rgba(20,25,23,0.35)" },
+        paper: { borderRadius: 14, border: `1px solid ${brand.line}`, boxShadow: "0 24px 60px -24px rgba(20,25,23,0.28)" },
       },
     },
     MuiMenuItem: {
       styleOverrides: {
-        root: { minHeight: 44, "&.Mui-selected": { backgroundColor: brand.paleGreen, boxShadow: `inset 3px 0 0 ${brand.signal}` } },
+        root: { minHeight: 44, "&.Mui-selected": { backgroundColor: brand.paleGreen } },
       },
     },
     MuiTooltip: {
       styleOverrides: {
-        tooltip: { borderRadius: 0, backgroundColor: brand.charcoal, fontSize: 12.5, fontWeight: 500, padding: "6px 10px" },
+        tooltip: { borderRadius: 8, backgroundColor: brand.charcoal, fontSize: 12.5, fontWeight: 500, padding: "6px 10px" },
         arrow: { color: brand.charcoal },
       },
     },
     MuiTabs: {
       styleOverrides: {
-        indicator: { height: 3, backgroundColor: brand.signal },
+        indicator: { height: 2, backgroundColor: brand.charcoal },
       },
     },
     MuiTab: {
@@ -280,7 +279,7 @@ export const obasixTheme = createTheme({
         root: {
           textTransform: "none",
           fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
-          fontWeight: 700,
+          fontWeight: 600,
           fontSize: 15,
           letterSpacing: "-0.01em",
           minHeight: 52,
@@ -291,21 +290,21 @@ export const obasixTheme = createTheme({
     },
     MuiLinearProgress: {
       styleOverrides: {
-        root: { borderRadius: 0, height: 4, backgroundColor: brand.line },
-        bar: { borderRadius: 0, backgroundColor: brand.forest },
+        root: { borderRadius: 99, height: 4, backgroundColor: brand.line },
+        bar: { borderRadius: 99, backgroundColor: brand.forest },
       },
     },
     MuiCircularProgress: {
       styleOverrides: { root: { color: brand.forest } },
     },
     MuiSkeleton: {
-      styleOverrides: { root: { borderRadius: 0, backgroundColor: "rgba(20,25,23,0.07)" } },
+      styleOverrides: { root: { borderRadius: 12, backgroundColor: "rgba(20,25,23,0.06)" } },
     },
     MuiStepIcon: {
       styleOverrides: {
         root: {
           color: brand.line,
-          "&.Mui-active": { color: brand.signal },
+          "&.Mui-active": { color: brand.charcoal },
           "&.Mui-completed": { color: brand.forest },
           "& .MuiStepIcon-text": { fontFamily: 'var(--font-display), sans-serif', fontWeight: 700 },
         },
@@ -316,7 +315,7 @@ export const obasixTheme = createTheme({
         label: {
           fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
           fontWeight: 600,
-          "&.Mui-active, &.Mui-completed": { fontWeight: 800, color: brand.charcoal },
+          "&.Mui-active, &.Mui-completed": { fontWeight: 600, color: brand.charcoal },
         },
       },
     },
@@ -328,17 +327,17 @@ export const obasixTheme = createTheme({
     },
     MuiAccordionSummary: {
       styleOverrides: {
-        content: { fontFamily: 'var(--font-display), Helvetica Neue, sans-serif', fontWeight: 700, fontSize: 17, letterSpacing: "-0.01em", color: brand.charcoal },
+        content: { fontFamily: 'var(--font-display), Helvetica Neue, sans-serif', fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", color: brand.charcoal },
       },
     },
     MuiDivider: {
       styleOverrides: { root: { borderColor: brand.line } },
     },
     MuiBadge: {
-      styleOverrides: { badge: { borderRadius: 0, fontWeight: 700, fontFamily: 'var(--font-display), sans-serif' } },
+      styleOverrides: { badge: { borderRadius: 99, fontWeight: 600, fontFamily: 'var(--font-display), sans-serif' } },
     },
     MuiSnackbarContent: {
-      styleOverrides: { root: { borderRadius: 0, backgroundColor: brand.charcoal, borderLeft: `4px solid ${brand.signal}` } },
+      styleOverrides: { root: { borderRadius: 14, backgroundColor: brand.charcoal } },
     },
     MuiCard: {
       defaultProps: {
@@ -347,7 +346,7 @@ export const obasixTheme = createTheme({
       styleOverrides: {
         root: {
           border: `1px solid ${brand.line}`,
-          borderRadius: 0,
+          borderRadius: brand.radius,
           backgroundImage: "none",
           backgroundColor: brand.paper,
         },
@@ -369,8 +368,8 @@ export const obasixTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
-          fontWeight: 600,
+          borderRadius: 999,
+          fontWeight: 500,
           fontFamily: 'var(--font-display), Helvetica Neue, sans-serif',
           letterSpacing: "0",
         },
@@ -400,7 +399,8 @@ export const obasixTheme = createTheme({
       },
       styleOverrides: {
         root: {
-          backgroundColor: brand.white,
+          backgroundColor: "rgba(255,255,255,0.82)",
+          backdropFilter: "saturate(180%) blur(18px)",
           color: brand.charcoal,
           borderBottom: `1px solid ${brand.line}`,
         },
@@ -409,6 +409,16 @@ export const obasixTheme = createTheme({
     MuiContainer: {
       defaultProps: {
         maxWidth: "lg",
+      },
+      styleOverrides: {
+        root: ({ theme }) => ({
+          paddingLeft: 20,
+          paddingRight: 20,
+          [theme.breakpoints.up("sm")]: { paddingLeft: 32, paddingRight: 32 },
+          [theme.breakpoints.up("md")]: { paddingLeft: 48, paddingRight: 48 },
+          [theme.breakpoints.up("lg")]: { paddingLeft: 64, paddingRight: 64 },
+        }),
+        maxWidthLg: { "@media (min-width: 1200px)": { maxWidth: 1440 } },
       },
     },
     MuiLink: {
@@ -419,7 +429,7 @@ export const obasixTheme = createTheme({
     MuiToggleButton: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
+          borderRadius: 10,
           "&.Mui-selected": {
             backgroundColor: brand.paleGreen,
             color: brand.forest,

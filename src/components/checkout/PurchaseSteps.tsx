@@ -2,7 +2,6 @@
 
 import Box from "@mui/material/Box";
 import Link from "@/components/Link";
-import { signType } from "@/components/home/directory/sign";
 import { brandTokens as brand } from "@/theme/brandTokens";
 
 const steps = [
@@ -12,16 +11,14 @@ const steps = [
   { href: "/orders/track", label: "Track Order" },
 ];
 
-/** Purchase route as a wayfinding strip: done steps carry the tick, the current one the orange plate. */
-export function PurchaseSteps({ current, tone = "light" }: { current: number; tone?: "light" | "dark" }) {
-  const dark = tone === "dark";
+/** Purchase progress: a quiet segmented rail. Done steps in brand green, current in ink. */
+export function PurchaseSteps({ current }: { current: number; tone?: "light" | "dark" }) {
   return (
     <Box component="nav" aria-label="Purchase steps" sx={{ mt: 3, maxWidth: 760 }}>
-      <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+      <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 1 }}>
         {steps.map((step, index) => {
           const done = index < current;
           const on = index === current;
-          const lineColor = done || on ? brand.signal : dark ? "rgba(255,255,255,0.22)" : brand.line;
           return (
             <Box component="li" key={step.label} sx={{ minWidth: 0 }}>
               <Box
@@ -32,26 +29,17 @@ export function PurchaseSteps({ current, tone = "light" }: { current: number; to
                   display: "flex",
                   flexDirection: "column",
                   gap: 1,
-                  pt: 1.25,
-                  pr: 1,
-                  borderTop: `4px solid ${lineColor}`,
-                  color: on ? (dark ? brand.white : brand.charcoal) : dark ? "rgba(255,255,255,0.72)" : brand.body,
-                  transition: "color 180ms",
-                  "&:hover": { color: dark ? brand.white : brand.charcoal },
-                  "&:focus-visible": { outline: `3px solid ${brand.signal}`, outlineOffset: 2 },
+                  color: on ? brand.charcoal : brand.muted,
+                  transition: "color 160ms",
+                  "&:hover": { color: brand.charcoal },
+                  "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: 4, borderRadius: 1 },
                 }}
               >
-                <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.75, ...signType.code, fontSize: 12, color: done ? (dark ? "#FFC59E" : brand.signalInk) : "inherit" }}>
-                  {done ? (
-                    <Box component="svg" viewBox="0 0 24 24" aria-hidden sx={{ width: 14, height: 14 }}>
-                      <path d="M3.5 12.5l5.5 5.5L21 4.5" stroke="currentColor" strokeWidth="3.5" strokeLinecap="square" fill="none" />
-                    </Box>
-                  ) : null}
-                  {String(index + 1).padStart(2, "0")}
-                  {done ? <Box component="span" sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}> completed</Box> : null}
-                </Box>
-                <Box component="span" sx={{ ...signType.plate, fontSize: { xs: 13.5, sm: 16 }, fontWeight: on ? 800 : 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: { xs: "normal", sm: "nowrap" } }}>
+                <Box aria-hidden sx={{ height: 3, borderRadius: 99, bgcolor: on ? brand.charcoal : done ? brand.forest : brand.line }} />
+                <Box component="span" sx={{ fontSize: { xs: 12.5, sm: 14 }, fontWeight: on ? 600 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: { xs: "normal", sm: "nowrap" } }}>
+                  {done ? "✓ " : ""}
                   {step.label}
+                  {done ? <Box component="span" sx={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", whiteSpace: "nowrap", clip: "rect(0 0 0 0)" }}> completed</Box> : null}
                 </Box>
               </Box>
             </Box>

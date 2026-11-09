@@ -69,7 +69,7 @@ export function DesignYourBoardSection() {
                     onClick={() => setSelectedId(item.id)}
                     aria-pressed={active}
                     sx={{
-                      borderRadius: 0,
+                      borderRadius: "16px",
                       border: "1px solid",
                       borderColor: active ? home.green : home.line,
                       color: active ? home.green : home.muted,

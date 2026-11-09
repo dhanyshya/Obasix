@@ -386,8 +386,8 @@ export function ProductShowroom() {
 
   return (
     <Box sx={{ bgcolor: "background.default" }}>
-      <Box sx={{ bgcolor: "#0B2E22", color: "#FFFFFF" }}>
-        <Container maxWidth={false} sx={{ maxWidth: 1440, pt: { xs: 4.5, md: 7 }, pb: { xs: 4, md: 6 } }}>
+      <Box sx={{ bgcolor: "#FFFFFF", color: "#1B1D1C" }}>
+        <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 }, pt: { xs: 5, md: 9 }, pb: { xs: 4, md: 6 } }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={{ xs: 2.5, md: 4 }}
@@ -397,24 +397,23 @@ export function ProductShowroom() {
               <Typography
                 variant="h1"
                 sx={{
-                  fontSize: { xs: "2.6rem", sm: "3.4rem", md: "4.4rem" },
-                  fontWeight: 800,
-                  fontVariationSettings: '"wdth" 88',
+                  fontSize: { xs: "2.4rem", sm: "3.2rem", md: "4.25rem" },
+                  fontWeight: 600,
                   letterSpacing: "-0.04em",
-                  lineHeight: 0.92,
-                  color: "#FFFFFF",
+                  lineHeight: 1.02,
+                  color: "#1B1D1C",
                 }}
               >
                 Find the right board for your space.
               </Typography>
-              <Typography sx={{ mt: 2.25, color: "rgba(255,255,255,0.82)", fontSize: { xs: 15.5, md: 17 }, maxWidth: 540, lineHeight: 1.6 }}>
+              <Typography sx={{ mt: 2.25, color: "#4A4F4C", fontSize: { xs: 16, md: 18 }, maxWidth: 540, lineHeight: 1.6 }}>
                 Every OBASIX board, stand and accessory, with its product code, sizes and price.
               </Typography>
             </Box>
             <Button
               component={Link}
               href="/products?guide=1"
-              variant="contained"
+              variant="outlined"
               endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
               sx={{ alignSelf: { xs: "flex-start", md: "flex-end" }, flexShrink: 0 }}
             >
@@ -422,11 +421,6 @@ export function ProductShowroom() {
             </Button>
           </Stack>
         </Container>
-        <Box aria-hidden sx={{ display: "grid", gridTemplateColumns: "6fr 1fr 2fr", height: 4 }}>
-          <Box sx={{ bgcolor: "#164E3B" }} />
-          <Box sx={{ bgcolor: "#EE6A1F" }} />
-          <Box sx={{ bgcolor: "#C8282E" }} />
-        </Box>
       </Box>
 
       <Box
@@ -437,7 +431,7 @@ export function ProductShowroom() {
           bgcolor: "background.paper",
         }}
       >
-        <Container maxWidth={false} sx={{ maxWidth: 1440 }}>
+        <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 } }}>
           <Box
             component="nav"
             aria-label="Product categories"
@@ -497,7 +491,7 @@ export function ProductShowroom() {
         </Container>
       </Box>
 
-      <Container maxWidth={false} sx={{ maxWidth: 1440, pt: 2.75, pb: 1.5 }}>
+      <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 }, pt: 2.75, pb: 1.5 }}>
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={1.5}
@@ -516,7 +510,7 @@ export function ProductShowroom() {
                     onDelete={() => setParams({ [chip.key]: null })}
                     size="small"
                     variant="outlined"
-                    sx={{ borderRadius: 0 }}
+                    sx={{ borderRadius: "16px" }}
                   />
                 ))}
                 <Button size="small" onClick={clearFilters} sx={{ px: 0, minWidth: 0 }}>
@@ -535,7 +529,7 @@ export function ProductShowroom() {
             >
               Filter{activeFilters.length > 0 ? ` (${activeFilters.length})` : ""}
             </Button>
-            <FormControl size="small" sx={{ minWidth: 150, bgcolor: "background.paper", borderRadius: 0 }}>
+            <FormControl size="small" sx={{ minWidth: 150, bgcolor: "background.paper", borderRadius: "16px" }}>
               <InputLabel id="sort-label">Sort by</InputLabel>
               <Select
                 labelId="sort-label"
@@ -555,7 +549,7 @@ export function ProductShowroom() {
         </Stack>
       </Container>
 
-      <Container maxWidth={false} sx={{ maxWidth: 1440, pt: 1.5 }}>
+      <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 }, pt: 1.5 }}>
         {visible.length === 0 ? (
           <Box
             sx={{
@@ -578,9 +572,9 @@ export function ProductShowroom() {
             </Button>
           </Box>
         ) : (
-          <Grid container rowSpacing={{ xs: 4, md: 6 }} columnSpacing={{ xs: 2, md: 3 }}>
+          <Grid container rowSpacing={{ xs: 4, md: 6 }} columnSpacing={{ xs: 1.5, md: 3 }}>
             {visible.map((product) => (
-              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+              <Grid key={product.id} size={{ xs: 6, md: 4, lg: 3 }}>
                 <ProductCard product={product} onQuickView={setQuickProduct} />
               </Grid>
             ))}
@@ -598,7 +592,7 @@ export function ProductShowroom() {
             {relatedAccessories.length > 0 ? (
               <Grid container spacing={2.5} sx={{ mt: 0.5 }}>
                 {relatedAccessories.map((item) => (
-                  <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                  <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
                     <ProductCard product={item} />
                   </Grid>
                 ))}

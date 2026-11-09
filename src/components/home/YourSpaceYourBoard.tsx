@@ -82,7 +82,7 @@ export function YourSpaceYourBoard() {
                 onClick={() => setActive(space.id)}
                 aria-pressed={isActive}
                 sx={{
-                  borderRadius: 0,
+                  borderRadius: "16px",
                   px: { xs: 1.5, md: 2.25 },
                   py: 1.5,
                   minWidth: 0,

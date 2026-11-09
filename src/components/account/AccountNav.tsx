@@ -46,11 +46,11 @@ export function AccountNav() {
               px: { xs: 1.5, md: 2 },
               py: 1.75,
               whiteSpace: "nowrap",
-              color: active ? brand.white : "rgba(255,255,255,0.72)",
-              boxShadow: active ? `inset 0 -4px 0 ${brand.signal}` : "inset 0 -4px 0 transparent",
+              color: active ? brand.white : "#4A4F4C",
+              boxShadow: active ? "inset 0 -2px 0 currentColor" : "inset 0 -2px 0 transparent",
               transition: "color 180ms, box-shadow 220ms cubic-bezier(0.16,1,0.3,1)",
-              "&:hover": { color: brand.white, boxShadow: active ? `inset 0 -4px 0 ${brand.signal}` : "inset 0 -4px 0 rgba(255,255,255,0.3)" },
-              "&:focus-visible": { outline: `3px solid ${brand.signal}`, outlineOffset: -3 },
+              "&:hover": { color: brand.charcoal, boxShadow: active ? "inset 0 -2px 0 currentColor" : "inset 0 -2px 0 transparent" },
+              "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: -2 },
             }}
           >
             {link.label}

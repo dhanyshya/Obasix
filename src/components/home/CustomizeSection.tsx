@@ -103,7 +103,7 @@ export function CustomizeSection() {
                       variant="outlined"
                       sx={{
                         position: "relative",
-                        borderRadius: 0,
+                        borderRadius: "16px",
                         px: 2,
                         py: 1.25,
                         fontSize: 14,

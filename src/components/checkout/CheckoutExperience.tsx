@@ -144,7 +144,7 @@ export function CheckoutExperience() {
               maxWidth: 576,
               border: "1px solid",
               borderColor: "divider",
-              borderRadius: 0,
+              borderRadius: "16px",
               bgcolor: "background.paper",
               px: 3,
               py: 8,
@@ -183,7 +183,7 @@ export function CheckoutExperience() {
         >
           <Box sx={{ minWidth: 0 }}>
             <Box component="form" onSubmit={onContinue} noValidate>
-              <Paper variant="outlined" sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: 0 }}>
+              <Paper variant="outlined" sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: "16px" }}>
                 <Stack spacing={4} divider={<Divider flexItem />}>
                   <Box component="section">
                     <Typography variant="h5" component="h2">
@@ -282,7 +282,7 @@ export function CheckoutExperience() {
             <Paper
               component="aside"
               variant="outlined"
-              sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: 0, height: "fit-content", position: { lg: "sticky" }, top: { lg: 112 } }}
+              sx={{ p: { xs: 2.5, sm: 3, md: 3.75 }, borderRadius: "16px", height: "fit-content", position: { lg: "sticky" }, top: { lg: 112 } }}
             >
               <Typography variant="h6" component="h2">
                 Order summary
@@ -337,7 +337,7 @@ function CheckoutHeader() {
       lede={
         <>
           <Box component="p" sx={{ m: 0 }}>
-            <Box component={Link} href="/login?next=/checkout" sx={{ color: "#fff", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 4 }}>
+            <Box component={Link} href="/login?next=/checkout" sx={{ color: "#164E3B", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 4 }}>
               Sign in
             </Box>{" "}
             to keep this cart with your account. You can also continue as a guest.
@@ -348,7 +348,7 @@ function CheckoutHeader() {
         </>
       }
     >
-      <PurchaseSteps current={0} tone="dark" />
+      <PurchaseSteps current={0} />
     </PageMasthead>
   );
 }
@@ -364,7 +364,7 @@ function SummaryLine({ item }: { item: CartItem }) {
 
   return (
     <Box component="li" sx={{ display: "grid", gridTemplateColumns: "72px 1fr", gap: 1.5 }}>
-      <Box sx={{ position: "relative", height: 72, overflow: "hidden", borderRadius: 0, bgcolor: "background.default" }}>
+      <Box sx={{ position: "relative", height: 72, overflow: "hidden", borderRadius: "16px", bgcolor: "background.default" }}>
         {product.images[0] ? (
           <Image src={product.images[0]} alt="" fill className="object-contain p-1" sizes="72px" />
         ) : null}

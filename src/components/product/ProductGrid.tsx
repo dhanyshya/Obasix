@@ -19,7 +19,7 @@ export function ProductGrid({
         sx={{
           border: "1px dashed",
           borderColor: "divider",
-          borderRadius: 0,
+          borderRadius: "16px",
           bgcolor: "background.paper",
           px: 3,
           py: 8,
@@ -39,7 +39,7 @@ export function ProductGrid({
   return (
     <Grid container spacing={2.5}>
       {products.map((product) => (
-        <Grid key={product.id} size={{ xs: 12, sm: 6, xl: 4 }}>
+        <Grid key={product.id} size={{ xs: 6, xl: 4 }}>
           <ProductCard product={product} onQuickView={onQuickView} />
         </Grid>
       ))}

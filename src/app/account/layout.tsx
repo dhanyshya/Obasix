@@ -11,11 +11,10 @@ export default async function AccountLayout({ children }: { children: React.Reac
   if (!session) redirect("/login?next=/account");
   return (
     <Box sx={{ bgcolor: brand.ivory }}>
-      <Box sx={{ bgcolor: brand.forestDeep, color: brand.white }}>
+      <Box sx={{ bgcolor: brand.white, color: brand.charcoal }}>
         <Box sx={{ ...pageMax, ...pagePad, pt: { xs: 3, md: 4 } }}>
           <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.25 }}>
-            <Box aria-hidden sx={{ width: 10, height: 10, bgcolor: brand.signal }} />
-            <Typography sx={{ ...signType.code, fontSize: 13, color: "#FFC59E" }}>YOUR ACCOUNT</Typography>
+            <Typography sx={{ ...signType.code, fontSize: 13, color: "#164E3B" }}>YOUR ACCOUNT</Typography>
           </Box>
           <Box sx={{ mt: 1.5 }}>
             <AccountNav />

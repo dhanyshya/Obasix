@@ -20,7 +20,7 @@ function QuoteContent() {
         crumbs={[{ href: "/", label: "Home" }, { label: "Request a Quote" }]}
       />
 
-      <Container sx={{ maxWidth: 1200, py: { xs: 4, md: 5.5 } }}>
+      <Container sx={{ py: { xs: 4, md: 6 } }}>
         <QuoteForm
           initial={{
             boardType: searchParams.get("boardType") ?? "",
@@ -31,6 +31,7 @@ function QuoteContent() {
             features: searchParams.get("features") ?? "",
             branding: searchParams.get("branding") ?? "",
             configurationSummary: searchParams.get("config") ?? "",
+            requirements: searchParams.get("notes") ?? "",
             product: searchParams.get("product") ?? "",
             productId: searchParams.get("productId") ?? "",
             frame: searchParams.get("frame") ?? "",
@@ -49,7 +50,7 @@ export default function QuotePage() {
     <Suspense
       fallback={
         <Box sx={{ bgcolor: quoteTheme.ivory, py: 10 }}>
-          <Container sx={{ maxWidth: 1200 }}>
+          <Container>
             <Typography sx={{ color: quoteTheme.muted }}>Loading quote form...</Typography>
           </Container>
         </Box>

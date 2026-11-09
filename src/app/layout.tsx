@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Inter } from "next/font/google";
+import { Inter, Inter_Tight } from "next/font/google";
 import Box from "@mui/material/Box";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -9,10 +9,10 @@ import { AppProviders } from "@/components/providers/AppProviders";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
-const display = Archivo({
+const display = Inter_Tight({
   variable: "--font-display",
   subsets: ["latin"],
-  axes: ["wdth"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 

@@ -153,7 +153,7 @@ export function PaymentExperience() {
             : "Card details are not collected here. A payment starts only after the server verifies a provider."
         }
       >
-        <PurchaseSteps current={1} tone="dark" />
+        <PurchaseSteps current={1} />
       </PageMasthead>
 
       <Container sx={{ py: 5 }}>
@@ -165,7 +165,7 @@ export function PaymentExperience() {
                 sx={{
                   border: "1px solid",
                   borderColor: "divider",
-                  borderRadius: 0,
+                  borderRadius: "16px",
                   bgcolor: "background.paper",
                   px: 3,
                   py: 6,
@@ -189,7 +189,7 @@ export function PaymentExperience() {
                 </Typography>
               </Stack>
             ) : mode === "demo" ? (
-              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3.5 }, borderTop: "6px solid #164E3B" }}>
+              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3.5 }, borderTop: 0 }}>
                 <Alert severity="info" sx={{ fontWeight: 600 }}>
                   DEMO MODE — NO REAL PAYMENT
                 </Alert>
@@ -253,7 +253,7 @@ export function PaymentExperience() {
                 ) : null}
               </Paper>
             ) : (
-              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3.5 }, borderTop: "6px solid #164E3B" }}>
+              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3.5 }, borderTop: 0 }}>
                 <Typography variant="h5" component="h2">
                   Ready to pay
                 </Typography>
@@ -307,7 +307,7 @@ export function PaymentExperience() {
           </Grid>
 
           <Grid size={{ xs: 12, lg: 5 }}>
-            <Paper component="aside" variant="outlined" sx={{ p: { xs: 2.5, md: 3 }, borderRadius: 0, height: "fit-content" }}>
+            <Paper component="aside" variant="outlined" sx={{ p: { xs: 2.5, md: 3 }, borderRadius: "16px", height: "fit-content" }}>
               <Typography variant="h6" component="h2">
                 Amount
               </Typography>

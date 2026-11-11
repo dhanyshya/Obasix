@@ -19,7 +19,6 @@ import {
 } from "@/lib/productActions";
 import {
   productCardActionContainedSx,
-  productCardActionOutlineSx,
 } from "./productCardButtonStyles";
 
 export type ProductActionsVariant = "card" | "detail" | "compact";
@@ -126,12 +125,7 @@ export function ProductActions({
   return (
     <Box sx={{ width: "100%" }}>
       <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1.7fr",
-          alignItems: "stretch",
-          gap: { xs: 0.4, sm: 0.5 },
-        }}
+        sx={{ display: "flex" }}
       >
         {showCart ? (
           <Button
@@ -147,38 +141,6 @@ export function ProductActions({
         ) : (
           <Button size="small" variant="contained" disabled sx={productCardActionContainedSx}>
             Add to Cart
-          </Button>
-        )}
-        {showCustomize ? (
-          <Button
-            component={Link}
-            href={productCustomizeHref(product, selectedSize)}
-            size="small"
-            variant="outlined"
-            onClick={onNavigating}
-            sx={productCardActionOutlineSx}
-          >
-            Customise
-          </Button>
-        ) : (
-          <Button size="small" variant="outlined" disabled sx={productCardActionOutlineSx}>
-            Customise
-          </Button>
-        )}
-        {showVisualize ? (
-          <Button
-            component={Link}
-            href={buildVisualizeHref({ productId: product.id, sizeId: selectedSize })}
-            size="small"
-            variant="outlined"
-            onClick={onNavigating}
-            sx={productCardActionOutlineSx}
-          >
-            Visualise Your Space
-          </Button>
-        ) : (
-          <Button size="small" variant="outlined" disabled sx={productCardActionOutlineSx}>
-            Visualise Your Space
           </Button>
         )}
       </Box>

@@ -178,6 +178,10 @@ export interface CustomizerState {
   quantity: number;
   /** Multi-surface layout; defaults to single catalogue surface when omitted. */
   combinationLayout?: CombinationLayout;
+  /** Back surface for a double-sided build ("none" = single-sided). Quote only. */
+  backMaterialId?: CombinationMaterialId | "none";
+  /** Free-text requests sent with the quote. */
+  notes?: string;
 }
 
 export interface QuoteRequest {

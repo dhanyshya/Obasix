@@ -2,9 +2,9 @@ import Image from "next/image";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import NextLink from "@/components/Link";
 import { brandTokens as brand } from "@/theme/brandTokens";
+import { SignArrow } from "@/components/home/directory/sign";
 
 const columns = [
   {
@@ -40,22 +40,24 @@ const footerLinkSx = {
   display: "inline-flex",
   alignItems: "center",
   minHeight: 38,
-  color: "rgba(247,245,240,0.6)",
-  fontSize: 12.5,
+  color: brand.body,
+  fontSize: 14.5,
   lineHeight: 1.4,
-  transition: "color 0.2s ease, transform 0.2s ease",
-  "&:hover": { color: brand.ivory, transform: "translateX(3px)" },
-  "&:focus-visible": { outline: `1px solid ${brand.oak}`, outlineOffset: 2 },
+  transition: "color 180ms ease, box-shadow 220ms cubic-bezier(0.16,1,0.3,1)",
+  boxShadow: "inset 0 -1px 0 transparent",
+  "&:hover": { color: brand.charcoal, textDecoration: "underline", textUnderlineOffset: 3 },
+  "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: 2 },
 } as const;
 
 const contactLinkSx = {
   display: "inline-block",
-  color: "rgba(247,245,240,0.72)",
-  fontSize: 13.5,
-  lineHeight: 1.6,
-  transition: "color 0.2s ease",
-  "&:hover": { color: brand.oak },
-  "&:focus-visible": { outline: `1px solid ${brand.oak}`, outlineOffset: 2 },
+  color: brand.charcoal,
+  fontSize: 15,
+  fontWeight: 600,
+  lineHeight: 1.7,
+  transition: "color 180ms ease",
+  "&:hover": { color: brand.forest },
+  "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: 2 },
 } as const;
 
 export function Footer() {
@@ -66,8 +68,9 @@ export function Footer() {
         mt: "auto",
         position: "relative",
         overflow: "hidden",
-        bgcolor: brand.charcoal,
-        color: brand.ivory,
+        bgcolor: brand.ivory,
+        color: brand.charcoal,
+        borderTop: `1px solid ${brand.line}`,
       }}
     >
       <Box
@@ -87,7 +90,7 @@ export function Footer() {
             gridTemplateColumns: { xs: "1fr", md: "repeat(12, minmax(0, 1fr))" },
             gap: { xs: 6, md: 4 },
             pb: { xs: 6, md: 8 },
-            borderBottom: "1px solid rgba(247,245,240,0.12)",
+            borderBottom: `1px solid ${brand.line}`,
           }}
         >
           <Box sx={{ gridColumn: { md: "1 / 5" }, maxWidth: 390 }}>
@@ -97,7 +100,7 @@ export function Footer() {
               aria-label="OBASIX home"
               sx={{
                 display: "inline-flex",
-                "&:focus-visible": { outline: `2px solid ${brand.oak}`, outlineOffset: 4 },
+                "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: 4 },
               }}
             >
               <Image
@@ -105,33 +108,33 @@ export function Footer() {
                 alt="OBASIX"
                 width={550}
                 height={182}
-                sizes="210px"
-                style={{ display: "block", width: 210, height: "auto" }}
+                sizes="150px"
+                style={{ display: "block", width: 150, height: "auto" }}
               />
             </Box>
             <Typography
               sx={{
                 mt: 2.5,
                 maxWidth: 330,
-                fontFamily: "var(--font-display), Georgia, serif",
-                fontSize: 23,
-                lineHeight: 1.15,
-                letterSpacing: "-0.02em",
-                color: brand.ivory,
+                fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+                fontSize: 24,
+                fontWeight: 600,
+                                lineHeight: 1.02,
+                letterSpacing: "-0.03em",
+                color: brand.charcoal,
               }}
             >
               Boards for Working Spaces.
             </Typography>
-            <Typography sx={{ mt: 1.25, maxWidth: 320, fontSize: 13, lineHeight: 1.75, color: "rgba(247,245,240,0.52)" }}>
-              Thoughtfully designed writing surfaces and workspace solutions for environments where people
-              work, learn, collaborate and create.
+            <Typography sx={{ mt: 1.25, maxWidth: 320, fontSize: 14.5, lineHeight: 1.7, color: brand.body }}>
+              Whiteboards, notice boards, stands and accessories, made at our factory in Bawana, Delhi.
             </Typography>
-            <Typography sx={{ mt: 1.25, maxWidth: 320, fontSize: 11.5, lineHeight: 1.7, color: "rgba(247,245,240,0.42)" }}>
-              Designed in India. Made to your requirements.
+            <Typography sx={{ mt: 1.25, maxWidth: 320, fontSize: 14, lineHeight: 1.7, color: brand.body }}>
+              Custom sizes, logos and bulk orders quoted on request.
             </Typography>
 
             <Box sx={{ mt: 3.5 }}>
-              <Typography sx={{ fontSize: 9.5, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(247,245,240,0.38)" }}>
+              <Typography sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: "-0.01em", color: brand.body }}>
                 Talk to us
               </Typography>
               <Stack spacing={0.35} sx={{ mt: 1.5 }}>
@@ -141,7 +144,7 @@ export function Footer() {
                 <Box component="a" href="mailto:info@obasix.com" sx={contactLinkSx}>
                   info@obasix.com
                 </Box>
-                <Typography sx={{ pt: 0.75, fontSize: 11.5, lineHeight: 1.65, color: "rgba(247,245,240,0.38)", maxWidth: 280 }}>
+                <Typography sx={{ pt: 0.75, fontSize: 13.5, lineHeight: 1.65, color: brand.body, maxWidth: 280 }}>
                   1105, 11th Floor, Ansal Bhawan, 16 KG Marg, New Delhi 110001
                 </Typography>
               </Stack>
@@ -157,19 +160,21 @@ export function Footer() {
                 mt: 3,
                 pb: 0.75,
                 minHeight: 44,
-                borderBottom: `1px solid ${brand.oak}`,
-                color: brand.oak,
-                fontSize: 10,
+                
+                color: brand.charcoal,
+                fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+                fontSize: 15,
                 fontWeight: 700,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                transition: "color 0.2s ease, gap 0.2s ease",
-                "&:hover": { color: brand.ivory, gap: 1.5 },
-                "&:focus-visible": { outline: `2px solid ${brand.oak}`, outlineOffset: 3 },
+                letterSpacing: "-0.01em",
+                transition: "color 180ms ease",
+                "&:hover": { color: brand.forest },
+                "&:hover svg": { transform: "translateX(4px)" },
+                "& svg": { transition: "transform 220ms cubic-bezier(0.16,1,0.3,1)" },
+                "&:focus-visible": { outline: `2px solid ${brand.forest}`, outlineOffset: 3 },
               }}
             >
               Start a project
-              <ArrowForwardIcon sx={{ fontSize: 15 }} aria-hidden />
+              <SignArrow size={16} color={brand.forest} />
             </Box>
           </Box>
 
@@ -184,13 +189,8 @@ export function Footer() {
             {columns.map((column) => (
               <Box key={column.title}>
                 <Typography
-                  sx={{
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    letterSpacing: "0.22em",
-                    textTransform: "uppercase",
-                    color: "rgba(247,245,240,0.4)",
-                  }}
+                  component="h2"
+                  sx={{ fontSize: 14, fontWeight: 600, color: brand.charcoal, pb: 0.5 }}
                 >
                   {column.title}
                 </Typography>
@@ -216,10 +216,10 @@ export function Footer() {
             gap: 1.5,
           }}
         >
-          <Typography sx={{ fontSize: 10.5, letterSpacing: "0.06em", color: "rgba(247,245,240,0.38)" }}>
+          <Typography sx={{ fontSize: 12.5, color: brand.body }}>
             © 2026 OBASIX Industries Pvt. Ltd. All Rights Reserved.
           </Typography>
-          <Typography sx={{ fontSize: 9.5, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(247,245,240,0.34)" }}>
+          <Typography sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: "-0.01em", color: brand.body }}>
             A HSN Group company
           </Typography>
         </Box>

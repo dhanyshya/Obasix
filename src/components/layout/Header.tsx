@@ -14,7 +14,6 @@ import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -124,21 +123,22 @@ export function Header() {
 
   const navButtonSx = {
     color: brand.charcoal,
-    fontSize: { lg: 10.5, xl: 11 },
-    fontWeight: 600,
-    letterSpacing: "0.15em",
-    textTransform: "uppercase" as const,
-    px: { xs: 1.1, lg: 1.4, xl: 1.7 },
+    fontFamily: "var(--font-body), sans-serif",
+    fontSize: { lg: 14.5, xl: 15 },
+    fontWeight: 500,
+    letterSpacing: "0",
+    textTransform: "none" as const,
+    px: { xs: 1.1, lg: 1.5, xl: 1.9 },
     py: 1,
     minWidth: 0,
-    minHeight: 44,
-    borderRadius: 0,
-    borderBottom: "1px solid transparent",
+    minHeight: 40,
+    borderRadius: "999px",
+    border: 0,
     bgcolor: "transparent",
-    transition: "color 0.18s ease, border-color 0.18s ease",
+    transition: "color 0.18s ease, background-color 0.18s ease",
     "&:hover": {
-      bgcolor: "transparent",
-      color: brand.forest,
+      bgcolor: "rgba(27,29,28,0.05)",
+      color: brand.charcoal,
     },
     "&:focus-visible": {
       outline: `2px solid ${brand.forest}`,
@@ -151,11 +151,11 @@ export function Header() {
     transition: "color 0.18s ease, background-color 0.18s ease",
     width: 40,
     height: 40,
-    borderRadius: 1,
-    "&:hover": { color: "primary.main", bgcolor: "primary.light" },
+    borderRadius: "50%",
+    "&:hover": { color: brand.charcoal, bgcolor: "rgba(27,29,28,0.05)" },
     "&:focus-visible": {
       outline: "2px solid",
-      outlineColor: "primary.main",
+      outlineColor: brand.forest,
       outlineOffset: 2,
     },
   } as const;
@@ -165,70 +165,22 @@ export function Header() {
       position="sticky"
       sx={{
         zIndex: (t) => t.zIndex.appBar,
-        bgcolor: brand.white,
-        borderBottom: `1px solid ${brand.line}`,
-        backdropFilter: scrolled ? "blur(10px)" : "none",
-        transition: "box-shadow 0.22s ease",
-        boxShadow: scrolled ? "0 6px 24px rgba(37,42,38,0.055)" : "none",
+        bgcolor: "rgba(255,255,255,0.78)",
+        backdropFilter: "saturate(180%) blur(20px)",
+        WebkitBackdropFilter: "saturate(180%) blur(20px)",
+        borderBottom: `1px solid ${scrolled ? brand.line : "transparent"}`,
+        transition: "border-color 0.22s ease",
+        boxShadow: "none",
       }}
     >
-      <Box sx={{ bgcolor: brand.forestDeep, color: brand.ivory }}>
-        <Container
-          maxWidth={false}
-          sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 } }}
-        >
-          <Stack
-            direction="row"
-            sx={{
-              minHeight: 30,
-              alignItems: "center",
-              justifyContent: { xs: "center", sm: "space-between" },
-              gap: 2,
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: { xs: 9.5, sm: 10 },
-                fontWeight: 600,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "rgba(247,245,240,0.78)",
-                textAlign: "center",
-              }}
-            >
-              Made-to-measure boards, planned around your space
-            </Typography>
-            <Box
-              component={NextLink}
-              href="/quote"
-              sx={{
-                display: { xs: "none", sm: "inline-flex" },
-                alignItems: "center",
-                minHeight: 32,
-                fontSize: 9.5,
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: brand.oak,
-                transition: "color 0.2s ease",
-                "&:hover": { color: brand.ivory },
-                "&:focus-visible": { outline: `1px solid ${brand.oak}`, outlineOffset: 2 },
-              }}
-            >
-              Talk to us
-            </Box>
-          </Stack>
-        </Container>
-      </Box>
-
       <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 } }}>
         <Toolbar
           disableGutters
           sx={{
-            minHeight: { xs: 58, sm: 64, md: 72 },
+            minHeight: { xs: 60, sm: 64, md: 72 },
             gap: { xs: 1, md: 2 },
             display: "grid",
-            gridTemplateColumns: "1fr auto 1fr",
+            gridTemplateColumns: { xs: "auto 1fr", lg: "1fr auto 1fr" },
             alignItems: "center",
           }}
         >
@@ -265,7 +217,7 @@ export function Header() {
                 height={182}
                 priority
                 sizes="(max-width: 900px) 108px, 146px"
-                style={{ display: "block", width: "clamp(108px, 11vw, 146px)", height: "auto" }}
+                style={{ display: "block", width: "clamp(96px, 10vw, 136px)", height: "auto" }}
               />
             </Box>
           </Stack>
@@ -305,9 +257,8 @@ export function Header() {
                     }
                     sx={{
                       ...navButtonSx,
-                      color: megaOpen || pathname.startsWith("/products") ? "primary.main" : "text.primary",
-                      borderBottomColor:
-                        megaOpen || pathname.startsWith("/products") ? "primary.main" : "transparent",
+                      "&&": { fontWeight: 500, fontSize: { lg: 14.5, xl: 15 }, letterSpacing: "0", textTransform: "none", bgcolor: megaOpen ? "rgba(27,29,28,0.05)" : "transparent", border: 0, color: brand.charcoal },
+                      color: brand.charcoal,
                     }}
                   >
                     {item.label}
@@ -324,8 +275,8 @@ export function Header() {
                     onFocus={() => setMegaOpen(false)}
                     sx={{
                       ...navButtonSx,
-                      color: active ? "primary.main" : "text.primary",
-                      borderBottomColor: active ? "primary.main" : "transparent",
+                      color: brand.charcoal,
+                      bgcolor: active ? "rgba(27,29,28,0.06)" : "transparent",
                     }}
                   >
                     {item.label}
@@ -405,7 +356,7 @@ export function Header() {
               size="small"
               sx={iconBtnSx}
             >
-              <Badge badgeContent={itemCount > 0 ? itemCount : 0} color="primary" max={99}>
+              <Badge badgeContent={itemCount > 0 ? itemCount : 0} max={99} sx={{ "& .MuiBadge-badge": { bgcolor: brand.action, color: brand.white, fontWeight: 700 } }}>
                 <ShoppingBagOutlinedIcon fontSize="small" />
               </Badge>
             </IconButton>
@@ -431,7 +382,7 @@ export function Header() {
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         slotProps={{
-          paper: { sx: { width: "min(100%, 360px)", bgcolor: "background.paper" } },
+          paper: { sx: { width: "min(100%, 380px)", bgcolor: "background.paper", borderTop: 0 } },
         }}
       >
         <Box sx={{ px: 2.5, py: 2, borderBottom: 1, borderColor: "divider" }}>
@@ -488,7 +439,7 @@ export function Header() {
                       sx={{ transition: "transform 0.2s", transform: productsOpen ? "rotate(180deg)" : "none" }}
                     />
                   }
-                  sx={{ justifyContent: "space-between", py: 1.5, color: brand.charcoal, fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}
+                  sx={{ justifyContent: "space-between", py: 1.5, color: brand.charcoal, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontSize: 21, fontWeight: 600, letterSpacing: "-0.02em", textTransform: "none", borderBottom: `1px solid ${brand.line}`, borderRadius: "16px", px: 1 }}
                 >
                   Collections
                 </Button>
@@ -504,7 +455,7 @@ export function Header() {
                 component={NextLink}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                sx={{ justifyContent: "flex-start", py: 1.5, color: brand.charcoal, fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}
+                sx={{ justifyContent: "flex-start", py: 1.5, color: brand.charcoal, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontSize: 21, fontWeight: 600, letterSpacing: "-0.02em", textTransform: "none", borderBottom: `1px solid ${brand.line}`, borderRadius: "16px", px: 1 }}
               >
                 {item.label}
               </Button>

@@ -386,63 +386,42 @@ export function ProductShowroom() {
 
   return (
     <Box sx={{ bgcolor: "background.default" }}>
-      <Container
-        maxWidth={false}
-        sx={{ maxWidth: 1440, pt: { xs: 4, md: 5.5 }, pb: { xs: 3, md: 3.5 } }}
-      >
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={{ xs: 2.5, md: 4 }}
-          sx={{ alignItems: { md: "flex-end" }, justifyContent: "space-between" }}
-        >
-          <Box sx={{ minWidth: 0, maxWidth: 680 }}>
-            <Typography
-              variant="overline"
-              sx={{
-                display: "inline-flex",
-                px: 1,
-                py: 0.35,
-                borderRadius: 0.5,
-                bgcolor: "primary.light",
-                color: "primary.main",
-                letterSpacing: "0.16em",
-                fontSize: 11,
-              }}
-            >
-              Collection
-            </Typography>
-            <Typography
-              variant="h1"
-              sx={{
-                mt: 1.25,
-                fontSize: { xs: "1.85rem", md: "2.45rem" },
-                fontWeight: 600,
-                letterSpacing: "-0.03em",
-                lineHeight: 1.12,
-                color: "text.primary",
-              }}
-            >
-              Find the Right Board for Your Space
-            </Typography>
-            <Box sx={{ width: 44, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 2 }} />
-            <Typography sx={{ mt: 2, color: "text.secondary", fontSize: { xs: 15, md: 16.5 }, maxWidth: 520, lineHeight: 1.7 }}>
-              Explore thoughtfully designed boards, stands and accessories for better working spaces.
-            </Typography>
-          </Box>
-          <Button
-            component={Link}
-            href="/products?guide=1"
-            variant="contained"
-            endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
-            sx={{
-              alignSelf: { xs: "flex-start", md: "flex-end" },
-              flexShrink: 0,
-            }}
+      <Box sx={{ bgcolor: "#FFFFFF", color: "#1B1D1C" }}>
+        <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 }, pt: { xs: 5, md: 9 }, pb: { xs: 4, md: 6 } }}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={{ xs: 2.5, md: 4 }}
+            sx={{ alignItems: { md: "flex-end" }, justifyContent: "space-between" }}
           >
-            Find My Product
-          </Button>
-        </Stack>
-      </Container>
+            <Box sx={{ minWidth: 0, maxWidth: 760 }}>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontSize: { xs: "2.4rem", sm: "3.2rem", md: "4.25rem" },
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.02,
+                  color: "#1B1D1C",
+                }}
+              >
+                Find the right board for your space.
+              </Typography>
+              <Typography sx={{ mt: 2.25, color: "#4A4F4C", fontSize: { xs: 16, md: 18 }, maxWidth: 540, lineHeight: 1.6 }}>
+                Every OBASIX board, stand and accessory, with its product code, sizes and price.
+              </Typography>
+            </Box>
+            <Button
+              component={Link}
+              href="/products?guide=1"
+              variant="outlined"
+              endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
+              sx={{ alignSelf: { xs: "flex-start", md: "flex-end" }, flexShrink: 0 }}
+            >
+              Find My Product
+            </Button>
+          </Stack>
+        </Container>
+      </Box>
 
       <Box
         sx={{
@@ -452,7 +431,7 @@ export function ProductShowroom() {
           bgcolor: "background.paper",
         }}
       >
-        <Container maxWidth={false} sx={{ maxWidth: 1440 }}>
+        <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 } }}>
           <Box
             component="nav"
             aria-label="Product categories"
@@ -512,7 +491,7 @@ export function ProductShowroom() {
         </Container>
       </Box>
 
-      <Container maxWidth={false} sx={{ maxWidth: 1440, pt: 2.75, pb: 1.5 }}>
+      <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 }, pt: 2.75, pb: 1.5 }}>
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={1.5}
@@ -531,7 +510,7 @@ export function ProductShowroom() {
                     onDelete={() => setParams({ [chip.key]: null })}
                     size="small"
                     variant="outlined"
-                    sx={{ borderRadius: 0.5 }}
+                    sx={{ borderRadius: "16px" }}
                   />
                 ))}
                 <Button size="small" onClick={clearFilters} sx={{ px: 0, minWidth: 0 }}>
@@ -546,42 +525,11 @@ export function ProductShowroom() {
               size="small"
               startIcon={<FilterListIcon />}
               onClick={() => setFilterOpen(true)}
-              sx={{
-                bgcolor: "#164E3B",
-                color: "#FFFFFF !important",
-                borderColor: "#164E3B",
-                borderWidth: "1px",
-                borderStyle: "solid",
-                "&, &.MuiButton-outlined, &.MuiButton-colorInherit, &.MuiButton-colorPrimary": {
-                  color: "#FFFFFF !important",
-                  WebkitTextFillColor: "#FFFFFF",
-                },
-                "& .MuiButton-startIcon, & .MuiSvgIcon-root": {
-                  color: "#FFFFFF !important",
-                  fill: "#FFFFFF !important",
-                },
-                transition: "background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease",
-                "&:hover": {
-                  bgcolor: "#0B3528",
-                  borderColor: "#0B3528",
-                  color: "#FFFFFF !important",
-                  WebkitTextFillColor: "#FFFFFF",
-                },
-                "&.Mui-disabled": {
-                  bgcolor: "#E8E6E0 !important",
-                  borderColor: "#E8E6E0 !important",
-                  color: "#6F756D !important",
-                  WebkitTextFillColor: "#6F756D",
-                },
-                "&.Mui-disabled .MuiSvgIcon-root": {
-                  color: "#6F756D !important",
-                  fill: "#6F756D !important",
-                },
-              }}
+              sx={{ minHeight: 44 }}
             >
               Filter{activeFilters.length > 0 ? ` (${activeFilters.length})` : ""}
             </Button>
-            <FormControl size="small" sx={{ minWidth: 150, bgcolor: "background.paper", borderRadius: 0.5 }}>
+            <FormControl size="small" sx={{ minWidth: 150, bgcolor: "background.paper", borderRadius: "16px" }}>
               <InputLabel id="sort-label">Sort by</InputLabel>
               <Select
                 labelId="sort-label"
@@ -601,7 +549,7 @@ export function ProductShowroom() {
         </Stack>
       </Container>
 
-      <Container maxWidth={false} sx={{ maxWidth: 1440, pt: 1.5 }}>
+      <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2.5, sm: 4, md: 6, lg: 8 }, pt: 1.5 }}>
         {visible.length === 0 ? (
           <Box
             sx={{
@@ -624,9 +572,9 @@ export function ProductShowroom() {
             </Button>
           </Box>
         ) : (
-          <Grid container spacing={{ xs: 2, md: 2.5 }}>
+          <Grid container rowSpacing={{ xs: 4, md: 6 }} columnSpacing={{ xs: 1.5, md: 3 }}>
             {visible.map((product) => (
-              <Grid key={product.id} size={{ xs: 12, sm: 6, md: 4, xl: 3 }}>
+              <Grid key={product.id} size={{ xs: 6, md: 4, lg: 3 }}>
                 <ProductCard product={product} onQuickView={setQuickProduct} />
               </Grid>
             ))}
@@ -644,7 +592,7 @@ export function ProductShowroom() {
             {relatedAccessories.length > 0 ? (
               <Grid container spacing={2.5} sx={{ mt: 0.5 }}>
                 {relatedAccessories.map((item) => (
-                  <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4, xl: 3 }}>
+                  <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
                     <ProductCard product={item} />
                   </Grid>
                 ))}

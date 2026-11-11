@@ -47,6 +47,7 @@ import type {
   WallModel,
 } from "@/lib/types";
 import { WallScene } from "./WallScene";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import { AIProductCard } from "@/components/ai/AIProductCard";
 
 type StudioStep = "board" | "customize" | "preview" | "quote";
@@ -427,91 +428,92 @@ export function WallStudio({ wall }: { wall: WallModel }) {
   const currentIndex = stepIndex(step);
 
   return (
-    <Box sx={{ overflowX: "hidden", bgcolor: "background.paper", pb: 18 }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Container sx={{ py: 2 }}>
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", justifyContent: "space-between" }}>
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-              <Button
-                component={Link}
-                href="/visualize"
-                color="inherit"
-                startIcon={<ArrowBackIcon sx={{ fontSize: 14 }} />}
-                sx={{ p: 0, minWidth: 0, fontSize: 14 }}
-              >
-                {wall.name}
-              </Button>
-              <Typography sx={{ fontSize: 12, color: "text.secondary", display: { xs: "none", sm: "block" } }}>
-                or{" "}
-                <Box component={Link} href="/visualize" sx={{ color: "primary.main", fontWeight: 600 }}>
-                  upload your own wall
+    <Box sx={{ overflowX: "hidden", bgcolor: "#F2F3F0", pb: 18 }}>
+      <PageMasthead
+        code="Visualise · Sample room"
+        title={wall.name}
+        crumbs={[{ href: "/visualize", label: "Visualise" }, { label: wall.name }]}
+        compact
+        lede={
+          <>
+            Try boards on this sample wall, or{" "}
+            <Box component={Link} href="/visualize" sx={{ color: "#164E3B", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 4 }}>
+              upload a photo of your own wall
+            </Box>
+            .
+          </>
+        }
+      >
+        <Box component="ol" aria-label="Studio steps" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gridTemplateColumns: `repeat(${stepper.length}, minmax(0, 1fr))`, gap: 0.5 }}>
+          {stepper.map((item, index) => {
+            const active = item.id === step;
+            const done = index < currentIndex || (item.id === "space" && index === 0);
+            const locked = index > reached && item.id !== "space";
+            const railSx = {
+              width: "100%",
+              display: "flex",
+              flexDirection: "column" as const,
+              alignItems: "flex-start",
+              gap: 0.5,
+              pt: 1.25,
+              pb: 0.5,
+              textAlign: "left" as const,
+              borderTop: "2px solid",
+              borderColor: active ? "#1B1D1C" : done ? "#164E3B" : "#E5E5E0",
+              color: active ? "#1B1D1C" : "#6B706D",
+              "&:hover": { color: "#1B1D1C" },
+              "&.Mui-disabled": { opacity: 0.5, color: "#6B706D" },
+              "&.Mui-focusVisible, &:focus-visible": { outline: "2px solid #164E3B", outlineOffset: 2 },
+            };
+            const inner = (
+              <>
+                <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 500, fontSize: 12.5, letterSpacing: "0", color: done && !active ? "#164E3B" : "inherit" }}>
+                  {done && !active ? "✓ " : ""}
+                  {`0${index + 1}`}
                 </Box>
-              </Typography>
-            </Stack>
-            <ButtonBase type="button" onClick={askWallAI} sx={{ display: "block", textAlign: "left", fontSize: 14 }}>
-              <Typography component="span" sx={{ display: "block", fontSize: 11, color: "text.secondary" }}>
-                Not sure what fits your space?
-              </Typography>
-              <Typography component="span" sx={{ fontWeight: 600, color: "secondary.main", fontSize: "inherit" }}>
-                Ask OBASIX AI →
-              </Typography>
-            </ButtonBase>
-          </Stack>
-          <Stack
-            component="ol"
-            direction="row"
-            spacing={1}
-            sx={{ m: 0, mt: 2, p: 0, listStyle: "none", overflowX: "auto", pb: 0.5, fontSize: 12, fontWeight: 600 }}
-          >
-            {stepper.map((item, index) => {
-              const active = item.id === step;
-              const done = index < currentIndex || (item.id === "space" && index === 0);
-              const locked = index > reached && item.id !== "space";
-              const color = active ? "text.primary" : done ? "secondary.main" : "text.secondary";
-              return (
-                <Stack
-                  component="li"
-                  key={item.id}
-                  direction="row"
-                  spacing={1}
-                  sx={{ flexShrink: 0, alignItems: "center" }}
-                >
-                  {index > 0 ? (
-                    <Box component="span" sx={{ color: "divider" }}>
-                      →
-                    </Box>
-                  ) : null}
-                  {item.id === "space" ? (
-                    <Box component={Link} href="/visualize" sx={{ color: "text.secondary" }}>
-                      {`0${index + 1} ${item.label}`}
-                    </Box>
-                  ) : (
-                    <ButtonBase
-                      type="button"
-                      disabled={locked}
-                      onClick={() => go(item.id)}
-                      sx={{ fontSize: "inherit", fontWeight: "inherit", color, "&.Mui-disabled": { opacity: 0.4, color } }}
-                    >
-                      {`0${index + 1} ${item.label}`}
-                    </ButtonBase>
-                  )}
-                </Stack>
-              );
-            })}
-          </Stack>
-        </Container>
-      </Box>
+                <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: active ? 600 : 500, fontSize: { xs: 12, sm: 14.5 }, letterSpacing: "-0.01em", lineHeight: 1.15 }}>
+                  {item.label}
+                </Box>
+              </>
+            );
+            return (
+              <Box component="li" key={item.id} sx={{ minWidth: 0 }}>
+                {item.id === "space" ? (
+                  <Box component={Link} href="/visualize" sx={railSx}>
+                    {inner}
+                  </Box>
+                ) : (
+                  <ButtonBase type="button" disabled={locked} aria-current={active ? "step" : undefined} onClick={() => go(item.id)} sx={railSx}>
+                    {inner}
+                  </ButtonBase>
+                )}
+              </Box>
+            );
+          })}
+        </Box>
+        <ButtonBase type="button" onClick={askWallAI} sx={{ mt: 2.5, display: "inline-flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", "&.Mui-focusVisible": { outline: "2px solid #164E3B", outlineOffset: 2 } }}>
+          <Typography component="span" sx={{ fontSize: 13, color: "#6B706D" }}>
+            Not sure what fits your space?
+          </Typography>
+          <Typography component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 600, fontSize: 15.5, color: "#164E3B", textDecoration: "underline", textUnderlineOffset: 4 }}>
+            Ask OBASIX AI
+          </Typography>
+        </ButtonBase>
+      </PageMasthead>
 
       <Container
+        maxWidth={false}
         sx={{
+          maxWidth: 1440,
+          px: { xs: 2, sm: 4, md: 6, lg: 8 },
           display: "grid",
-          gap: 3,
-          py: { xs: 3, lg: 4 },
+          gap: { xs: 3, lg: 4 },
+          py: { xs: 3, lg: 5 },
           gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.4fr) minmax(280px, 0.8fr)" },
         }}
       >
         <Box sx={{ minWidth: 0 }}>
-          <Box ref={sceneRef} sx={{ position: "relative", minWidth: 0, bgcolor: "#111" }}>
+          <Box ref={sceneRef} sx={{ position: "relative", minWidth: 0, bgcolor: "#1B1D1C", borderRadius: { xs: "20px", md: "28px" }, overflow: "hidden" }}>
             <WallScene
               wall={wall}
               state={state}
@@ -522,7 +524,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
               comparePercent={comparePercent}
               zoom={zoom}
               onBoardOffsetChange={(x, y) => patch({ boardOffsetX: x, boardOffsetY: y })}
-              sx={{ minHeight: { xs: 240, lg: 520 }, borderRadius: 0 }}
+              sx={{ minHeight: { xs: 240, lg: 520 }, borderRadius: "16px" }}
             />
             <Stack spacing={0.5} sx={{ position: "absolute", right: 12, top: 12, zIndex: 30 }}>
               <CanvasButton label="Zoom in" onClick={() => setZoom((value) => Math.min(1.8, value + 0.2))}>
@@ -587,7 +589,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
           </Typography>
         </Box>
 
-        <Box component="aside" sx={{ minWidth: 0 }}>
+        <Box component="aside" sx={{ minWidth: 0, bgcolor: "#FFFFFF", borderTop: 0, p: { xs: 2.5, md: 3.5 }, alignSelf: "start" }}>
           <Box key={step} className="finder-step">
             {step === "board" ? (
               <Panel
@@ -664,7 +666,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
                                 fontSize: 12,
                                 fontWeight: 600,
                                 textTransform: "uppercase",
-                                letterSpacing: "0.12em",
+                                letterSpacing: "0.05em",
                                 color: "secondary.main",
                               }}
                             >
@@ -1047,9 +1049,9 @@ export function WallStudio({ wall }: { wall: WallModel }) {
           right: 0,
           bottom: { xs: "var(--mobile-nav-h, 64px)", md: 0 },
           zIndex: 1000,
-          borderTop: 1,
-          borderColor: "divider",
-          bgcolor: "background.paper",
+          borderTop: "1px solid #E5E5E0",
+          bgcolor: "#FFFFFF",
+          boxShadow: "0 -18px 40px -24px rgba(11,46,34,0.45)",
         }}
       >
         <Container>
@@ -1061,11 +1063,11 @@ export function WallStudio({ wall }: { wall: WallModel }) {
             >
               <Typography
                 component="p"
-                sx={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.14em", color: "text.secondary" }}
+                sx={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}
               >
                 Your board
               </Typography>
-              <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+              <Typography variant="body2" noWrap sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 15.5, color: "text.primary" }}>
                 {product?.shortName ?? "Choose a board"}
                 {" · "}
                 {state.widthFt} × {state.heightFt} ft
@@ -1130,7 +1132,7 @@ function choiceSx(selected: boolean, mode: "dark" | "outline" | "mist"): SxProps
         ? { bgcolor: "background.default", color: "text.primary", borderColor: "text.primary" }
         : { bgcolor: "transparent", color: "text.primary", borderColor: "text.primary" };
   return {
-    borderRadius: 0.5,
+    borderRadius: "16px",
     px: mode === "dark" ? 2 : 1.5,
     py: mode === "dark" ? 1.5 : 1,
     fontSize: 14,
@@ -1152,7 +1154,7 @@ function Panel({
 }) {
   return (
     <Box>
-      <Typography variant="h2" sx={{ fontSize: 24, letterSpacing: "-0.02em" }}>
+      <Typography variant="h2" sx={{ fontSize: { xs: 24, md: 28 }, letterSpacing: "-0.025em" }}>
         {title}
       </Typography>
       <Typography variant="body2" sx={{ mt: 1, lineHeight: 1.7, color: "text.secondary" }}>
@@ -1166,7 +1168,7 @@ function Panel({
 function Group({ label, children }: { label: string; children: ReactNode }) {
   return (
     <Box sx={{ mt: 2.5 }}>
-      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+      <Typography variant="body2" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 15, color: "text.primary" }}>
         {label}
       </Typography>
       <Box sx={{ mt: 1 }}>{children}</Box>
@@ -1275,7 +1277,7 @@ function CanvasButton({
       sx={{
         height: 32,
         width: 32,
-        borderRadius: 0,
+        borderRadius: "16px",
         fontSize: 14,
         bgcolor: "rgba(255,255,255,0.95)",
         color: "text.primary",

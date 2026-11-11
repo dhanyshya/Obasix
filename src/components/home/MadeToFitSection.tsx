@@ -99,7 +99,7 @@ export function MadeToFitSection() {
 
           <Box>
             <Reveal>
-              <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+              <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
                 Customization
               </Typography>
               <Typography variant="h2" sx={{ mt: 1.5, fontSize: { xs: "2rem", md: "2.75rem" }, maxWidth: 420 }}>
@@ -121,7 +121,7 @@ export function MadeToFitSection() {
                     variant={active ? "contained" : "outlined"}
                     size="small"
                     onClick={() => setSelectedId(item.id)}
-                    sx={{ borderRadius: 0.5 }}
+                    sx={{ borderRadius: "16px" }}
                   >
                     {item.shortName}
                   </Button>

@@ -53,7 +53,7 @@ export function MegaMenu({
           <Box key={col.title}>
             <Typography
               variant="overline"
-              sx={{ display: "block", mb: 0.75, color: "primary.main", letterSpacing: "0.14em" }}
+              sx={{ display: "block", mb: 0.75, color: "secondary.main", letterSpacing: "0.06em" }}
             >
               {col.title}
             </Typography>
@@ -70,7 +70,7 @@ export function MegaMenu({
                     px: 1,
                     fontSize: 14,
                     color: "text.primary",
-                    borderRadius: 0.5,
+                    borderRadius: "16px",
                     "&:hover": { bgcolor: "primary.light", color: "primary.main" },
                   }}
                 >
@@ -126,7 +126,7 @@ export function MegaMenu({
           <Box key={col.title}>
             <Typography
               variant="overline"
-              sx={{ display: "block", mb: 1.5, color: "primary.main", letterSpacing: "0.16em" }}
+              sx={{ display: "block", mb: 1.5, pb: 1, color: "secondary.main", letterSpacing: "0.06em", borderBottom: "2px solid #141917" }}
             >
               {col.title}
             </Typography>
@@ -143,7 +143,7 @@ export function MegaMenu({
                     gap: 1.25,
                     alignItems: "center",
                     p: 0.75,
-                    borderRadius: 0.5,
+                    borderRadius: "16px",
                     color: "text.primary",
                     transition: "background-color 0.2s ease",
                     "&:hover": { bgcolor: "primary.light" },
@@ -194,11 +194,11 @@ export function MegaMenu({
             sx={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(to top, rgba(15,61,38,0.88) 0%, rgba(15,61,38,0.15) 70%)",
+              background: "linear-gradient(to top, rgba(11,46,34,0.92) 0%, rgba(11,46,34,0.1) 72%)",
             }}
           />
           <Box sx={{ position: "absolute", insetInline: 0, bottom: 0, p: 2.5, color: "#fff" }}>
-            <Typography variant="overline" sx={{ color: "rgba(255,255,255,0.7)", letterSpacing: "0.16em" }}>
+            <Typography variant="overline" sx={{ color: "#164E3B", letterSpacing: "0.06em" }}>
               01 / Experience
             </Typography>
             <Typography variant="h6" sx={{ mt: 0.75, fontSize: 18, color: "#fff", lineHeight: 1.25 }}>

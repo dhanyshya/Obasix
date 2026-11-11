@@ -40,22 +40,21 @@ export function AccountOverview() {
   return (
     <Stack spacing={3}>
       <Box>
-        <Typography component="h1" variant="h4" sx={{ color: "text.primary" }}>
+        <Typography component="h1" variant="h2" sx={{ fontSize: { xs: 34, md: 46 }, color: "text.primary" }}>
           My account
         </Typography>
-        <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
           {user ? `Signed in as ${user.name}` : "Loading your account..."}
         </Typography>
       </Box>
       <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" } }}>
         {shortcuts.map((item) => (
-          <Paper key={item.href} variant="outlined" component={NextLink} href={item.href} sx={{ p: 2, fontWeight: 600, "&:hover": { borderColor: "primary.main" } }}>
+          <Paper key={item.href} variant="outlined" component={NextLink} href={item.href} sx={{ p: 2.5, fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "-0.01em", color: "text.primary", boxShadow: "0 0 0 transparent", transition: "box-shadow 200ms cubic-bezier(0.16,1,0.3,1)", "&:hover": { boxShadow: "0 24px 48px -28px rgba(20,25,23,0.35)" } }}>
             {item.label}
           </Paper>
         ))}
       </Box>
-      <Paper variant="outlined" component="section" sx={{ p: 2 }}>
+      <Paper variant="outlined" component="section" sx={{ p: { xs: 2.5, md: 3.5 } }}>
         <Typography component="h2" variant="subtitle1" sx={{ fontWeight: 600 }}>
           Saved board configurations
         </Typography>
@@ -88,7 +87,7 @@ export function AccountOverview() {
           ))}
         </List>
       </Paper>
-      <Paper variant="outlined" component="section" sx={{ p: 2 }}>
+      <Paper variant="outlined" component="section" sx={{ p: { xs: 2.5, md: 3.5 } }}>
         <Typography component="h2" variant="subtitle1" sx={{ fontWeight: 600 }}>
           Recent quotes
         </Typography>

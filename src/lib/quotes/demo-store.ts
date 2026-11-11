@@ -35,7 +35,7 @@ export type StoredQuote = {
   configurationSummary: string;
   lines: StoredQuoteLine[];
   catalogueListSubtotal: number;
-  attachment: { name: string; type: string; size: number } | null;
+  attachment: { name: string; type: string; size: number; storedAs?: string } | null;
   notified: false;
 };
 

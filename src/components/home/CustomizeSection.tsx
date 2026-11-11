@@ -103,7 +103,7 @@ export function CustomizeSection() {
                       variant="outlined"
                       sx={{
                         position: "relative",
-                        borderRadius: 0.5,
+                        borderRadius: "16px",
                         px: 2,
                         py: 1.25,
                         fontSize: 14,
@@ -155,7 +155,7 @@ export function CustomizeSection() {
                 <Typography
                   variant="overline"
                   component="p"
-                  sx={{ mb: 1.5, display: "block", fontSize: 11, letterSpacing: "0.18em", color: "text.secondary" }}
+                  sx={{ mb: 1.5, display: "block", fontSize: 11, letterSpacing: "0.05em", color: "text.secondary" }}
                 >
                   Make it yours.
                 </Typography>
@@ -222,7 +222,7 @@ export function CustomizeSection() {
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", color: "text.primary" }}
+                    sx={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.primary" }}
                   >
                     {current.label}
                   </Typography>

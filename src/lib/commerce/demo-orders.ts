@@ -65,6 +65,10 @@ const statusOrder: OrderStatus[] = [
   "Delivered",
 ];
 
+/**
+ * The server is the source of truth for demo orders (see /api/commerce/orders).
+ * This browser keeps a copy of orders it placed so the confirmation page can render without a lookup form.
+ */
 function readAll(): DemoOrder[] {
   if (typeof window === "undefined") return [];
   try {
@@ -75,40 +79,15 @@ function readAll(): DemoOrder[] {
   }
 }
 
-function writeAll(orders: DemoOrder[]) {
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-}
-
-export function demoOrderId(idempotencyKey: string) {
-  return `OBX-DEMO-${idempotencyKey.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
-}
-
 export function findDemoOrder(id: string) {
   return readAll().find((order) => order.id === id);
 }
 
-export function saveDemoOrder(order: DemoOrder) {
-  const orders = readAll();
-  const existing = orders.find((item) => item.idempotencyKey === order.idempotencyKey);
-  if (existing) return existing;
-  writeAll([...orders, order]);
-  return order;
-}
-
-export function advanceDemoOrder(id: string) {
-  const orders = readAll();
-  const index = orders.findIndex((order) => order.id === id);
-  if (index < 0) return undefined;
-  const current = statusOrder.indexOf(orders[index].status);
-  const next = statusOrder[Math.min(current + 1, statusOrder.length - 1)];
-  orders[index] = { ...orders[index], status: next };
-  writeAll(orders);
-  return orders[index];
-}
-
-export function contactMatches(order: DemoOrder, contact: string) {
-  const value = contact.trim().toLowerCase();
-  const digits = value.replace(/\D/g, "");
-  if (value === order.email.trim().toLowerCase()) return true;
-  return digits.length >= 8 && digits === order.phone.replace(/\D/g, "");
+export function rememberDemoOrder(order: DemoOrder) {
+  try {
+    const orders = readAll().filter((item) => item.id !== order.id);
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify([...orders, order].slice(-10)));
+  } catch {
+    // Storage blocked: the order is still saved on the server and can be tracked.
+  }
 }

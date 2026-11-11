@@ -11,7 +11,7 @@ export function FindBoardSection() {
   return (
     <Box component="section" sx={{ bgcolor: "background.default", py: { xs: 6, md: 8 } }}>
       <Container>
-        <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+        <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
           Solutions
         </Typography>
         <Typography

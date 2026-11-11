@@ -39,6 +39,7 @@ import {
   type OverlayTransform,
   type SavedSpacePreview,
 } from "@/lib/visualizeSpace";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import { WallOverlayCanvas } from "./WallOverlayCanvas";
 
 type StepId = "product" | "upload" | "position" | "preview";
@@ -385,7 +386,7 @@ export function SpaceVisualizer() {
     );
 
   return (
-    <Box sx={{ bgcolor: "#FFFFFF", pb: { xs: 12, md: 8 } }}>
+    <Box sx={{ bgcolor: "#F2F3F0", pb: { xs: 12, md: 8 } }}>
       <input
         ref={fileInputRef}
         type="file"
@@ -408,102 +409,62 @@ export function SpaceVisualizer() {
         }}
       />
 
-      <Box sx={{ borderBottom: "1px solid", borderColor: "divider" }}>
-        <Container sx={{ py: { xs: 4, md: 5 } }}>
-          <Typography
-            variant="overline"
-            sx={{
-              display: "inline-flex",
-              px: 1,
-              py: 0.35,
-              borderRadius: 0.5,
-              bgcolor: "primary.light",
-              color: "primary.main",
-              letterSpacing: "0.18em",
-              fontWeight: 700,
-            }}
-          >
-            Visualize Your Space
-          </Typography>
-          <Typography
-            variant="h1"
-            sx={{
-              mt: 1.25,
-              maxWidth: 720,
-              fontSize: { xs: "2rem", md: "2.75rem" },
-              letterSpacing: "-0.03em",
-              color: "text.primary",
-            }}
-          >
-            See how your board looks on your wall
-          </Typography>
-          <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
-          <Typography sx={{ mt: 1.5, maxWidth: 560, color: "text.secondary", lineHeight: 1.7 }}>
-            Select a board, then upload or capture a photo of your own wall. Sample rooms stay optional —
-            every customer can use a different photo.
-          </Typography>
-
-          <Stack
-            component="ol"
-            direction="row"
-            spacing={{ xs: 1, md: 2 }}
-            sx={{
-              m: 0,
-              mt: 3.5,
-              p: 0,
-              listStyle: "none",
-              overflowX: "auto",
-              pb: 0.5,
-            }}
-          >
-            {STEPS.map((item, index) => {
-              const active = item.id === step;
-              const done = index < stepIndex(step);
-              const locked = index > reached;
-              return (
-                <Box component="li" key={item.id} sx={{ flexShrink: 0 }}>
-                  <ButtonBase
-                    type="button"
-                    disabled={locked}
-                    onClick={() => go(item.id)}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 1.25,
-                      py: 1,
-                      borderBottom: "2px solid",
-                      borderColor: active ? "primary.main" : "transparent",
-                      color: active || done ? "text.primary" : "text.secondary",
-                      opacity: locked ? 0.45 : 1,
-                      fontWeight: active ? 700 : 600,
-                      fontSize: { xs: 12, md: 13 },
-                    }}
-                  >
-                    <Box
-                      component="span"
-                      sx={{
-                        color: active ? "primary.main" : "inherit",
-                        fontVariantNumeric: "tabular-nums",
-                      }}
-                    >
-                      {item.number}
-                    </Box>
+      <PageMasthead
+        code="Visualise"
+        title="See your board on your wall"
+        lede="Select a board, then upload or capture a photo of your own wall. Sample rooms stay optional — every customer can use a different photo."
+        crumbs={[{ href: "/", label: "Home" }, { label: "Visualise" }]}
+        compact
+      >
+        <Box component="ol" aria-label="Visualiser steps" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 0.5 }}>
+          {STEPS.map((item, index) => {
+            const active = item.id === step;
+            const done = index < stepIndex(step);
+            const locked = index > reached;
+            return (
+              <Box component="li" key={item.id} sx={{ minWidth: 0 }}>
+                <ButtonBase
+                  type="button"
+                  disabled={locked}
+                  aria-current={active ? "step" : undefined}
+                  onClick={() => go(item.id)}
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: 0.5,
+                    pt: 1.25,
+                    pb: 0.5,
+                    textAlign: "left",
+                    borderTop: "2px solid",
+                    borderColor: active ? "#1B1D1C" : done ? "#164E3B" : "#E5E5E0",
+                    color: active ? "#1B1D1C" : "#6B706D",
+                    opacity: locked ? 0.5 : 1,
+                    transition: "border-color 200ms cubic-bezier(0.16,1,0.3,1), color 160ms",
+                    "&:hover": { color: "#1B1D1C" },
+                    "&.Mui-focusVisible": { outline: "2px solid #164E3B", outlineOffset: 2 },
+                  }}
+                >
+                  <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 500, fontSize: 12.5, letterSpacing: "0", color: done ? "#164E3B" : "inherit" }}>
+                    {done ? "✓ " : ""}
+                    {item.number}
+                  </Box>
+                  <Box component="span" sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: active ? 600 : 500, fontSize: { xs: 12.5, sm: 15 }, letterSpacing: "-0.01em", lineHeight: 1.15 }}>
                     {item.label}
-                  </ButtonBase>
-                </Box>
-              );
-            })}
-          </Stack>
-        </Container>
-      </Box>
-
-      <Container sx={{ py: { xs: 3, md: 4 } }}>
+                  </Box>
+                </ButtonBase>
+              </Box>
+            );
+          })}
+        </Box>
+      </PageMasthead>
+      <Container maxWidth={false} sx={{ maxWidth: 1440, px: { xs: 2, sm: 4, md: 6, lg: 8 }, py: { xs: 3, md: 5 } }}>
         <Box
           sx={{
             display: "grid",
             gap: { xs: 3, lg: 4 },
-            gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 0.95fr) minmax(0, 1.05fr)" },
+            gridTemplateColumns: { xs: "1fr", lg: "minmax(380px, 0.8fr) minmax(0, 1.2fr)" },
             alignItems: "start",
           }}
         >
@@ -512,6 +473,10 @@ export function SpaceVisualizer() {
             sx={{
               minWidth: 0,
               order: { xs: 2, lg: 1 },
+              bgcolor: "#FFFFFF",
+              borderTop: 0,
+              p: { xs: 2.5, md: 3.5 },
+              mx: { xs: -2, sm: 0 },
             }}
           >
             {step === "product" ? (
@@ -536,12 +501,15 @@ export function SpaceVisualizer() {
                         size="small"
                         onClick={() => setFilter(item.id)}
                         sx={{
-                          minHeight: 32,
+                          minHeight: 36,
+                          px: 1.5,
                           border: "1px solid",
-                          borderColor: active ? "primary.main" : "divider",
-                          color: active ? "primary.main" : "text.secondary",
-                          bgcolor: active ? "rgba(21,92,64,0.06)" : "transparent",
-                          fontWeight: active ? 700 : 500,
+                          borderColor: active ? "#141917" : "divider",
+                          color: active ? "#FFFFFF" : "text.primary",
+                          bgcolor: active ? "#141917" : "#FFFFFF",
+                          fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+                          fontWeight: 700,
+                          "&:hover": { bgcolor: active ? "#141917" : "#F2F3F0" },
                         }}
                       >
                         {item.label}
@@ -576,12 +544,14 @@ export function SpaceVisualizer() {
                           flexDirection: "column",
                           alignItems: "stretch",
                           textAlign: "left",
-                          border: "1px solid",
-                          borderColor: selected ? "primary.main" : "divider",
+                          border: "2px solid",
+                          borderColor: selected ? "#141917" : "#DCDFDA",
                           bgcolor: "#FFFFFF",
-                          boxShadow: selected ? "0 8px 24px rgba(15,61,38,0.08)" : "none",
+                          boxShadow: selected ? "0 0 0 1.5px #1B1D1C" : "none",
                           overflow: "hidden",
-                          "&:hover": { borderColor: "primary.main" },
+                          transition: "border-color 160ms",
+                          "&:hover": { borderColor: selected ? "#141917" : "#8A928C" },
+                          "&.Mui-focusVisible": { outline: "2px solid #164E3B", outlineOffset: 2 },
                         }}
                       >
                         <Box
@@ -605,7 +575,7 @@ export function SpaceVisualizer() {
                           <Typography sx={{ fontSize: 11, color: "text.secondary", mb: 0.35 }}>
                             {getProductCategoryLabel(item)}
                           </Typography>
-                          <Typography sx={{ fontWeight: 700, fontSize: 14, color: "text.primary" }}>
+                          <Typography sx={{ fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 700, fontSize: 15.5, letterSpacing: "-0.01em", color: "text.primary" }}>
                             {item.shortName}
                           </Typography>
                           {item.sizes.length ? (
@@ -622,7 +592,7 @@ export function SpaceVisualizer() {
                                 mt: 0.75,
                                 fontSize: 11,
                                 fontWeight: 700,
-                                letterSpacing: "0.12em",
+                                letterSpacing: "0.05em",
                                 textTransform: "uppercase",
                                 color: "primary.main",
                               }}
@@ -759,7 +729,7 @@ export function SpaceVisualizer() {
                   <Box
                     sx={{
                       mt: 2,
-                      border: "1px dashed",
+                      border: "2px dashed",
                       borderColor: "divider",
                       bgcolor: "#FAFAF9",
                       p: 2.5,
@@ -996,13 +966,18 @@ export function SpaceVisualizer() {
               minWidth: 0,
               order: { xs: 1, lg: 2 },
               position: { lg: "sticky" },
-              top: { lg: 96 },
+              top: { lg: 112 },
               display: { xs: "none", lg: "block" },
+              bgcolor: "#FFFFFF",
+              border: "1px solid #E5E5E0",
+              borderRadius: "28px",
+              overflow: "hidden",
+              p: 1.5,
             }}
           >
             {previewPanel}
             {(step === "position" || step === "preview") && canPosition ? (
-              <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap", mt: 1.5, display: { xs: "none", lg: "flex" } }}>
+              <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap", mt: 1.5, display: { xs: "none", lg: "flex" }, px: 1, pb: 1 }}>
                 <Button
                   size="small"
                   variant={compare ? "contained" : "outlined"}
@@ -1053,7 +1028,7 @@ function Panel({
     <Box>
       <Typography
         variant="h2"
-        sx={{ fontSize: { xs: "1.35rem", md: "1.6rem" }, color: "primary.main" }}
+        sx={{ fontSize: { xs: "1.6rem", md: "1.9rem" }, color: "#141917" }}
       >
         {title}
       </Typography>

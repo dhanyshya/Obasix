@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -15,7 +14,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { ProductActions } from "./ProductActions";
-import { productCardDetailsButtonSx } from "./productCardButtonStyles";
+import { CompareToggle } from "@/components/compare/CompareToggle";
 
 const categoryLabel: Record<string, string> = {
   "magnetic-whiteboard": "Magnetic Whiteboard",
@@ -59,30 +58,22 @@ export function ProductCard({
         flexDirection: "column",
         height: "100%",
         minWidth: 0,
-        border: "1px solid",
-        borderColor: "divider",
-        bgcolor: "background.paper",
-        borderRadius: 1,
-        overflow: "hidden",
-        transition: "border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease",
-        "&:hover": {
-          borderColor: "primary.main",
-          boxShadow: "0 10px 28px rgba(37,42,38,0.06)",
-          transform: "translateY(-2px)",
-        },
-        "&:hover .pc-image": { transform: "scale(1.02)" },
+        bgcolor: "transparent",
+        "&:hover .pc-image": { transform: "scale(1.035)" },
         "&:hover .pc-quick": { opacity: 1 },
-        "&:focus-within": { borderColor: "primary.main" },
+        "&:hover .pc-rule": { transform: "scaleX(1)" },
       }}
     >
       <Box
         sx={{
           position: "relative",
-          aspectRatio: "4 / 3",
+          aspectRatio: "1 / 1",
           overflow: "hidden",
           bgcolor: "#FFFFFF",
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          border: "1px solid #E5E5E0",
+          borderRadius: "20px",
+          transition: "box-shadow 300ms cubic-bezier(0.16,1,0.3,1)",
+          "article:hover &": { boxShadow: "0 24px 48px -28px rgba(20,25,23,0.3)" },
           flexShrink: 0,
         }}
       >
@@ -92,8 +83,8 @@ export function ProductCard({
             alt={product.name}
             fill
             className="pc-image object-contain"
-            style={{ transition: "transform 0.35s ease", padding: 18 }}
-            sizes="(max-width: 600px) 100vw, (max-width: 1200px) 33vw, 25vw"
+            style={{ transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)", padding: "9%" }}
+            sizes="(max-width: 600px) 50vw, (max-width: 1200px) 33vw, 25vw"
             onError={() => setImgFailed(true)}
           />
         ) : (
@@ -121,10 +112,11 @@ export function ProductCard({
           size="small"
           sx={{
             position: "absolute",
-            right: 8,
-            top: 8,
-            bgcolor: "rgba(255,255,255,0.96)",
-            color: wished ? "secondary.main" : "text.secondary",
+            right: 12,
+            top: 12,
+            bgcolor: "rgba(255,255,255,0.9)",
+            backdropFilter: "blur(8px)",
+            color: wished ? "#C8282E" : "text.secondary",
             boxShadow: "0 1px 4px rgba(37,42,38,0.08)",
             "&:hover": { bgcolor: "#FFFFFF" },
             "&:focus-visible": {
@@ -145,8 +137,8 @@ export function ProductCard({
             size="small"
             sx={{
               position: "absolute",
-              left: 8,
-              top: 8,
+              left: 12,
+              top: 12,
               opacity: { xs: 1, md: 0 },
               transition: "opacity 0.2s ease",
               bgcolor: "rgba(255,255,255,0.96)",
@@ -165,57 +157,30 @@ export function ProductCard({
         ) : null}
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          flex: 1,
-          flexDirection: "column",
-          px: { xs: 1.6, md: 1.85 },
-          pt: 1.6,
-          pb: 1.75,
-          minWidth: 0,
-        }}
-      >
-        <Typography
-          variant="overline"
-          sx={{ color: "primary.main", letterSpacing: "0.12em", fontSize: 10, lineHeight: 1.4 }}
-        >
-          {label}
-        </Typography>
-        <Typography
-          component={Link}
-          href={`/products/${product.id}`}
-          variant="h6"
+      <Box sx={{ display: "none" }}>
+        <Box
+          className="pc-rule"
+          aria-hidden
           sx={{
-            mt: 0.4,
-            minHeight: { xs: "2.5em", md: "2.55em" },
-            fontSize: { xs: "0.92rem", md: "1rem" },
-            lineHeight: 1.3,
-            fontWeight: 600,
-            color: "text.primary",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            transition: "color 0.2s ease",
-            "&:hover": { color: "primary.main" },
-            "&:focus-visible": {
-              outline: "2px solid",
-              outlineColor: "primary.main",
-              outlineOffset: 2,
-            },
+            position: "absolute",
+            inset: 0,
+            bgcolor: "#EE6A1F",
+            transform: "scaleX(0)",
+            transformOrigin: "left",
+            transition: "transform 420ms cubic-bezier(0.16,1,0.3,1)",
+            "@media (prefers-reduced-motion: reduce)": { transition: "none" },
           }}
-        >
-          {product.shortName}
-        </Typography>
-        {product.sku ? (
+        />
+      </Box>
+      <Box sx={{ display: "flex", flex: 1, flexDirection: "column", pt: 2, px: 0.5, minWidth: 0 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5, alignItems: "baseline" }}>
           <Typography
-            variant="caption"
             sx={{
-              mt: 0.45,
-              color: "text.secondary",
-              letterSpacing: "0.03em",
-              display: "block",
+              fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+              fontWeight: 500,
+              fontSize: 12.5,
+              letterSpacing: "0.01em",
+              color: "#6B706D",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -223,24 +188,61 @@ export function ProductCard({
           >
             {product.sku}
           </Typography>
-        ) : null}
-        <Typography sx={{ mt: 1.1, fontWeight: 700, fontSize: "0.98rem", color: "text.primary" }}>
-          {product.price > 0 ? formatPrice(product.price) : "Quote on request"}
+          <Typography sx={{ fontSize: 12, color: "text.secondary", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
+            {product.sizes[0]?.label ?? label}
+          </Typography>
+        </Box>
+        <Typography
+          component={Link}
+          href={`/products/${product.id}`}
+          sx={{
+            mt: 0.75,
+            minHeight: "2.3em",
+            fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+            fontWeight: 600,
+            fontSize: { xs: "0.95rem", md: "1.1rem" },
+            lineHeight: 1.25,
+            letterSpacing: "-0.015em",
+            color: "text.primary",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            "&:hover": { textDecoration: "underline", textUnderlineOffset: 4 },
+            "&:focus-visible": { outline: "2px solid #164E3B", outlineOffset: 2 },
+          }}
+        >
+          {product.shortName}
         </Typography>
-
-        <Stack spacing={0.75} sx={{ mt: "auto", pt: 1.6 }}>
-          <Button
-            component={Link}
-            href={`/products/${product.id}`}
-            size="small"
-            variant="outlined"
-            fullWidth
-            sx={productCardDetailsButtonSx}
+                <Box sx={{ mt: 1.25, display: "flex", alignItems: "baseline", gap: 1 }}>
+          <Typography
+            sx={{
+              fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
+              fontWeight: 500,
+              fontSize: { xs: "1.05rem", md: "1.2rem" },
+              letterSpacing: "-0.015em",
+              fontVariantNumeric: "tabular-nums",
+              color: "text.primary",
+            }}
           >
-            {detailsLabel}
-          </Button>
+            {product.price > 0 ? formatPrice(product.price) : "On quote"}
+          </Typography>
+          {product.compareAtPrice && product.price > 0 ? (
+            <Typography component="s" sx={{ fontSize: 13.5, color: "text.secondary" }}>
+              {formatPrice(product.compareAtPrice)}
+            </Typography>
+          ) : null}
+        </Box>
+
+        <Box sx={{ mt: "auto", pt: 1.75 }}>
           <ProductActions product={product} variant="card" />
-        </Stack>
+        </Box>
+        <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", columnGap: 1 }}>
+          <Box component={Link} href={`/products/${product.id}`} sx={{ fontSize: 14, fontWeight: 500, color: "#164E3B", py: 0.75, "&:hover": { textDecoration: "underline", textUnderlineOffset: 3 } }}>
+            {detailsLabel}
+          </Box>
+          <CompareToggle productId={product.id} />
+        </Box>
       </Box>
     </Box>
   );

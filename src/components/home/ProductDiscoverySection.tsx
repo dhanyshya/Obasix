@@ -70,7 +70,7 @@ export function ProductDiscoverySection() {
             <Box sx={{ maxWidth: 560 }}>
               <Typography
                 variant="overline"
-                sx={{ color: "primary.main", letterSpacing: "0.18em", fontWeight: 600 }}
+                sx={{ color: "primary.main", letterSpacing: "0.05em", fontWeight: 600 }}
               >
                 PRODUCT DISCOVERY
               </Typography>
@@ -159,7 +159,7 @@ export function ProductDiscoverySection() {
                 variant={active ? "filled" : "outlined"}
                 color={active ? "primary" : "default"}
                 sx={{
-                  borderRadius: 0.5,
+                  borderRadius: "16px",
                   fontWeight: active ? 600 : 500,
                   height: 34,
                   "& .MuiChip-label": { px: 1.5 },
@@ -191,7 +191,7 @@ export function ProductDiscoverySection() {
                   setCategoryId("all");
                   setQuery("");
                 }}
-                sx={{ borderRadius: 0.5 }}
+                sx={{ borderRadius: "16px" }}
               >
                 Reset Filters
               </Button>
@@ -200,7 +200,7 @@ export function ProductDiscoverySection() {
                 href="/products"
                 variant="contained"
                 color="primary"
-                sx={{ borderRadius: 0.5 }}
+                sx={{ borderRadius: "16px" }}
               >
                 View All Products
               </Button>
@@ -235,7 +235,7 @@ export function ProductDiscoverySection() {
               variant="outlined"
               color="inherit"
               endIcon={<ArrowForwardIcon sx={{ fontSize: 15 }} />}
-              sx={{ borderRadius: 0.5, borderColor: "divider", minHeight: 44, px: 2.5 }}
+              sx={{ borderRadius: "16px", borderColor: "divider", minHeight: 44, px: 2.5 }}
             >
               View all {filtered.length} matching products
             </Button>

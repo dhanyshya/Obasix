@@ -46,7 +46,7 @@ export function TrendingProducts() {
                   width: "100%",
                   bgcolor: home.white,
                   border: `1px solid ${home.line}`,
-                  borderRadius: 1,
+                  borderRadius: "16px",
                   overflow: "hidden",
                   transition: "border-color 0.25s ease, box-shadow 0.25s ease",
                   "&:hover": {
@@ -97,7 +97,7 @@ export function TrendingProducts() {
                       py: 0.45,
                       fontSize: 8.5,
                       fontWeight: 700,
-                      letterSpacing: "0.15em",
+                      letterSpacing: "0.05em",
                       textTransform: "uppercase",
                     }}
                   >
@@ -117,7 +117,7 @@ export function TrendingProducts() {
                   <Typography
                     component="h3"
                     sx={{
-                      fontFamily: "var(--font-display), Georgia, serif",
+                      fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                       fontSize: { xs: 17, md: 21 },
                       lineHeight: 1.15,
                       color: home.charcoal,
@@ -155,7 +155,7 @@ export function TrendingProducts() {
                       sx={{
                         fontSize: 9.5,
                         fontWeight: 700,
-                        letterSpacing: "0.17em",
+                        letterSpacing: "0.05em",
                         textTransform: "uppercase",
                       }}
                     >

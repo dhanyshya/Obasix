@@ -1,18 +1,30 @@
 import { redirect } from "next/navigation";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
 import { AccountNav } from "@/components/account/AccountNav";
+import { pageMax, pagePad, signType, StripeSpine } from "@/components/home/directory/sign";
 import { readSession } from "@/lib/auth/session";
+import { brandTokens as brand } from "@/theme/brandTokens";
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const session = await readSession();
   if (!session) redirect("/login?next=/account");
   return (
-    <Box sx={{ bgcolor: "background.default" }}>
-      <Container sx={{ display: "grid", gap: 4, py: 5, gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "200px minmax(0, 1fr)" } }}>
-        <AccountNav />
-        <Box sx={{ minWidth: 0 }}>{children}</Box>
-      </Container>
+    <Box sx={{ bgcolor: brand.ivory }}>
+      <Box sx={{ bgcolor: brand.white, color: brand.charcoal }}>
+        <Box sx={{ ...pageMax, ...pagePad, pt: { xs: 3, md: 4 } }}>
+          <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.25 }}>
+            <Typography sx={{ ...signType.code, fontSize: 13, color: "#164E3B" }}>YOUR ACCOUNT</Typography>
+          </Box>
+          <Box sx={{ mt: 1.5 }}>
+            <AccountNav />
+          </Box>
+        </Box>
+        <StripeSpine height={4} />
+      </Box>
+      <Box sx={{ ...pageMax, ...pagePad, py: { xs: 4, md: 6 }, minHeight: "50vh" }}>
+        <Box sx={{ maxWidth: 1080, minWidth: 0 }}>{children}</Box>
+      </Box>
     </Box>
   );
 }

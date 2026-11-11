@@ -8,12 +8,7 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import {
-  advanceDemoOrder,
-  contactMatches,
-  findDemoOrder,
-  type DemoOrder,
-} from "@/lib/commerce/demo-orders";
+import type { DemoOrder } from "@/lib/commerce/demo-orders";
 import { formatPrice } from "@/lib/format";
 import type { CommerceResponse } from "@/lib/commerce/types";
 
@@ -41,27 +36,21 @@ export function TrackOrder() {
       return;
     }
     setError("");
-    const local = findDemoOrder(orderNumber.trim());
-    if (local) {
-      if (!contactMatches(local, contact)) {
-        setUnknown(true);
-        return;
-      }
-      setDemo(local);
-      return;
-    }
-    if (orderNumber.trim().toUpperCase().startsWith("OBX-DEMO-")) {
-      setUnknown(true);
-      return;
-    }
+    await lookup(false);
+  };
+
+  const lookup = async (advance: boolean) => {
     setLoading(true);
     try {
       const response = await fetch("/api/commerce/track", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ orderNumber: orderNumber.trim(), contact: contact.trim() }),
+        body: JSON.stringify({ orderNumber: orderNumber.trim(), contact: contact.trim(), advance }),
       });
-      setResult((await response.json()) as CommerceResponse);
+      const body = (await response.json()) as { ok: boolean; found?: boolean; order?: DemoOrder } & Partial<CommerceResponse>;
+      if (body.ok && body.order) setDemo(body.order);
+      else if (body.found === false) setUnknown(true);
+      else setResult(body as CommerceResponse);
     } catch {
       setResult({
         ok: false,
@@ -81,7 +70,7 @@ export function TrackOrder() {
       variant="outlined"
       onSubmit={onSubmit}
       noValidate
-      sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: 1.5, width: "100%", boxSizing: "border-box" }}
+      sx={{ p: { xs: 2.5, sm: 3, md: 4 }, borderRadius: "16px", width: "100%", boxSizing: "border-box" }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
@@ -122,7 +111,7 @@ export function TrackOrder() {
       </Box>
       {unknown ? (
         <Alert severity="info" role="status" sx={{ mt: 2 }}>
-          No demo order matches that order number and contact.
+          No order matches that order number and contact.
         </Alert>
       ) : null}
       {demo ? (
@@ -154,10 +143,8 @@ export function TrackOrder() {
               variant="outlined"
               size="small"
               sx={{ mt: 2 }}
-              onClick={() => {
-                const next = advanceDemoOrder(demo.id);
-                if (next) setDemo(next);
-              }}
+              disabled={loading}
+              onClick={() => void lookup(true)}
             >
               Advance demo status
             </Button>

@@ -158,7 +158,7 @@ export function AccessoriesBandSection() {
                         disabled={added}
                         onClick={() => handleAdd(product.id, qty)}
                         startIcon={added ? <CheckIcon sx={{ fontSize: 14 }} /> : undefined}
-                        sx={{ borderRadius: 0.5 }}
+                        sx={{ borderRadius: "16px" }}
                       >
                         {added ? "Added" : "Add"}
                       </Button>

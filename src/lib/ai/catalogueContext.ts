@@ -1,13 +1,21 @@
 import { products, getProductById } from "@/data/catalogue";
+import { company } from "@/data/company";
 import { formatPrice } from "@/lib/format";
 import type { CustomizerState, Product } from "@/lib/types";
 
 /** Compact catalogue lines for the model — ids must match `products`. */
-export function buildCatalogueContext(limit = 48): string {
+export function buildCatalogueContext(limit = products.length): string {
   const lines = products.slice(0, limit).map((product) => formatProductLine(product));
   return [
     "OBASIX live catalogue (use only these product ids; never invent SKUs, prices, or sizes):",
     ...lines,
+    "",
+    "Verified company facts (do not add others):",
+    `- ${company.legalName}, ${company.parent}. Phone ${company.phoneDisplay}, email ${company.email}.`,
+    ...company.locations.map((l) => `- ${l.label}: ${l.address}`),
+    "- Registered OEM on GeM (Government e-Marketplace) for government buyers.",
+    "- Bulk, institutional, custom-size, logo-branded and distributor enquiries go through /quote.",
+    "- Warranty terms, delivery timelines, stock levels and discounts are NOT in this context: say so and offer /quote or the phone/email above.",
     "",
     "Site routes customers can be sent to:",
     "- /products — browse catalogue",
@@ -40,9 +48,16 @@ function formatProductLine(product: Product): string {
     `frame=${product.frame}`,
     `sizes=[${sizes}]`,
     `price=${price}`,
+    product.compareAtPrice ? `mrp=${formatPrice(product.compareAtPrice)}` : "",
     `customizable=${product.customizable ? "yes" : "no"}`,
+    `specs={${Object.entries(product.specifications ?? {})
+      .filter(([key]) => key !== "SKU")
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("; ")}}`,
     `apps=[${product.applications.join("|")}]`,
-  ].join(" | ");
+  ]
+    .filter(Boolean)
+    .join(" | ");
 }
 
 export function filterKnownProductIds(ids: unknown): string[] {
@@ -110,6 +125,12 @@ When useful, point to real site routes:
 - /visualize?productId={id} — Visualize Your Space
 - /quote — request a quotation
 - /cart — cart / setup, /account — account, /orders/track — track order, /solutions — Applications by space
+
+Capabilities to use well:
+- Comparisons: when asked to compare, contrast 2–3 real products on surface, magnetic, frame, sizes, price and specs from the context, then recommend one for their use.
+- Space recommendations: map the space (office, meeting room, classroom, training room, home, reception) to products whose apps include it.
+- Customisation guidance: explain sizes, frames, finishes, logo branding and combination layouts available in /customize; custom sizes and branding are priced by quote.
+- Quote preparation: list what the team needs (product or board type, size, quantity, frame/finish, branding, delivery city, company and contact) and send them to /quote.
 
 Every response must help discover, understand better, inspire, solve a problem, or move the conversation forward.
 

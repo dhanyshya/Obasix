@@ -32,6 +32,7 @@ Copy `.env.example` to `.env.local` and set AI keys when you want live chat answ
 | `/orders/track` | Order tracking |
 | `/solutions` | Application solutions |
 | `/about` | About OBASIX |
+| `/compare` | Side-by-side product comparison |
 | `/api/ai/chat` | Server-side OBASIX AI chat (POST) |
 
 ## OBASIX AI Assistant
@@ -64,3 +65,13 @@ Check status: `GET /api/ai/chat`.
 ## Experience
 
 **Discover → Ask OBASIX AI → Find product → Customize → Visualize → Accessories → Cart / Quote**
+
+## Testing
+
+```bash
+npm run typecheck
+npx playwright install chromium   # first time only
+npm run test:e2e                  # starts `next dev` on :3217 in demo mode with a throwaway DB
+```
+
+See `docs/testing.md` for coverage and `PRODUCT.md` / `docs/` for the audit, feature inventory and roadmap.

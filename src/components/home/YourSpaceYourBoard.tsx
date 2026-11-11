@@ -47,7 +47,7 @@ export function YourSpaceYourBoard() {
     >
       <Container>
         <Reveal>
-          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.16em" }}>
+          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
             SPACE STUDIO
           </Typography>
           <Typography
@@ -82,7 +82,7 @@ export function YourSpaceYourBoard() {
                 onClick={() => setActive(space.id)}
                 aria-pressed={isActive}
                 sx={{
-                  borderRadius: 0,
+                  borderRadius: "16px",
                   px: { xs: 1.5, md: 2.25 },
                   py: 1.5,
                   minWidth: 0,
@@ -135,7 +135,7 @@ export function YourSpaceYourBoard() {
             />
             <Box sx={{ position: "absolute", left: 20, bottom: 20, right: 20 }}>
               <Typography
-                sx={{ color: "rgba(255,255,255,0.7)", fontSize: 11, letterSpacing: "0.16em", fontWeight: 600 }}
+                sx={{ color: "rgba(255,255,255,0.7)", fontSize: 11, letterSpacing: "0.05em", fontWeight: 600 }}
               >
                 {selected.label.toUpperCase()}
               </Typography>

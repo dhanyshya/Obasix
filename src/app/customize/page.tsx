@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Link from "@/components/Link";
-import { getBoardProducts, getProductById, products as catalogueProducts } from "@/data/catalogue";
+import { colours, frames, getBoardProducts, getProductById, products as catalogueProducts } from "@/data/catalogue";
 import {
   decodeLayout,
   defaultCombinationLayout,
@@ -25,6 +25,7 @@ import {
 import { defaultFeatureIds } from "@/lib/features";
 import type { CustomizerState, FrameType, Product } from "@/lib/types";
 import { ProductConfigurator } from "@/components/customizer/ProductConfigurator";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import { useCart } from "@/context/CartContext";
 import { buildCustomizeHref, formatPrice } from "@/lib/format";
 
@@ -119,8 +120,8 @@ function CustomizeContent() {
     setState(
       stateFromProduct(product, {
         ...(sizeId && product.sizes.some((size) => size.id === sizeId) ? { sizeId } : {}),
-        ...(frameId && frameId === product.frame ? { frameId } : {}),
-        ...(colourId && product.colours.includes(colourId) ? { colourId } : {}),
+        ...(frameId && frames.some((f) => f.id === frameId) ? { frameId } : {}),
+        ...(colourId && colours.some((c) => c.id === colourId) ? { colourId } : {}),
         ...(features ? { features: features.split(",").filter(Boolean) } : {}),
         ...(branding ? { branding: branding === "true" } : {}),
         ...(quantity ? { quantity: Number(quantity) || 1 } : {}),
@@ -160,17 +161,26 @@ function CustomizeContent() {
   return (
     <Box
       sx={{
-        bgcolor: "#FFFFFF",
+        bgcolor: "#F2F3F0",
         pb: { xs: 16, lg: 8 },
       }}
     >
+      {configuratorReady ? (
+        <PageMasthead
+          code="Studio"
+          title="Design your board"
+          lede="Any size, any frame and colour, two or three surfaces on one board, double-sided, your logo — and room to describe anything else. Listed configurations go straight to cart; custom builds are quoted."
+          crumbs={[{ href: "/products", label: "Collections" }, { label: "Design your board" }]}
+          compact
+        />
+      ) : null}
       <Box
         sx={{
           width: "100%",
-          maxWidth: 1280,
+          maxWidth: 1440,
           mx: "auto",
-          px: { xs: 2.5, md: 4 },
-          py: { xs: 3, md: 4 },
+          px: { xs: 2, sm: 4, md: 6, lg: 8 },
+          py: { xs: 3, md: 5 },
         }}
       >
         {resolved.status === "missing" || resolved.status === "invalid" ? (
@@ -212,6 +222,10 @@ function CustomizeContent() {
                   !product.customizable ||
                   state.useCustomSize ||
                   product.price <= 0 ||
+                  state.frameId !== product.frame ||
+                  !product.colours.includes(state.colourId) ||
+                  (state.backMaterialId && state.backMaterialId !== "none") ||
+                  Boolean(state.notes?.trim()) ||
                   combinationRequiresQuote(
                     state.combinationLayout ?? defaultCombinationLayout(product),
                   )
@@ -271,13 +285,11 @@ function SelectProductState({
         Back to Products
       </Button>
       <Typography
-        variant="h5"
         component="h1"
-        sx={{ mt: 2, color: "text.primary", fontWeight: 600 }}
+        sx={{ mt: 2, color: "text.primary", fontFamily: "var(--font-display), Helvetica Neue, sans-serif", fontWeight: 600, fontSize: { xs: "2rem", md: "2.75rem" }, letterSpacing: "-0.03em", lineHeight: 1 }}
       >
         {title}
       </Typography>
-      <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1, maxWidth: 672, lineHeight: 1.7 }}>
         {message}
       </Typography>
@@ -293,7 +305,7 @@ function SelectProductState({
                 height: "100%",
                 overflow: "hidden",
                 textAlign: "left",
-                borderRadius: "10px",
+                borderRadius: "16px",
                 border: 1,
                 borderColor: "divider",
                 bgcolor: "background.paper",
@@ -340,7 +352,7 @@ function NotCustomizableState({ product }: { product: Product }) {
             maxWidth: 200,
             flexShrink: 0,
             overflow: "hidden",
-            borderRadius: "10px",
+            borderRadius: "16px",
             bgcolor: "background.default",
           }}
         >

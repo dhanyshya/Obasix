@@ -1,0 +1,436 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T14:51:38+00:00",
+  "title": "Design System: OBASIX",
+  "extensions": {
+    "colorMeta": {
+      "forest": {
+        "role": "primary",
+        "displayName": "Signage Forest",
+        "canonical": "oklch(39% 0.07 163)",
+        "tonalRamp": [
+          "oklch(15% 0.07 163)",
+          "oklch(25% 0.07 163)",
+          "oklch(35% 0.07 163)",
+          "oklch(45% 0.07 163)",
+          "oklch(55% 0.07 163)",
+          "oklch(65% 0.07 163)",
+          "oklch(80% 0.07 163)",
+          "oklch(95% 0.07 163)"
+        ]
+      },
+      "forest-dark": {
+        "role": "primary",
+        "displayName": "Forest Dark",
+        "canonical": "oklch(33% 0.06 163)",
+        "tonalRamp": [
+          "oklch(15% 0.06 163)",
+          "oklch(25% 0.06 163)",
+          "oklch(35% 0.06 163)",
+          "oklch(45% 0.06 163)",
+          "oklch(55% 0.06 163)",
+          "oklch(65% 0.06 163)",
+          "oklch(80% 0.06 163)",
+          "oklch(95% 0.06 163)"
+        ]
+      },
+      "forest-deep": {
+        "role": "primary",
+        "displayName": "Lobby Forest Deep",
+        "canonical": "oklch(29% 0.05 163)",
+        "tonalRamp": [
+          "oklch(15% 0.05 163)",
+          "oklch(25% 0.05 163)",
+          "oklch(35% 0.05 163)",
+          "oklch(45% 0.05 163)",
+          "oklch(55% 0.05 163)",
+          "oklch(65% 0.05 163)",
+          "oklch(80% 0.05 163)",
+          "oklch(95% 0.05 163)"
+        ]
+      },
+      "signal": {
+        "role": "secondary",
+        "displayName": "Signal Orange",
+        "canonical": "oklch(67% 0.18 46)",
+        "tonalRamp": [
+          "oklch(15% 0.18 46)",
+          "oklch(25% 0.18 46)",
+          "oklch(35% 0.18 46)",
+          "oklch(45% 0.18 46)",
+          "oklch(55% 0.18 46)",
+          "oklch(65% 0.18 46)",
+          "oklch(80% 0.18 46)",
+          "oklch(95% 0.18 46)"
+        ]
+      },
+      "action": {
+        "role": "tertiary",
+        "displayName": "Action Red",
+        "canonical": "oklch(53% 0.19 25)",
+        "tonalRamp": [
+          "oklch(15% 0.19 25)",
+          "oklch(25% 0.19 25)",
+          "oklch(35% 0.19 25)",
+          "oklch(45% 0.19 25)",
+          "oklch(55% 0.19 25)",
+          "oklch(65% 0.19 25)",
+          "oklch(80% 0.19 25)",
+          "oklch(95% 0.19 25)"
+        ]
+      },
+      "action-dark": {
+        "role": "tertiary",
+        "displayName": "Action Red Dark",
+        "canonical": "oklch(46% 0.17 25)",
+        "tonalRamp": [
+          "oklch(15% 0.17 25)",
+          "oklch(25% 0.17 25)",
+          "oklch(35% 0.17 25)",
+          "oklch(45% 0.17 25)",
+          "oklch(55% 0.17 25)",
+          "oklch(65% 0.17 25)",
+          "oklch(80% 0.17 25)",
+          "oklch(95% 0.17 25)"
+        ]
+      },
+      "action-pressed": {
+        "role": "tertiary",
+        "displayName": "Action Red Pressed",
+        "canonical": "oklch(40% 0.15 25)",
+        "tonalRamp": [
+          "oklch(15% 0.15 25)",
+          "oklch(25% 0.15 25)",
+          "oklch(35% 0.15 25)",
+          "oklch(45% 0.15 25)",
+          "oklch(55% 0.15 25)",
+          "oklch(65% 0.15 25)",
+          "oklch(80% 0.15 25)",
+          "oklch(95% 0.15 25)"
+        ]
+      },
+      "charcoal": {
+        "role": "neutral",
+        "displayName": "Sign Charcoal",
+        "canonical": "oklch(20% 0.008 160)",
+        "tonalRamp": [
+          "oklch(15% 0.008 160)",
+          "oklch(25% 0.008 160)",
+          "oklch(35% 0.008 160)",
+          "oklch(45% 0.008 160)",
+          "oklch(55% 0.008 160)",
+          "oklch(65% 0.008 160)",
+          "oklch(80% 0.008 160)",
+          "oklch(95% 0.008 160)"
+        ]
+      },
+      "body": {
+        "role": "neutral",
+        "displayName": "Body Slate",
+        "canonical": "oklch(40% 0.012 155)",
+        "tonalRamp": [
+          "oklch(15% 0.012 155)",
+          "oklch(25% 0.012 155)",
+          "oklch(35% 0.012 155)",
+          "oklch(45% 0.012 155)",
+          "oklch(55% 0.012 155)",
+          "oklch(65% 0.012 155)",
+          "oklch(80% 0.012 155)",
+          "oklch(95% 0.012 155)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "oklch(50% 0.012 155)",
+        "tonalRamp": [
+          "oklch(15% 0.012 155)",
+          "oklch(25% 0.012 155)",
+          "oklch(35% 0.012 155)",
+          "oklch(45% 0.012 155)",
+          "oklch(55% 0.012 155)",
+          "oklch(65% 0.012 155)",
+          "oklch(80% 0.012 155)",
+          "oklch(95% 0.012 155)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Enamel White",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(25% 0 0)",
+          "oklch(35% 0 0)",
+          "oklch(45% 0 0)",
+          "oklch(55% 0 0)",
+          "oklch(65% 0 0)",
+          "oklch(80% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "ivory": {
+        "role": "neutral",
+        "displayName": "Enamel Grey",
+        "canonical": "oklch(96% 0.004 130)",
+        "tonalRamp": [
+          "oklch(15% 0.004 130)",
+          "oklch(25% 0.004 130)",
+          "oklch(35% 0.004 130)",
+          "oklch(45% 0.004 130)",
+          "oklch(55% 0.004 130)",
+          "oklch(65% 0.004 130)",
+          "oklch(80% 0.004 130)",
+          "oklch(95% 0.004 130)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Rule Grey",
+        "canonical": "oklch(89% 0.007 140)",
+        "tonalRamp": [
+          "oklch(15% 0.007 140)",
+          "oklch(25% 0.007 140)",
+          "oklch(35% 0.007 140)",
+          "oklch(45% 0.007 140)",
+          "oklch(55% 0.007 140)",
+          "oklch(65% 0.007 140)",
+          "oklch(80% 0.007 140)",
+          "oklch(95% 0.007 140)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Directory headline in the hero; one per page."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles as declarative sentences; product page titles."
+      },
+      "title": {
+        "displayName": "Title / Plate",
+        "purpose": "Sign plates: directory and range row names, card names, plate headers."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "Prices on cards, plates and product pages, tabular."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Ledes, descriptions and running text."
+      },
+      "label": {
+        "displayName": "Label / Code",
+        "purpose": "SKUs, sizes, counts, product-code band, definition terms."
+      }
+    },
+    "shadows": [
+      {
+        "name": "destination-plate-lift",
+        "value": "0 30px 60px -20px rgba(0,0,0,0.45)",
+        "purpose": "The hero destination plate mounted on the directory board, md and up only."
+      },
+      {
+        "name": "floating-control",
+        "value": "0 1px 4px rgba(37,42,38,0.08)",
+        "purpose": "Wishlist and quick-view buttons over product photography."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-sign",
+        "value": "cubic-bezier(0.16,1,0.3,1)",
+        "purpose": "Every state change: row colour, roundel fill, arrow nudge, card rule wipe, plate reveal."
+      },
+      {
+        "name": "duration-state",
+        "value": "200ms",
+        "purpose": "Colour and border changes on rows, links and buttons."
+      },
+      {
+        "name": "duration-rule-wipe",
+        "value": "420ms",
+        "purpose": "Orange rule wiping under a product card on hover."
+      },
+      {
+        "name": "duration-plate-wipe",
+        "value": "520ms",
+        "purpose": "Destination plate clip-path reveal on zone change; off under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "xs",
+        "value": "0px"
+      },
+      {
+        "name": "sm",
+        "value": "600px"
+      },
+      {
+        "name": "md",
+        "value": "900px"
+      },
+      {
+        "name": "lg",
+        "value": "1200px"
+      },
+      {
+        "name": "xl",
+        "value": "1536px"
+      }
+    ],
+    "focus": {
+      "value": "3px solid #EE6A1F",
+      "offset": "2px to 3px",
+      "purpose": "Keyboard focus on every interactive element."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The buying action; the only red element on a plate.",
+      "html": "<button class=\"ds-btn-primary\">Add to Cart</button>",
+      "css": ".ds-btn-primary { font-family: Archivo, 'Helvetica Neue', sans-serif; min-height:48px; padding:12px 24px; font-weight:700; font-size:0.95rem; letter-spacing:-0.005em; background:#C8282E; color:#FFFFFF; border:1px solid #C8282E; border-radius:0; cursor:pointer; transition:background-color 250ms ease, border-color 250ms ease; } .ds-btn-primary:hover { background:#A11E23; border-color:#A11E23; } .ds-btn-primary:active { background:#86181C; border-color:#86181C; } .ds-btn-primary:focus-visible { outline:3px solid #EE6A1F; outline-offset:3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Charcoal-outlined plate that inverts on hover.",
+      "html": "<button class=\"ds-btn-secondary\">Request a quote</button>",
+      "css": ".ds-btn-secondary { font-family: Archivo, 'Helvetica Neue', sans-serif; min-height:48px; padding:12px 24px; font-weight:700; font-size:0.95rem; background:#FFFFFF; color:#141917; border:2px solid #141917; border-radius:0; cursor:pointer; transition:background-color 250ms ease, color 250ms ease; } .ds-btn-secondary:hover, .ds-btn-secondary:active { background:#141917; color:#FFFFFF; } .ds-btn-secondary:focus-visible { outline:3px solid #EE6A1F; outline-offset:3px; }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "card-add-to-cart",
+      "description": "Square image well, charcoal rule with orange hover wipe, code line, plate name, price, red action.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-img\"><div class=\"ds-card-photo\"></div></div><div class=\"ds-card-rule\"><span></span></div><div class=\"ds-card-meta\"><span class=\"ds-card-sku\">OBX-MWB-6090</span><span class=\"ds-card-size\">60 x 90 cm</span></div><a class=\"ds-card-name\" href=\"#\">Magnetic Whiteboard, Aluminium Frame</a><div class=\"ds-card-cat\">Magnetic Whiteboard</div><div class=\"ds-card-price\">&#8377;3,450</div><button class=\"ds-card-cta\">Add to Cart</button><a class=\"ds-card-link\" href=\"#\">View Details</a></article>",
+      "css": ".ds-card { display:flex; flex-direction:column; width:260px; } .ds-card-img { aspect-ratio:1/1; background:#FFFFFF; outline:1px solid #DCDFDA; outline-offset:-1px; display:grid; place-items:center; overflow:hidden; } .ds-card-photo { width:70%; height:50%; background:#F2F3F0; border:6px solid #C9CCC7; transition:transform 600ms cubic-bezier(0.16,1,0.3,1); } .ds-card:hover .ds-card-photo { transform:scale(1.035); } .ds-card-rule { position:relative; height:3px; background:#141917; } .ds-card-rule span { position:absolute; inset:0; background:#EE6A1F; transform:scaleX(0); transform-origin:left; transition:transform 420ms cubic-bezier(0.16,1,0.3,1); } .ds-card:hover .ds-card-rule span { transform:scaleX(1); } .ds-card-meta { display:flex; justify-content:space-between; padding-top:12px; font-size:12px; font-variant-numeric:tabular-nums; } .ds-card-sku { font-family: Archivo, 'Helvetica Neue', sans-serif; font-weight:600; letter-spacing:0.05em; color:#164E3B; } .ds-card-size { color:#3F4843; font-family:Inter, sans-serif; } .ds-card-name { font-family: Archivo, 'Helvetica Neue', sans-serif; margin-top:6px; font-weight:700; font-variation-settings:'wdth' 94; font-size:1.2rem; line-height:1.15; letter-spacing:-0.02em; color:#141917; text-decoration:none; } .ds-card-name:hover { text-decoration:underline; text-underline-offset:4px; } .ds-card-cat { margin-top:4px; font:13px Inter, sans-serif; color:#3F4843; } .ds-card-price { font-family: Archivo, 'Helvetica Neue', sans-serif; margin-top:10px; font-weight:800; font-size:1.45rem; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:#141917; } .ds-card-cta { font-family: Archivo, 'Helvetica Neue', sans-serif; margin-top:14px; width:100%; min-height:46px; border:0; border-radius:0; background:#C8282E; color:#FFFFFF; font-weight:700; font-size:0.95rem; cursor:pointer; transition:background-color 200ms cubic-bezier(0.16,1,0.3,1); } .ds-card-cta:hover { background:#A11E23; } .ds-card-cta:focus-visible, .ds-card-link:focus-visible { outline:3px solid #EE6A1F; outline-offset:2px; } .ds-card-link { font-family: Archivo, 'Helvetica Neue', sans-serif; display:inline-block; margin-top:8px; font-weight:700; font-size:0.88rem; color:#141917; text-decoration:underline; text-underline-offset:4px; } .ds-card-link:hover { color:#164E3B; text-decoration-thickness:2px; }"
+    },
+    {
+      "name": "Directory Row",
+      "kind": "nav",
+      "refersTo": "roundel",
+      "description": "Numbered roundel, plate-type space name and sign arrow on the forest-deep board; active row fills signal.",
+      "html": "<ul class=\"ds-dir\"><li><button class=\"ds-dir-row is-on\" aria-pressed=\"true\"><span class=\"ds-roundel\">01</span><span class=\"ds-dir-name\">Office</span><span class=\"ds-dir-arrow\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M3 12.5h15.5\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"square\" fill=\"none\"/><path d=\"M12.5 5.5l7 7-7 7\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" fill=\"none\"/></svg></span></button></li><li><button class=\"ds-dir-row\" aria-pressed=\"false\"><span class=\"ds-roundel\">02</span><span class=\"ds-dir-name\">Meeting room</span><span class=\"ds-dir-arrow\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M3 12.5h15.5\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"square\" fill=\"none\"/><path d=\"M12.5 5.5l7 7-7 7\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" fill=\"none\"/></svg></span></button></li></ul>",
+      "css": ".ds-dir { list-style:none; margin:0; padding:16px 24px; background:#0B2E22; border-top:2px solid rgba(255,255,255,0.22); width:360px; } .ds-dir li { border-bottom:1px solid rgba(255,255,255,0.16); } .ds-dir-row { all:unset; box-sizing:border-box; width:100%; display:flex; align-items:center; gap:14px; padding:13px 0; cursor:pointer; color:rgba(255,255,255,0.78); transition:color 200ms cubic-bezier(0.16,1,0.3,1); } .ds-dir-row:hover, .ds-dir-row.is-on { color:#FFFFFF; } .ds-dir-row:focus-visible { outline:3px solid #EE6A1F; outline-offset:2px; } .ds-roundel { font-family: Archivo, 'Helvetica Neue', sans-serif; width:40px; height:40px; border-radius:50%; display:inline-grid; place-items:center; border:2px solid rgba(255,255,255,0.4); font-weight:600; font-size:14px; font-variant-numeric:tabular-nums; color:#FFFFFF; transition:background-color 220ms cubic-bezier(0.16,1,0.3,1), border-color 220ms cubic-bezier(0.16,1,0.3,1); } .is-on .ds-roundel { background:#EE6A1F; border-color:#EE6A1F; } .ds-dir-name { font-family: Archivo, 'Helvetica Neue', sans-serif; flex:1; font-weight:700; font-variation-settings:'wdth' 94; letter-spacing:-0.02em; font-size:23px; } .ds-dir-arrow { display:block; color:rgba(255,255,255,0.45); transform:translateX(-6px); transition:transform 240ms cubic-bezier(0.16,1,0.3,1); } .is-on .ds-dir-arrow { color:#EE6A1F; transform:none; }"
+    },
+    {
+      "name": "Wayfinding Sign",
+      "kind": "custom",
+      "refersTo": "wayfinding-arrow-block",
+      "description": "Full-width destination row with a square forest arrow block that turns red and slides on hover.",
+      "html": "<a class=\"ds-sign\" href=\"#\"><span class=\"ds-sign-title\">Compare side by side</span><span class=\"ds-sign-line\">Surface, frame, sizes and price for up to four boards.</span><span class=\"ds-sign-arrow\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M3 12.5h15.5\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"square\" fill=\"none\"/><path d=\"M12.5 5.5l7 7-7 7\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" fill=\"none\"/></svg></span></a>",
+      "css": ".ds-sign { display:grid; grid-template-columns:1.1fr 1fr auto; align-items:center; gap:32px; padding:32px 0; border-top:3px solid #141917; border-bottom:1px solid #DCDFDA; color:#141917; text-decoration:none; } .ds-sign:focus-visible { outline:3px solid #EE6A1F; outline-offset:-3px; } .ds-sign-title { font-family: Archivo, 'Helvetica Neue', sans-serif; font-weight:800; font-variation-settings:'wdth' 94; font-size:36px; letter-spacing:-0.03em; line-height:1.05; } .ds-sign-line { font:16px/1.55 Inter, sans-serif; color:#3F4843; } .ds-sign-arrow { width:64px; height:64px; display:grid; place-items:center; background:#164E3B; color:#FFFFFF; transition:transform 260ms cubic-bezier(0.16,1,0.3,1), background-color 200ms; } .ds-sign:hover .ds-sign-arrow { transform:translateX(6px); background:#C8282E; }"
+    },
+    {
+      "name": "Size Keys",
+      "kind": "chip",
+      "refersTo": "size-key",
+      "description": "One row of square size keys; selected key is charcoal with a signal inset bar.",
+      "html": "<div class=\"ds-keys\" role=\"group\" aria-label=\"Size\"><button class=\"ds-key is-on\" aria-pressed=\"true\">60 x 90 cm</button><button class=\"ds-key\" aria-pressed=\"false\">90 x 120 cm</button><button class=\"ds-key\" aria-pressed=\"false\">120 x 180 cm</button></div>",
+      "css": ".ds-keys { display:flex; flex-wrap:wrap; gap:8px; } .ds-key { font-family: Archivo, 'Helvetica Neue', sans-serif; min-width:88px; min-height:48px; padding:0 16px; font-weight:700; font-size:15px; font-variant-numeric:tabular-nums; background:#FFFFFF; color:#141917; border:2px solid #141917; border-radius:0; cursor:pointer; } .ds-key:hover, .ds-key.is-on { background:#141917; color:#FFFFFF; } .ds-key.is-on { box-shadow:inset 0 -4px 0 #EE6A1F; } .ds-key:focus-visible { outline:3px solid #EE6A1F; outline-offset:3px; }"
+    },
+    {
+      "name": "Code Band",
+      "kind": "custom",
+      "refersTo": "label",
+      "description": "Charcoal strip with a signal top edge carrying the catalogue as a scrolling run of SKUs.",
+      "html": "<div class=\"ds-band\"><span class=\"ds-band-label\">42 boards, by code</span><div class=\"ds-band-run\"><a href=\"#\">CMWB-6090 <span>60x90</span></a><a href=\"#\">CMWB-9012 <span>90x120</span></a><a href=\"#\">NB-6090 <span>60x90</span></a><a href=\"#\">PB-4560 <span>45x60</span></a></div></div>",
+      "css": ".ds-band { display:flex; gap:32px; align-items:center; padding:18px 32px; background:#141917; border-top:3px solid #EE6A1F; } .ds-band-label { font-family: Archivo, 'Helvetica Neue', sans-serif; flex-shrink:0; font-weight:700; font-size:14px; color:#EE6A1F; } .ds-band-run { display:flex; gap:28px; overflow-x:auto; mask-image:linear-gradient(90deg,#000 85%,transparent); } .ds-band-run a { font-family: Archivo, 'Helvetica Neue', sans-serif; white-space:nowrap; font-weight:600; font-size:13px; letter-spacing:0.04em; font-variant-numeric:tabular-nums; color:rgba(255,255,255,0.78); text-decoration:none; padding:4px 0; } .ds-band-run a:hover { color:#FFFFFF; } .ds-band-run a:focus-visible { outline:2px solid #EE6A1F; outline-offset:2px; } .ds-band-run span { color:rgba(255,255,255,0.5); }"
+    },
+    {
+      "name": "Stripe Spine",
+      "kind": "custom",
+      "refersTo": "forest",
+      "description": "Three-band logo rule (green 6, orange 1, red 2) across the top of header and footer.",
+      "html": "<div class=\"ds-spine\" aria-hidden=\"true\"><span></span><span></span><span></span></div>",
+      "css": ".ds-spine { display:grid; grid-template-columns:6fr 1fr 2fr; height:6px; width:100%; } .ds-spine span:nth-child(1) { background:#164E3B; } .ds-spine span:nth-child(2) { background:#EE6A1F; } .ds-spine span:nth-child(3) { background:#C8282E; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Outlined, small, square, white.",
+      "html": "<label class=\"ds-field\"><span>Quantity</span><input type=\"number\" value=\"1\" min=\"1\"></label>",
+      "css": ".ds-field { display:inline-flex; flex-direction:column; gap:8px; font:600 14px Inter, sans-serif; color:#141917; } .ds-field input { width:112px; height:40px; padding:0 12px; font:15px Inter, sans-serif; background:#FFFFFF; color:#141917; border:1px solid rgba(0,0,0,0.23); border-radius:0; } .ds-field input:hover { border-color:#141917; } .ds-field input:focus-visible { outline:none; border:2px solid #164E3B; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lobby Directory",
+    "overview": "The storefront is built as the wayfinding system of an office building. Spaces are zones on a directory board, products are destinations with codes, and the logo's tick is redrawn as the arrow that points to them. Deep signage green is the committed ground for the header band, the directory hero and the maker section; product information sits on enamel-white plates; orange from the logo's \"O\" marks where you are; red from the logo lettering is spent only on the action that buys.\n\nDensity is high and factual. Rows, codes, sizes and prices are the content; imagery is the official product photography, set on white or enamel grey with generous internal padding so each board reads as an object, never as a lifestyle scene. Lettering is a heavy, slightly condensed grotesk set tight like sign vinyl, with tabular numerals wherever a number is a fact.\n\nSurfaces are flat and square. Structure comes from rules (heavy charcoal tops, hairline row dividers) and from colour fields, not from cards, shadows or radii. The only curved shapes in the system are the numbered roundels of the directory.",
+    "keyCharacteristics": [
+      "Committed forest-green fields; white and enamel-grey plates for product content.",
+      "Three logo colours with fixed jobs: green ground, orange position, red action.",
+      "Archivo set heavy and condensed for every sign-like role; Inter for reading.",
+      "Lists as directories: full-width rows with a code or roundel, a name, a fact, an arrow.",
+      "Square corners everywhere except the circular roundel.",
+      "One easing curve, cubic-bezier(0.16, 1, 0.3, 1), for every state change."
+    ],
+    "rules": [
+      {
+        "name": "The Three Jobs Rule",
+        "body": "Green is ground, orange is position, red is purchase. A colour never takes another colour's job: orange never fills a buy button, red never marks the current zone.",
+        "section": "colors"
+      },
+      {
+        "name": "The Red Is Spent Once Rule",
+        "body": "Each product plate or card carries exactly one red element, the action that adds to cart or requests a quote.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signal Is A Mark Rule",
+        "body": "Orange marks: rules, underlines, roundels, focus rings, short labels on charcoal. It is not a ground for small white text; white on signal measures about 3.1:1 and fails AA below large-text size.",
+        "section": "colors"
+      },
+      {
+        "name": "The Every Number Is A Fact Rule",
+        "body": "Prices, sizes, counts, SKUs and phone numbers use tabular numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Headline Rule",
+        "body": "Headlines are sentences in sentence case with a full stop, set in Archivo 800. No labels stacked above them.",
+        "section": "typography"
+      },
+      {
+        "name": "The Directory Row Rule",
+        "body": "When content is a set of destinations, render rows with a leading code or roundel and a trailing arrow, not a grid of cards.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Mounted Plate Rule",
+        "body": "Only the hero destination plate is lifted off its ground. Everything else sits flush.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square Plate Rule",
+        "body": "Panels, buttons, fields and images have square corners; only roundels are round.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** set green as a committed ground (forest or forest-deep) for whole sections, not as a tint behind content.",
+      "**Do** keep red to one buying action per plate, card or section.",
+      "**Do** mark the current item, active zone and keyboard focus with signal orange (3px).",
+      "**Do** draw arrows and ticks with the sign primitives (square caps, mitred joins), and number directory rows with roundels.",
+      "**Do** set every price, size, count and SKU with tabular numerals in Archivo.",
+      "**Do** separate list rows with a 3px charcoal top rule and 1px rule-grey hairlines.",
+      "**Do** run state changes on cubic-bezier(0.16, 1, 0.3, 1) between 200ms and 520ms, and guard reveal animations with prefers-reduced-motion."
+    ],
+    "donts": [
+      "**Don't** round corners on panels, buttons, fields, chips or images; the roundel is the only curve.",
+      "**Don't** add shadows to cards or sections; the hero destination plate is the one mounted object.",
+      "**Don't** set small white text on signal orange or small signal text on forest; both measure about 3:1.",
+      "**Don't** use oak, beige or the older terracotta secondary as accents on migrated surfaces; they belong to the previous system.",
+      "**Don't** stack uppercase tracked labels above headlines; headlines stand alone as sentences.",
+      "**Don't** substitute stock arrow icons for the sign arrow on wayfinding links."
+    ]
+  }
+}

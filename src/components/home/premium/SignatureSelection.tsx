@@ -115,7 +115,7 @@ export function SignatureSelection() {
                       top: { xs: 16, md: 24 },
                       fontSize: 9.5,
                       fontWeight: 700,
-                      letterSpacing: "0.17em",
+                      letterSpacing: "0.05em",
                       textTransform: "uppercase",
                       color: home.forest,
                     }}
@@ -139,7 +139,7 @@ export function SignatureSelection() {
                       component="h3"
                       sx={{
                         mt: 1,
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: { xs: "2rem", md: "2.5rem" },
                         lineHeight: 1.02,
                         letterSpacing: "-0.025em",
@@ -152,7 +152,7 @@ export function SignatureSelection() {
                   <Box sx={{ textAlign: { sm: "right" } }}>
                     <Typography
                       sx={{
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: 26,
                         color: home.charcoal,
                       }}
@@ -248,7 +248,7 @@ export function SignatureSelection() {
                   >
                     <Typography
                       sx={{
-                        fontFamily: "var(--font-display), Georgia, serif",
+                        fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                         fontSize: 18,
                         color: isActive ? home.forest : home.oak,
                       }}
@@ -258,7 +258,7 @@ export function SignatureSelection() {
                     <Box>
                       <Typography
                         sx={{
-                          fontFamily: "var(--font-display), Georgia, serif",
+                          fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                           fontSize: { xs: 20, md: 23 },
                           lineHeight: 1.1,
                         }}

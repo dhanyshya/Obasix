@@ -141,7 +141,7 @@ function OptionGroup<T extends string>({
     <Box>
       <Typography
         variant="caption"
-        sx={{ letterSpacing: "0.12em", fontWeight: 600, color: "text.secondary", display: "block", mb: 1 }}
+        sx={{ letterSpacing: "0.05em", fontWeight: 600, color: "text.secondary", display: "block", mb: 1 }}
       >
         {label}
       </Typography>
@@ -155,7 +155,7 @@ function OptionGroup<T extends string>({
               onClick={() => onChange(option.id)}
               aria-pressed={active}
               sx={{
-                borderRadius: 0.5,
+                borderRadius: "16px",
                 border: "1px solid",
                 borderColor: active ? "primary.main" : "divider",
                 color: active ? "primary.main" : "text.secondary",
@@ -237,7 +237,7 @@ export function FindRightBoardSection() {
         <Reveal>
           <Typography
             variant="overline"
-            sx={{ color: "primary.main", letterSpacing: "0.18em", fontWeight: 600 }}
+            sx={{ color: "primary.main", letterSpacing: "0.05em", fontWeight: 600 }}
           >
             PRODUCT FINDER
           </Typography>
@@ -293,7 +293,7 @@ export function FindRightBoardSection() {
                   variant="outlined"
                   onClick={reset}
                   disabled={!hasFilters}
-                  sx={{ borderRadius: 0.5, borderColor: "divider" }}
+                  sx={{ borderRadius: "16px", borderColor: "divider" }}
                 >
                   Reset Filters
                 </Button>
@@ -350,7 +350,7 @@ export function FindRightBoardSection() {
                     Try widening size or budget, or browse applications for this space.
                   </Typography>
                   <Stack direction="row" spacing={1.5} sx={{ justifyContent: "center" }} useFlexGap>
-                    <Button variant="outlined" onClick={reset} sx={{ borderRadius: 0.5 }}>
+                    <Button variant="outlined" onClick={reset} sx={{ borderRadius: "16px" }}>
                       Reset Filters
                     </Button>
                     {space && space !== "training-room" ? (
@@ -358,12 +358,12 @@ export function FindRightBoardSection() {
                         component={Link}
                         href={`/solutions/${space}`}
                         variant="contained"
-                        sx={{ borderRadius: 0.5 }}
+                        sx={{ borderRadius: "16px" }}
                       >
                         View {spaces.find((s) => s.id === space)?.label} solutions
                       </Button>
                     ) : (
-                      <Button component={Link} href="/products" variant="contained" sx={{ borderRadius: 0.5 }}>
+                      <Button component={Link} href="/products" variant="contained" sx={{ borderRadius: "16px" }}>
                         Browse catalogue
                       </Button>
                     )}
@@ -446,7 +446,7 @@ export function FindRightBoardSection() {
                             size="small"
                             variant="outlined"
                             color="primary"
-                            sx={{ borderRadius: 0.5 }}
+                            sx={{ borderRadius: "16px" }}
                           >
                             Customize
                           </Button>

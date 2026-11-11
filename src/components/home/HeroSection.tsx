@@ -95,7 +95,7 @@ export function HeroSection() {
                   variant="overline"
                   sx={{
                     color: home.green,
-                    letterSpacing: "0.16em",
+                    letterSpacing: "0.05em",
                     fontSize: { xs: 11, md: 12 },
                     fontWeight: 700,
                     lineHeight: 1.45,
@@ -167,7 +167,7 @@ export function HeroSection() {
                   endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
                   sx={{
                     ...home.primaryBtn,
-                    borderRadius: 0.5,
+                    borderRadius: "16px",
                     px: 2.75,
                     py: 1.4,
                     fontSize: 15,
@@ -184,7 +184,7 @@ export function HeroSection() {
                   sx={{
                     ...home.linkBtn,
                     px: 0.25,
-                    borderRadius: 0,
+                    borderRadius: "16px",
                     alignSelf: { xs: "flex-start", sm: "center" },
                     "& .MuiButton-endIcon": { ml: 0.5 },
                   }}
@@ -268,7 +268,7 @@ export function HeroSection() {
                   sx={{
                     fontSize: 10,
                     fontWeight: 700,
-                    letterSpacing: "0.16em",
+                    letterSpacing: "0.05em",
                     textTransform: "uppercase",
                     color: home.green,
                   }}

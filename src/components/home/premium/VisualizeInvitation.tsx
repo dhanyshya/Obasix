@@ -120,7 +120,7 @@ export function VisualizeInvitation() {
                 >
                   <Typography
                     sx={{
-                      fontFamily: "var(--font-display), Georgia, serif",
+                      fontFamily: "var(--font-display), Helvetica Neue, sans-serif",
                       fontSize: 14,
                       color: home.forest,
                       width: 22,
@@ -171,7 +171,7 @@ export function VisualizeInvitation() {
             }}
           >
             <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: home.oak }} />
-            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            <Typography sx={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>
               Live preview
             </Typography>
           </Box>

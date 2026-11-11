@@ -168,7 +168,7 @@ export function WelcomeIntro() {
             mt: { xs: 2, md: 2.5 },
             height: 2,
             width: 56,
-            borderRadius: 1,
+            borderRadius: "16px",
             bgcolor: brandTokens.forest,
             transformOrigin: "center",
           }}

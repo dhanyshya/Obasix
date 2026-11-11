@@ -1,4 +1,6 @@
 import { randomBytes } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import {
   catalogueLine,
   cleanText,
@@ -18,6 +20,23 @@ function quoteMode() {
   if (process.env.OBASIX_COMMERCE_MODE === "demo" || process.env.NODE_ENV === "development") return "demo" as const;
   return "unconfigured" as const;
 }
+
+/** Confirms the file content matches its declared type (PNG, JPEG, WebP or PDF signatures). */
+function sniffType(bytes: Uint8Array): string | null {
+  const starts = (sig: number[], offset = 0) => sig.every((b, i) => bytes[offset + i] === b);
+  if (starts([0x89, 0x50, 0x4e, 0x47])) return "image/png";
+  if (starts([0xff, 0xd8, 0xff])) return "image/jpeg";
+  if (starts([0x52, 0x49, 0x46, 0x46]) && starts([0x57, 0x45, 0x42, 0x50], 8)) return "image/webp";
+  if (starts([0x25, 0x50, 0x44, 0x46])) return "application/pdf";
+  return null;
+}
+
+const extensions: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "application/pdf": "pdf",
+};
 
 function clientKey(request: Request) {
   return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
@@ -99,6 +118,23 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, saved: false, notified: false, message: "Check the highlighted fields.", errors }, { status: 400 });
   }
 
+  let attachmentBytes: Uint8Array | null = null;
+  if (attachment) {
+    attachmentBytes = new Uint8Array(await attachment.arrayBuffer());
+    if (sniffType(attachmentBytes) !== attachment.type) {
+      return Response.json(
+        {
+          ok: false,
+          saved: false,
+          notified: false,
+          message: "Check the highlighted fields.",
+          errors: { file: "The file content does not match a PNG, JPEG, WebP, or PDF file." },
+        },
+        { status: 400 },
+      );
+    }
+  }
+
   let rawLines: { productId?: string; quantity?: number; detail?: string }[] = [];
   try {
     const parsed = JSON.parse(String(form.get("lines") ?? "[]")) as unknown;
@@ -167,6 +203,15 @@ export async function POST(request: Request) {
       : null,
     notified: false,
   };
+
+  if (attachment && attachmentBytes && quote.attachment) {
+    // Stored privately on the server (never under /public). Only staff with server access can read it.
+    const dir = path.join(process.cwd(), ".data", "quote-files");
+    await mkdir(dir, { recursive: true });
+    const stored = `${quote.reference}.${extensions[attachment.type]}`;
+    await writeFile(path.join(dir, stored), attachmentBytes);
+    quote.attachment = { ...quote.attachment, storedAs: stored };
+  }
 
   const saved = await saveDemoQuote(quote);
   try {

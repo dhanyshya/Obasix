@@ -2,18 +2,16 @@
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "@/components/Link";
 import { getAccessoryProducts, getProductById } from "@/data/catalogue";
 import { CartItem } from "@/components/cart/CartItem";
 import { RecommendationCard } from "@/components/product/RecommendationCard";
+import { PageMasthead } from "@/components/layout/PageMasthead";
+import { SignArrow, pageMax, pagePad, signType } from "@/components/home/directory/sign";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/format";
+import { brandTokens as brand } from "@/theme/brandTokens";
 
 export default function CartPage() {
   const { items, subtotal, itemCount } = useCart();
@@ -26,142 +24,119 @@ export default function CartPage() {
     .slice(0, 4);
 
   return (
-    <Box sx={{ bgcolor: "background.default" }}>
-      <Box component="section" sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "background.paper", py: 6 }}>
-        <Container>
-          <Typography
-            variant="overline"
-            sx={{
-              display: "inline-flex",
-              px: 1,
-              py: 0.35,
-              borderRadius: 0.5,
-              bgcolor: "primary.light",
-              color: "primary.main",
-            }}
-          >
-            Cart
-          </Typography>
-          <Typography
-            variant="h3"
-            component="h1"
-            sx={{ mt: 1, fontSize: { xs: 34, md: 46 }, color: "text.primary" }}
-          >
-            Your OBASIX Setup
-          </Typography>
-          <Box sx={{ width: 40, height: 3, borderRadius: 1, bgcolor: "primary.main", mt: 1.5 }} />
-          <Typography color="text.secondary" sx={{ mt: 1.5, maxWidth: 672 }}>
-            Review configured boards and complete your setup with matching accessories.
-          </Typography>
-        </Container>
-      </Box>
+    <Box sx={{ bgcolor: brand.ivory }}>
+      <PageMasthead
+        code="Cart"
+        title="Your OBASIX setup"
+        lede="Review your configured boards, adjust quantities and add the accessories that go with them."
+        crumbs={[{ href: "/", label: "Home" }, { label: "Cart" }]}
+        compact
+      />
 
-      <Container sx={{ py: 5 }}>
-        <Grid container spacing={{ xs: 4, lg: 5 }}>
-          <Grid size={{ xs: 12, lg: 8 }}>
-            {items.length === 0 ? (
-              <Box
-                sx={{
-                  border: "1px dashed",
-                  borderColor: "divider",
-                  borderRadius: 1.5,
-                  bgcolor: "background.paper",
-                  px: 3,
-                  py: 8,
-                  textAlign: "center",
-                }}
-              >
-                <Typography variant="h6" component="p">
-                  Your setup is empty
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Explore whiteboards or open the customizer to start building.
-                </Typography>
-                <Stack direction="row" spacing={1.5} sx={{ justifyContent: "center", mt: 3 }}>
-                  <Button component={Link} href="/products" variant="outlined">
-                    Explore Products
-                  </Button>
-                  <Button component={Link} href="/customize" variant="contained">
-                    Customize
-                  </Button>
-                </Stack>
+      <Box
+        sx={{
+          ...pageMax,
+          ...pagePad,
+          py: { xs: 4, md: 7 },
+          display: "grid",
+          gap: { xs: 4, lg: 6 },
+          gridTemplateColumns: { xs: "minmax(0,1fr)", lg: "minmax(0, 1fr) 380px" },
+          alignItems: "start",
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          {items.length === 0 ? (
+            <Box sx={{ bgcolor: brand.white, borderTop: 0, px: { xs: 3, md: 6 }, py: { xs: 6, md: 8 } }}>
+              <Typography sx={{ ...signType.code, fontSize: 13, color: brand.forest }}>00 ITEMS</Typography>
+              <Typography component="p" sx={{ ...signType.title, fontSize: { xs: "1.9rem", md: "2.4rem" }, mt: 1, color: brand.charcoal }}>
+                Your setup is empty
+              </Typography>
+              <Typography sx={{ mt: 1.5, maxWidth: 460 }}>
+                Browse the collections, or design a board to your exact size, frame and finish.
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 3.5 }}>
+                <Button component={Link} href="/products" variant="contained" endIcon={<SignArrow size={18} />}>
+                  Explore Products
+                </Button>
+                <Button component={Link} href="/customize" variant="outlined">
+                  Customize
+                </Button>
               </Box>
-            ) : (
-              <Box sx={{ borderTop: 1, borderColor: "divider" }}>
-                {items.map((item) => (
-                  <CartItem key={item.id} item={item} />
+            </Box>
+          ) : (
+            <Box sx={{ bgcolor: brand.white, px: { xs: 2, md: 3.5 } }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", py: 2.25, borderBottom: `2px solid ${brand.charcoal}` }}>
+                <Typography component="h2" sx={{ ...signType.plate, fontSize: 20, color: brand.charcoal }}>
+                  Items
+                </Typography>
+                <Typography sx={{ ...signType.code, fontSize: 13, color: brand.muted }}>
+                  {String(itemCount).padStart(2, "0")} {itemCount === 1 ? "PIECE" : "PIECES"}
+                </Typography>
+              </Box>
+              {items.map((item) => (
+                <CartItem key={item.id} item={item} />
+              ))}
+            </Box>
+          )}
+
+          {(hasBoard || items.length === 0) && (
+            <Box component="section" sx={{ pt: { xs: 5, md: 7 } }}>
+              <Typography component="h2" sx={{ ...signType.plate, fontSize: { xs: 24, md: 28 }, color: brand.charcoal }}>
+                Complete your setup
+              </Typography>
+              <Typography sx={{ mt: 0.75, color: brand.body }}>Stands and accessories that work with OBASIX boards.</Typography>
+              <Box sx={{ mt: 2.5, display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
+                {recommended.map((item) => (
+                  <RecommendationCard key={item.id} item={item} />
                 ))}
               </Box>
-            )}
+            </Box>
+          )}
+        </Box>
 
-            {(hasBoard || items.length === 0) && (
-              <Box component="section" sx={{ pt: 5 }}>
-                <Typography variant="h5" component="h2">
-                  Complete Your Setup
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                  Recommended: Magnetic Buttons · Marker Holder · Duster · Stand
-                </Typography>
-                <Grid container spacing={1.5} sx={{ mt: 2 }}>
-                  {recommended.map((item) => (
-                    <Grid key={item.id} size={{ xs: 12, md: 6 }}>
-                      <RecommendationCard item={item} />
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-            )}
-          </Grid>
-
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <Paper
-              component="aside"
-              variant="outlined"
-              sx={{ p: 3, borderRadius: 1.5, position: { lg: "sticky" }, top: { lg: 96 } }}
-            >
-              <Typography variant="h6" component="h2">
-                Setup summary
+        <Box component="aside" aria-label="Setup summary" sx={{ position: { lg: "sticky" }, top: { lg: 112 }, bgcolor: brand.white, color: brand.charcoal }}>
+          <Box sx={{ px: 3, pt: 3, pb: 2.5 }}>
+            <Typography component="h2" sx={{ ...signType.plate, fontSize: 22, color: brand.charcoal }}>
+              Setup summary
+            </Typography>
+            <Box component="dl" sx={{ m: 0, mt: 2.5, display: "grid", gridTemplateColumns: "1fr auto", rowGap: 1.25, "& dt": { color: "#4A4F4C", fontSize: 14.5 }, "& dd": { m: 0, textAlign: "right", fontVariantNumeric: "tabular-nums" } }}>
+              <dt>Items</dt>
+              <dd>{itemCount}</dd>
+              <dt>Delivery</dt>
+              <dd style={{ color: "#4A4F4C", fontSize: 14 }}>Confirmed at checkout</dd>
+            </Box>
+            <Box sx={{ mt: 2.5, pt: 2.5, borderTop: "1px solid #E5E5E0", display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <Typography sx={{ color: "#4A4F4C" }}>Subtotal</Typography>
+              <Typography component="p" sx={{ ...signType.plate, fontSize: 32, fontVariantNumeric: "tabular-nums", color: brand.charcoal }}>
+                {formatPrice(subtotal)}
               </Typography>
-              <Stack spacing={1.5} sx={{ mt: 2 }}>
-                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Items
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {itemCount}
-                  </Typography>
-                </Stack>
-                <Divider />
-                <Stack direction="row" sx={{ alignItems: "baseline", justifyContent: "space-between" }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Subtotal
-                  </Typography>
-                  <Typography variant="h6" component="p" sx={{ fontWeight: 700 }}>
-                    {formatPrice(subtotal)}
-                  </Typography>
-                </Stack>
-              </Stack>
-              <Stack spacing={1} sx={{ mt: 3 }}>
-                {items.length === 0 ? (
-                  <Button variant="contained" fullWidth disabled>
-                    Proceed to Checkout
-                  </Button>
-                ) : (
-                  <Button component={Link} href="/checkout" variant="contained" fullWidth>
-                    Proceed to Checkout
-                  </Button>
-                )}
-                <Button component={Link} href="/quote" variant="outlined" fullWidth>
-                  Request Custom Quote
-                </Button>
-                <Button component={Link} href="/products" color="inherit" fullWidth>
-                  Continue Shopping
-                </Button>
-              </Stack>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
+            </Box>
+          </Box>
+          <Box sx={{ px: 3, pb: 3, display: "grid", gap: 1.25 }}>
+            {items.length === 0 ? (
+              <Button variant="contained" fullWidth disabled size="large">
+                Proceed to Checkout
+              </Button>
+            ) : (
+              <Button component={Link} href="/checkout" variant="contained" fullWidth size="large" endIcon={<SignArrow size={18} />}>
+                Proceed to Checkout
+              </Button>
+            )}
+            <Button
+              component={Link}
+              href="/quote"
+              variant="outlined"
+              fullWidth
+              sx={{ "&&": { color: brand.charcoal, borderColor: "#4A4F4C", bgcolor: "transparent" }, "&&:hover": { borderColor: brand.white, bgcolor: "rgba(255,255,255,0.08)" } }}
+            >
+              Request Custom Quote
+            </Button>
+            <Box component={Link} href="/products" sx={{ justifySelf: "center", mt: 0.5, py: 1, color: "#164E3B", fontWeight: 600, fontSize: 14.5, textDecoration: "underline", textUnderlineOffset: 4 }}>
+              Continue shopping
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 }

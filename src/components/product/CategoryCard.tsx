@@ -16,7 +16,7 @@ export function CategoryCard({ category }: { category: CategoryCardType }) {
         display: "block",
         position: "relative",
         overflow: "hidden",
-        borderRadius: 1.5,
+        borderRadius: "16px",
         "&:hover img": { transform: "scale(1.05)" },
       }}
     >
@@ -47,7 +47,7 @@ export function CategoryCard({ category }: { category: CategoryCardType }) {
           <Typography
             component="span"
             variant="body2"
-            sx={{ mt: 2, display: "inline-flex", alignItems: "center", gap: 0.5, fontWeight: 600, color: "warning.main" }}
+            sx={{ mt: 2, display: "inline-flex", alignItems: "center", gap: 0.5, fontWeight: 600, color: "secondary.main" }}
           >
             Explore <ArrowForwardIcon sx={{ fontSize: 16 }} />
           </Typography>

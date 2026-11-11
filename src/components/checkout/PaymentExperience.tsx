@@ -25,13 +25,14 @@ import { getProductById } from "@/data/catalogue";
 import { useCart } from "@/context/CartContext";
 import { useCheckoutDraft } from "@/context/CheckoutDraftContext";
 import {
-  demoOrderId,
-  saveDemoOrder,
+  rememberDemoOrder,
+  type DemoOrder,
   type DemoPaymentMethod,
 } from "@/lib/commerce/demo-orders";
 import { formatPrice } from "@/lib/format";
 import type { CommerceResponse } from "@/lib/commerce/types";
 import { commerceRequirements } from "@/lib/commerce/types";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import type { CartItem } from "@/lib/types";
 
 type CommerceMode = "demo" | "real" | "unconfigured";
@@ -49,7 +50,7 @@ function isQuoted(item: CartItem) {
 
 export function PaymentExperience() {
   const router = useRouter();
-  const { items, itemCount } = useCart();
+  const { items, itemCount, clearCart } = useCart();
   const priced = items.filter((item) => !isQuoted(item));
   const catalogueSubtotal = priced.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const { draft } = useCheckoutDraft();
@@ -103,7 +104,7 @@ export function PaymentExperience() {
     }
   };
 
-  const simulateSuccess = () => {
+  const simulateSuccess = async () => {
     if (!draft || placing) return;
     if (!method) {
       setMethodError("Choose UPI, Card, or Cash on Delivery.");
@@ -111,52 +112,49 @@ export function PaymentExperience() {
     }
     setPlacing(true);
     setMethodError("");
-    const order = saveDemoOrder({
-      id: demoOrderId(draft.idempotencyKey),
-      idempotencyKey: draft.idempotencyKey,
-      method,
-      email: draft.details.email,
-      phone: draft.details.phone,
-      subtotal: catalogueSubtotal,
-      status: "Payment Confirmed",
-      createdAt: new Date().toISOString(),
-      customerName: draft.details.name,
-      shippingAddress: draft.details.shipping,
-      paymentStatus: "paid",
-      items: priced.map((item) => {
-        const product = getProductById(item.productId);
-        return {
-          productId: item.productId,
-          name: product?.shortName ?? item.productId,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          lineTotal: item.unitPrice * item.quantity,
-        };
-      }),
-    });
-    router.push(`/checkout/confirmation?order=${order.id}`);
+    try {
+      // The server re-prices every line from the catalogue and stores the demo order.
+      const response = await fetch("/api/commerce/orders", {
+        method: "POST",
+        headers: { "content-type": "application/json", "idempotency-key": draft.idempotencyKey },
+        body: JSON.stringify({
+          method,
+          details: { name: draft.details.name, email: draft.details.email, phone: draft.details.phone, shipping: draft.details.shipping },
+          lines: priced.map((item) => ({ productId: item.productId, quantity: item.quantity, configuration: item.configuration })),
+        }),
+      });
+      const body = (await response.json()) as { ok: boolean; order?: DemoOrder; message?: string };
+      if (!response.ok || !body.ok || !body.order) {
+        setMethodError(body.message ?? "The demo order was not created.");
+        setPlacing(false);
+        return;
+      }
+      rememberDemoOrder(body.order);
+      clearCart();
+      router.push(`/checkout/confirmation?order=${body.order.id}`);
+    } catch {
+      setMethodError("The order service could not be reached. No order was created.");
+      setPlacing(false);
+    }
   };
 
   const ready = Boolean(draft) && items.length > 0;
 
   return (
     <Box sx={{ bgcolor: "background.default" }}>
-      <Box component="section" sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "background.paper", py: 5 }}>
-        <Container>
-          <Typography variant="overline" color="primary">
-            Payment
-          </Typography>
-          <Typography variant="h3" component="h1" sx={{ fontSize: { xs: 34, md: 46 } }}>
-            Payment
-          </Typography>
-          <Typography color="text.secondary" sx={{ mt: 1.5, maxWidth: 672 }}>
-            {mode === "demo"
-              ? "DEMO MODE — NO REAL PAYMENT. This simulation does not charge a card, send your details, or place an order."
-              : "Card details are not collected here. A payment starts only after the server verifies a provider."}
-          </Typography>
-          <PurchaseSteps current={1} />
-        </Container>
-      </Box>
+      <PageMasthead
+        code="Step 02 · Payment"
+        title="Payment"
+        crumbs={[{ href: "/cart", label: "Cart" }, { href: "/checkout", label: "Checkout" }, { label: "Payment" }]}
+        compact
+        lede={
+          mode === "demo"
+            ? "DEMO MODE — NO REAL PAYMENT. This simulation does not charge a card, send your details, or place an order."
+            : "Card details are not collected here. A payment starts only after the server verifies a provider."
+        }
+      >
+        <PurchaseSteps current={1} />
+      </PageMasthead>
 
       <Container sx={{ py: 5 }}>
         <Grid container spacing={{ xs: 4, lg: 5 }}>
@@ -165,9 +163,9 @@ export function PaymentExperience() {
               <Box
                 component="section"
                 sx={{
-                  border: "1px dashed",
+                  border: "1px solid",
                   borderColor: "divider",
-                  borderRadius: 1.5,
+                  borderRadius: "16px",
                   bgcolor: "background.paper",
                   px: 3,
                   py: 6,
@@ -191,7 +189,7 @@ export function PaymentExperience() {
                 </Typography>
               </Stack>
             ) : mode === "demo" ? (
-              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3 }, borderRadius: 1.5 }}>
+              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3.5 }, borderTop: 0 }}>
                 <Alert severity="info" sx={{ fontWeight: 600 }}>
                   DEMO MODE — NO REAL PAYMENT
                 </Alert>
@@ -226,7 +224,7 @@ export function PaymentExperience() {
                   {methodError ? <FormHelperText role="alert">{methodError}</FormHelperText> : null}
                 </FormControl>
                 <Stack direction={{ xs: "column", sm: "row" }} useFlexGap spacing={1.5} sx={{ mt: 3, flexWrap: "wrap" }}>
-                  <Button variant="contained" onClick={simulateSuccess} disabled={placing}>
+                  <Button variant="contained" onClick={() => void simulateSuccess()} disabled={placing}>
                     {placing ? "Placing order…" : "Simulate Successful Payment"}
                   </Button>
                   <Button
@@ -255,7 +253,7 @@ export function PaymentExperience() {
                 ) : null}
               </Paper>
             ) : (
-              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3 }, borderRadius: 1.5 }}>
+              <Paper component="section" variant="outlined" sx={{ p: { xs: 2.5, md: 3.5 }, borderTop: 0 }}>
                 <Typography variant="h5" component="h2">
                   Ready to pay
                 </Typography>
@@ -309,7 +307,7 @@ export function PaymentExperience() {
           </Grid>
 
           <Grid size={{ xs: 12, lg: 5 }}>
-            <Paper component="aside" variant="outlined" sx={{ p: { xs: 2.5, md: 3 }, borderRadius: 1.5, height: "fit-content" }}>
+            <Paper component="aside" variant="outlined" sx={{ p: { xs: 2.5, md: 3 }, borderRadius: "16px", height: "fit-content" }}>
               <Typography variant="h6" component="h2">
                 Amount
               </Typography>

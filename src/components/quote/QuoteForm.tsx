@@ -48,7 +48,7 @@ type QuoteInitial = Partial<QuoteRequest> & {
 const fieldSx = {
   "& .MuiOutlinedInput-root": {
     bgcolor: quoteTheme.white,
-    borderRadius: 1,
+    borderRadius: "16px",
     "& fieldset": { borderColor: quoteTheme.line },
     "&:hover fieldset": { borderColor: quoteTheme.oak },
     "&.Mui-focused fieldset": { borderColor: quoteTheme.forest, borderWidth: 1.5 },
@@ -224,7 +224,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
             bgcolor: quoteTheme.beige,
             color: quoteTheme.charcoal,
             border: `1px solid ${quoteTheme.line}`,
-            borderRadius: 1,
+            borderRadius: "16px",
             "& .MuiAlert-message": { width: "100%" },
           }}
         >
@@ -237,7 +237,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
         </Alert>
 
         {formError ? (
-          <Alert severity="error" role="alert" sx={{ borderRadius: 1 }}>
+          <Alert severity="error" role="alert" sx={{ borderRadius: "16px" }}>
             {formError}
           </Alert>
         ) : null}
@@ -366,7 +366,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
                 mt: 2.5,
                 px: 2,
                 py: 1.75,
-                borderRadius: 1,
+                borderRadius: "16px",
                 bgcolor: quoteTheme.beige,
                 border: `1px solid ${quoteTheme.line}`,
               }}
@@ -375,7 +375,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
                 sx={{
                   fontSize: 11,
                   fontWeight: 700,
-                  letterSpacing: "0.12em",
+                  letterSpacing: "0.05em",
                   textTransform: "uppercase",
                   color: quoteTheme.forest,
                 }}
@@ -482,7 +482,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
           <Box
             sx={{
               p: { xs: 2, md: 2.25 },
-              borderRadius: 1,
+              borderRadius: "16px",
               border: `1px dashed ${quoteTheme.oak}`,
               bgcolor: quoteTheme.white,
             }}
@@ -659,7 +659,7 @@ function Section({
       component="section"
       sx={{
         p: { xs: 2.25, md: 3 },
-        borderRadius: 1.25,
+        borderRadius: "16px",
         bgcolor: quoteTheme.white,
         border: `1px solid ${quoteTheme.line}`,
       }}
@@ -775,7 +775,7 @@ function ProductSummary({
       aria-label="Selected product summary"
       sx={{
         p: { xs: 2.25, md: 2.75 },
-        borderRadius: 1.25,
+        borderRadius: "16px",
         bgcolor: quoteTheme.white,
         border: `1px solid ${quoteTheme.line}`,
         boxShadow: "0 12px 36px rgba(37, 42, 38, 0.05)",
@@ -785,7 +785,7 @@ function ProductSummary({
         sx={{
           fontSize: 11,
           fontWeight: 700,
-          letterSpacing: "0.14em",
+          letterSpacing: "0.05em",
           textTransform: "uppercase",
           color: quoteTheme.forest,
         }}
@@ -815,7 +815,7 @@ function ProductSummary({
           position: "relative",
           mt: 2,
           aspectRatio: "5 / 4",
-          borderRadius: 1,
+          borderRadius: "16px",
           overflow: "hidden",
           bgcolor: quoteTheme.beige,
           border: `1px solid ${quoteTheme.line}`,

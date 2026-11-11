@@ -44,7 +44,7 @@ export function FrameSelector({
                   width: 32,
                   height: 32,
                   flexShrink: 0,
-                  borderRadius: "6px",
+                  borderRadius: "16px",
                   border: "1px solid rgba(0,0,0,0.1)",
                   backgroundColor: frame.swatch,
                 }}

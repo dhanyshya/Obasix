@@ -30,7 +30,7 @@ export function SolutionsEditorialSection() {
     <Box component="section" sx={{ py: { xs: 10, md: 14 }, bgcolor: "background.paper", borderTop: 1, borderColor: "divider" }}>
       <Container>
         <Reveal>
-          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+          <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
             Applications
           </Typography>
           <Typography variant="h2" sx={{ mt: 1.5, fontSize: { xs: "2rem", md: "2.75rem" }, maxWidth: 520 }}>
@@ -85,7 +85,7 @@ export function SolutionsEditorialSection() {
                   }}
                 />
                 <Box sx={{ position: "absolute", left: 20, right: 20, bottom: 20, color: "#fff" }}>
-                  <Typography variant="caption" sx={{ opacity: 0.65, letterSpacing: "0.14em" }}>
+                  <Typography variant="caption" sx={{ opacity: 0.65, letterSpacing: "0.05em" }}>
                     {String(index + 1).padStart(2, "0")}
                   </Typography>
                   <Typography variant="h4" sx={{ mt: 0.75, fontSize: { xs: "1.35rem", md: large ? "2rem" : "1.5rem" }, color: "#fff" }}>

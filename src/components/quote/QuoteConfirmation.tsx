@@ -74,7 +74,7 @@ export function QuoteConfirmation() {
     return (
       <Paper
         variant="outlined"
-        sx={{ p: { xs: 3, md: 4 }, borderRadius: 2, borderColor: quoteTheme.line }}
+        sx={{ p: { xs: 3, md: 4 }, borderRadius: "16px", borderColor: quoteTheme.line }}
       >
         <Typography variant="h5" component="p" sx={{ fontWeight: 600, color: quoteTheme.charcoal }}>
           We could not find that quote
@@ -93,7 +93,7 @@ export function QuoteConfirmation() {
     return (
       <Paper
         variant="outlined"
-        sx={{ p: { xs: 3, md: 4 }, borderRadius: 2, borderColor: quoteTheme.line }}
+        sx={{ p: { xs: 3, md: 4 }, borderRadius: "16px", borderColor: quoteTheme.line }}
       >
         <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
           <CircularProgress size={18} sx={{ color: quoteTheme.forest }} />
@@ -130,7 +130,7 @@ export function QuoteConfirmation() {
       variant="outlined"
       sx={{
         p: { xs: 2.5, sm: 3.5, md: 5 },
-        borderRadius: 2,
+        borderRadius: "16px",
         borderColor: quoteTheme.line,
         bgcolor: quoteTheme.white,
       }}
@@ -143,7 +143,7 @@ export function QuoteConfirmation() {
             bgcolor: quoteTheme.beige,
             color: quoteTheme.charcoal,
             border: `1px solid ${quoteTheme.line}`,
-            borderRadius: 1,
+            borderRadius: "16px",
           }}
         >
           Demo mode — this request is saved locally for this storefront. No email was sent.
@@ -187,7 +187,7 @@ export function QuoteConfirmation() {
               mt: 2,
               px: 2,
               py: 1,
-              borderRadius: 1,
+              borderRadius: "16px",
               bgcolor: "rgba(23, 77, 56, 0.08)",
               color: quoteTheme.forest,
               fontSize: 13.5,
@@ -205,7 +205,7 @@ export function QuoteConfirmation() {
             sx={{
               fontSize: 11,
               fontWeight: 700,
-              letterSpacing: "0.14em",
+              letterSpacing: "0.05em",
               textTransform: "uppercase",
               color: quoteTheme.forest,
             }}
@@ -223,7 +223,7 @@ export function QuoteConfirmation() {
                 width: { xs: "100%", sm: 160 },
                 flexShrink: 0,
                 aspectRatio: "5 / 4",
-                borderRadius: 1,
+                borderRadius: "16px",
                 overflow: "hidden",
                 bgcolor: quoteTheme.beige,
                 border: `1px solid ${quoteTheme.line}`,
@@ -322,7 +322,7 @@ export function QuoteConfirmation() {
                 sx={{
                   fontSize: 11,
                   fontWeight: 700,
-                  letterSpacing: "0.14em",
+                  letterSpacing: "0.05em",
                   textTransform: "uppercase",
                   color: quoteTheme.forest,
                 }}
@@ -361,7 +361,7 @@ export function QuoteConfirmation() {
           sx={{
             px: 2,
             py: 1.75,
-            borderRadius: 1,
+            borderRadius: "16px",
             bgcolor: quoteTheme.ivory,
             border: `1px solid ${quoteTheme.line}`,
           }}

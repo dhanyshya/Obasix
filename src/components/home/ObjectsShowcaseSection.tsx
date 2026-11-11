@@ -39,7 +39,7 @@ export function ObjectsShowcaseSection() {
             sx={{ alignItems: { md: "flex-end" }, justifyContent: "space-between", mb: { xs: 5, md: 7 } }}
           >
             <Box>
-              <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.18em" }}>
+              <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: "0.05em" }}>
                 Catalogue
               </Typography>
               <Typography variant="h2" sx={{ mt: 1.5, fontSize: { xs: "2rem", md: "2.75rem" }, maxWidth: 480 }}>
@@ -98,7 +98,7 @@ export function ObjectsShowcaseSection() {
                   }}
                 />
                 <Box sx={{ position: "absolute", left: 18, right: 18, bottom: 18, color: "#fff" }}>
-                  <Typography variant="caption" sx={{ opacity: 0.65, letterSpacing: "0.14em" }}>
+                  <Typography variant="caption" sx={{ opacity: 0.65, letterSpacing: "0.05em" }}>
                     {String(index + 1).padStart(2, "0")}
                   </Typography>
                   <Typography sx={{ mt: 0.5, fontWeight: 600, fontSize: { xs: 16, md: category.span === "lg" ? 22 : 17 } }}>
@@ -111,7 +111,7 @@ export function ObjectsShowcaseSection() {
         </Box>
 
         <Box sx={{ mt: { xs: 8, md: 10 } }}>
-          <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: "0.16em" }}>
+          <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: "0.05em" }}>
             Featured pieces
           </Typography>
           <Box

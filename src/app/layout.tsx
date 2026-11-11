@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Inter, Inter_Tight } from "next/font/google";
 import Box from "@mui/material/Box";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { AIChatbot } from "@/components/ai/AIChatbot";
 import { AppProviders } from "@/components/providers/AppProviders";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
-const display = Cormorant_Garamond({
+const display = Inter_Tight({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -23,6 +23,7 @@ const body = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "OBASIX — Boards for Working Spaces",
     template: "%s | OBASIX",

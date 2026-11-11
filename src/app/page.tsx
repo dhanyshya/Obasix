@@ -1,17 +1,5 @@
-import {
-  Collections,
-  ExploreProducts,
-  PremiumHero,
-  TrendingProducts,
-} from "@/components/home/premium";
+import { LuxeHome } from "@/components/home/luxe/LuxeHome";
 
 export default function HomePage() {
-  return (
-    <div style={{ backgroundColor: "#FFFFFF" }}>
-      <PremiumHero />
-      <Collections />
-      <ExploreProducts />
-      <TrendingProducts />
-    </div>
-  );
+  return <LuxeHome />;
 }

@@ -69,7 +69,7 @@ export function PremiumHero() {
             Surfaces That Bring
             <Box component="span" sx={{ display: "block" }}>
               Your Ideas{" "}
-              <Box component="span" sx={{ fontStyle: "italic" }}>
+              <Box component="span" sx={{ fontStyle: "normal" }}>
                 to Life.
               </Box>
             </Box>

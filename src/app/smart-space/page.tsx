@@ -14,6 +14,7 @@ import Link from "@/components/Link";
 import { getProductById, getSpaceById, spaces } from "@/data/catalogue";
 import { SpaceSelector } from "@/components/space/SpaceSelector";
 import { SetupBuilder } from "@/components/space/SetupBuilder";
+import { PageMasthead } from "@/components/layout/PageMasthead";
 import { formatPrice } from "@/lib/format";
 
 function SmartSpaceContent() {
@@ -43,22 +44,12 @@ function SmartSpaceContent() {
 
   return (
     <Box sx={{ bgcolor: "background.default" }}>
-      <Box
-        component="section"
-        sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "primary.main", py: 7, color: "common.white" }}
-      >
-        <Container>
-          <Typography variant="overline" sx={{ color: "warning.main", fontWeight: 700, letterSpacing: "0.14em" }}>
-            Smart Space
-          </Typography>
-          <Typography variant="h1" sx={{ mt: 1.5, fontSize: { xs: "2.25rem", md: "3rem" }, fontWeight: 700 }}>
-            What are you setting up?
-          </Typography>
-          <Typography sx={{ mt: 1.5, maxWidth: 672, color: "rgba(255,255,255,0.75)" }}>
-            Choose a space, explore recommended OBASIX boards and accessories, then build a complete setup.
-          </Typography>
-        </Container>
-      </Box>
+      <PageMasthead
+        code="Smart Space"
+        title="What are you setting up?"
+        lede="Choose a space, explore recommended OBASIX boards and accessories, then build a complete setup."
+        crumbs={[{ href: "/", label: "Home" }, { label: "Smart Space" }]}
+      />
 
       <Container>
         <Stack spacing={6} sx={{ py: { xs: 5, md: 7 } }}>
@@ -75,7 +66,7 @@ function SmartSpaceContent() {
                   {recommended.map((product) =>
                     product ? (
                       <Grid key={product.id} size={{ xs: 12, md: 6, xl: 3 }}>
-                        <Card sx={{ height: "100%", borderRadius: 2 }}>
+                        <Card sx={{ height: "100%", borderRadius: "16px" }}>
                           <CardActionArea
                             component={Link}
                             href={`/products/${product.id}`}

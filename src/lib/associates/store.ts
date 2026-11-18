@@ -275,3 +275,120 @@ export function listAttributedQuotes(code: string): AttributedQuote[] {
     .all(code) as { reference: string; customer: string; summary: string; created_at: string }[];
   return rows.map((row) => ({ reference: row.reference, customer: row.customer, summary: row.summary, createdAt: row.created_at }));
 }
+
+/* ------------------------------------------------------------------ */
+/* Staff administration                                                */
+/* ------------------------------------------------------------------ */
+
+let payoutColumnsReady = false;
+function adminDb() {
+  const database = db();
+  if (!payoutColumnsReady) {
+    const columns = (database.prepare("PRAGMA table_info(associate_commissions)").all() as { name: string }[]).map((c) => c.name);
+    if (!columns.includes("paid_at")) database.exec("ALTER TABLE associate_commissions ADD COLUMN paid_at TEXT");
+    if (!columns.includes("payout_ref")) database.exec("ALTER TABLE associate_commissions ADD COLUMN payout_ref TEXT NOT NULL DEFAULT ''");
+    if (!columns.includes("void_reason")) database.exec("ALTER TABLE associate_commissions ADD COLUMN void_reason TEXT NOT NULL DEFAULT ''");
+    payoutColumnsReady = true;
+  }
+  return database;
+}
+
+export type AssociateSummary = Associate & {
+  name: string;
+  email: string;
+  phone: string;
+  orders: number;
+  referredSales: number;
+  awaiting: number;
+  payable: number;
+  paid: number;
+  quotes: number;
+};
+
+export type AdminCommission = CommissionEntry & {
+  code: string;
+  associateName: string;
+  paidAt: string | null;
+  payoutRef: string;
+  voidReason: string;
+};
+
+export function listAdminCommissions(): AdminCommission[] {
+  const rows = adminDb()
+    .prepare(
+      `SELECT c.*, u.name AS associate_name
+       FROM associate_commissions c
+       LEFT JOIN associates a ON a.code = c.code
+       LEFT JOIN users u ON u.id = a.user_id
+       ORDER BY c.created_at DESC LIMIT 500`,
+    )
+    .all() as { id: string; code: string; associate_name: string | null; paid_at: string | null; payout_ref: string; void_reason: string }[];
+  const byCode = new Map<string, CommissionEntry[]>();
+  return rows.map((row) => {
+    if (!byCode.has(row.code)) byCode.set(row.code, listCommissions(row.code));
+    const entry = byCode.get(row.code)!.find((c) => c.id === row.id)!;
+    return {
+      ...entry,
+      code: row.code,
+      associateName: row.associate_name ?? "Unknown",
+      paidAt: row.paid_at,
+      payoutRef: row.payout_ref,
+      voidReason: row.void_reason,
+    };
+  });
+}
+
+export function listAssociateSummaries(): AssociateSummary[] {
+  const rows = adminDb()
+    .prepare(
+      `SELECT a.*, u.name, u.email, u.phone FROM associates a JOIN users u ON u.id = a.user_id ORDER BY a.created_at DESC`,
+    )
+    .all() as (AssociateRow & { name: string; email: string; phone: string })[];
+  return rows.map((row) => {
+    const commissions = listCommissions(row.code);
+    const total = (state: CommissionState) => commissions.filter((c) => c.state === state).reduce((s, c) => s + c.amount, 0);
+    const live = commissions.filter((c) => c.state !== "Void");
+    return {
+      ...toAssociate(row),
+      name: row.name,
+      email: row.email,
+      phone: row.phone,
+      orders: live.length,
+      referredSales: live.reduce((s, c) => s + c.baseAmount, 0),
+      awaiting: total("Awaiting delivery"),
+      payable: total("Payable"),
+      paid: total("Paid"),
+      quotes: listAttributedQuotes(row.code).length,
+    };
+  });
+}
+
+export function setAssociateStatus(code: string, status: "active" | "paused") {
+  return Number(adminDb().prepare("UPDATE associates SET status = ? WHERE code = ?").run(status, normalizeCode(code)).changes) > 0;
+}
+
+/**
+ * Mark commissions paid. Only entries that are currently payable (order
+ * delivered, not void, not already paid) change; the rest are reported back.
+ */
+export function markCommissionsPaid(ids: string[], payoutRef: string) {
+  const payable = new Set(listAdminCommissions().filter((c) => c.state === "Payable").map((c) => c.id));
+  const paidAt = new Date().toISOString();
+  const update = adminDb().prepare(
+    "UPDATE associate_commissions SET status = 'paid', paid_at = ?, payout_ref = ? WHERE id = ? AND status = 'pending'",
+  );
+  const paid: string[] = [];
+  const skipped: string[] = [];
+  for (const id of ids) {
+    if (payable.has(id) && Number(update.run(paidAt, payoutRef, id).changes) > 0) paid.push(id);
+    else skipped.push(id);
+  }
+  return { paid, skipped };
+}
+
+export function voidCommission(id: string, reason: string) {
+  const result = adminDb()
+    .prepare("UPDATE associate_commissions SET status = 'void', void_reason = ? WHERE id = ? AND status = 'pending'")
+    .run(reason, id);
+  return Number(result.changes) > 0;
+}

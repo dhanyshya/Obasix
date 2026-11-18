@@ -1,4 +1,5 @@
 import type { OrderStatus } from "@/lib/commerce/types";
+import type { CartConfiguration } from "@/lib/types";
 
 const STORAGE_KEY = "obasix-demo-orders";
 
@@ -10,6 +11,8 @@ export type DemoOrderItem = {
   quantity: number;
   unitPrice: number;
   lineTotal: number;
+  /** Present on orders placed after reorder lists shipped; older orders reorder with defaults. */
+  configuration?: CartConfiguration;
 };
 
 export type DemoOrderAddress = {

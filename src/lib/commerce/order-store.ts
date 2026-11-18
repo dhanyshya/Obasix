@@ -105,6 +105,8 @@ export function createDemoOrder(input: CreateOrderInput): CreateOrderResult {
       quantity: line.quantity,
       unitPrice: product.price,
       lineTotal: product.price * line.quantity,
+      // Kept so the order can be reordered with the same size, frame and colour.
+      configuration: line.configuration,
     };
   });
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);

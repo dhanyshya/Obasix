@@ -10,6 +10,7 @@ const links = [
   { href: "/account", label: "Overview" },
   { href: "/account/orders", label: "Orders" },
   { href: "/account/quotes", label: "Quotes" },
+  { href: "/account/company", label: "Company" },
   { href: "/account/wishlist", label: "Wishlist" },
   { href: "/account/profile", label: "Profile" },
   { href: "/account/associate", label: "Associate" },

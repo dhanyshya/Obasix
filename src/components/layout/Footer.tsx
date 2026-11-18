@@ -24,6 +24,7 @@ const columns = [
       { href: "/about", label: "About OBASIX" },
       { href: "/smart-space", label: "Smart Space" },
       { href: "/quote", label: "Start a Project" },
+      { href: "/associates", label: "Associate Programme" },
     ],
   },
   {

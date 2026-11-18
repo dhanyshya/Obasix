@@ -1,4 +1,7 @@
+import { cookies } from "next/headers";
 import { readSession, sameOrigin } from "@/lib/auth/session";
+import { referralCookieName } from "@/lib/associates/program";
+import { recordOrderCommission } from "@/lib/associates/store";
 import { commerceMode } from "@/lib/commerce/mode";
 import { createDemoOrder, findDemoOrderById, listDemoOrdersForUser } from "@/lib/commerce/order-store";
 import { commerceUnavailable } from "@/lib/commerce/server";
@@ -82,6 +85,17 @@ export async function POST(request: Request) {
     lines: body.lines,
   });
   if (!result.ok) return invalid(result.message, 422);
+  try {
+    recordOrderCommission({
+      orderId: result.order.id,
+      subtotal: result.order.subtotal,
+      code: (await cookies()).get(referralCookieName)?.value,
+      buyerUserId: session?.user.id ?? null,
+      buyerEmail: email,
+    });
+  } catch {
+    // The order stands even if the associate ledger cannot be written.
+  }
   return Response.json({ ok: true, mode: "demo", charged: false, orderCreated: true, order: result.order });
 }
 

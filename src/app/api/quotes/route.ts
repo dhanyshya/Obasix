@@ -231,6 +231,26 @@ export async function POST(request: Request) {
   } catch {
     // The demo quote is already saved. Account history is unavailable if the account store cannot be opened.
   }
+  try {
+    const { cookies } = await import("next/headers");
+    const { readSession } = await import("@/lib/auth/session");
+    const { referralCookieName } = await import("@/lib/associates/program");
+    const { findAssociateByUser, recordQuoteAttribution } = await import("@/lib/associates/store");
+    const session = await readSession();
+    // An associate preparing a quote from their own account is credited directly;
+    // otherwise the referral cookie decides.
+    const preparedBy = session ? findAssociateByUser(session.user.id) : null;
+    recordQuoteAttribution({
+      reference: saved.reference,
+      code: preparedBy?.code ?? (await cookies()).get(referralCookieName)?.value,
+      buyerUserId: session?.user.id ?? null,
+      buyerEmail: saved.email,
+      customer: [saved.name, saved.company].filter(Boolean).join(", "),
+      summary: [saved.product, saved.boardType, saved.dimensions, `qty ${saved.quantity}`].filter(Boolean).join(" · "),
+    });
+  } catch {
+    // Attribution is best effort; the quote is already saved.
+  }
   return Response.json({
     ok: true,
     saved: true,

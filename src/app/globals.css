@@ -751,10 +751,10 @@ a:hover .image-zoom {
 }
 
 /* Global button state normalization — prevents theme/sx conflicts that hide labels. */
-.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning),
-.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):hover,
-.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):active,
-.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning).Mui-selected {
+.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):not(.Mui-disabled),
+.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):not(.Mui-disabled):hover,
+.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):not(.Mui-disabled):active,
+.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):not(.Mui-disabled).Mui-selected {
   background-color: #164E3B !important;
   border-color: #164E3B !important;
   color: #FFFFFF !important;
@@ -763,7 +763,7 @@ a:hover .image-zoom {
   visibility: visible !important;
 }
 
-.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):hover {
+.MuiButton-contained:not(.MuiButton-colorSecondary):not(.MuiButton-colorError):not(.MuiButton-colorWarning):not(.Mui-disabled):hover {
   background-color: #0F3A2B !important;
   border-color: #0F3A2B !important;
 }

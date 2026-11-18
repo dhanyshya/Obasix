@@ -35,8 +35,8 @@ export const company = {
     {
       title: "Become a distributor",
       body: "Distributors can join in their city, with priority for regional resellers.",
-      cta: "Enquire about distribution",
-      href: "/quote?config=Distributor%20enquiry",
+      cta: "Apply to distribute",
+      href: "/distributors",
       external: false,
     },
   ],

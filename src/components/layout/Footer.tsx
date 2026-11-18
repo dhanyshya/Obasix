@@ -25,6 +25,7 @@ const columns = [
       { href: "/smart-space", label: "Smart Space" },
       { href: "/quote", label: "Start a Project" },
       { href: "/associates", label: "Associate Programme" },
+      { href: "/distributors", label: "Become a Distributor" },
     ],
   },
   {

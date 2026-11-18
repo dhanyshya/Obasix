@@ -103,7 +103,7 @@ export default function AssociatesPage() {
         </Box>
         <Typography sx={{ color: brand.muted, mt: 3, fontSize: 14, maxWidth: 760 }}>
           Looking to buy and resell OBASIX stock in your city instead?{" "}
-          <Link href="/quote?config=Distributor%20enquiry">Enquire about becoming a distributor</Link>.
+          <Link href="/distributors">Apply to become a distributor</Link>.
         </Typography>
       </Box>
     </Box>

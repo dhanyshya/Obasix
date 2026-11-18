@@ -27,6 +27,7 @@ const columns = [
       { href: "/quote", label: "Start a Project" },
       { href: "/associates", label: "Associate Programme" },
       { href: "/distributors", label: "Become a Distributor" },
+      { href: "/partners", label: "Project Partners" },
     ],
   },
   {

@@ -15,6 +15,7 @@ const links = [
   { href: "/account/profile", label: "Profile" },
   { href: "/account/associate", label: "Associate" },
   { href: "/account/distributor", label: "Distributor" },
+  { href: "/account/partner", label: "Partner" },
 ];
 
 /** Account sections as a directory strip: the current section carries the orange bar. */

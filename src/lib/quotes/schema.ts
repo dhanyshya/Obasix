@@ -11,6 +11,7 @@ export const quoteBoardTypes = [
   "Combination Board",
   "Chalk Board",
   "Custom Board",
+  "Nameplate / Signage",
 ] as const;
 
 export const quoteAttachmentTypes = ["image/png", "image/jpeg", "image/webp", "application/pdf"] as const;

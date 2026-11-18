@@ -12,6 +12,7 @@ const columns = [
     links: [
       { href: "/products", label: "Collections" },
       { href: "/solutions", label: "Spaces" },
+      { href: "/signage", label: "Nameplates & Signage" },
       { href: "/customize", label: "Customise" },
       { href: "/visualize", label: "Visualise" },
       { href: "/about#studio", label: "Studio" },

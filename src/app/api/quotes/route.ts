@@ -11,6 +11,8 @@ import {
   validateQuoteFields,
 } from "@/lib/quotes/schema";
 import { fileExtensions as extensions, sniffType } from "@/lib/files";
+import { sendEmail, staffAlertEmails } from "@/lib/email/send";
+import { quoteReceivedEmail, staffNewQuoteEmail } from "@/lib/email/templates";
 import { allowQuoteAttempt, saveDemoQuote, type StoredQuote } from "@/lib/quotes/demo-store";
 
 export const runtime = "nodejs";
@@ -236,12 +238,30 @@ export async function POST(request: Request) {
   } catch {
     // Attribution is best effort; the quote is already saved.
   }
+  // A retry with the same idempotency key returns the earlier quote: only email the first time.
+  const isNew = saved.reference === quote.reference;
+  let notified = false;
+  if (isNew) {
+    const summary = saved.configurationSummary || [saved.product, saved.boardType, saved.dimensions, `qty ${saved.quantity}`].filter(Boolean).join(" · ");
+    const [customer] = await Promise.all([
+      sendEmail({ to: saved.email, ...quoteReceivedEmail({ reference: saved.reference, name: saved.name, summary }) }),
+      sendEmail({
+        to: staffAlertEmails(),
+        ...staffNewQuoteEmail({ reference: saved.reference, name: saved.name, company: saved.company, email: saved.email, phone: saved.phone, summary }),
+      }),
+    ]);
+    notified = customer.sent;
+  }
   return Response.json({
     ok: true,
     saved: true,
     mode: "demo",
-    notified: false,
+    notified,
     reference: saved.reference,
-    message: "Demo quote saved on this server. No email was sent.",
+    message: !isNew
+      ? "We already have this request."
+      : notified
+        ? "Quote saved. We've emailed you a copy."
+        : "Quote saved on this server. No email was sent.",
   });
 }

@@ -1,6 +1,8 @@
 import { readSession, sameOrigin } from "@/lib/auth/session";
 import { cleanText } from "@/lib/clean";
 import { customerCanSeeQuote, decideProof, findProof } from "@/lib/proofs/store";
+import { sendEmail, staffAlertEmails } from "@/lib/email/send";
+import { staffProofDecisionEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 
@@ -30,5 +32,10 @@ export async function POST(request: Request) {
     comment,
     customerEmail: session.user.email,
   });
-  return result.ok ? Response.json({ ok: true }) : fail(result.message, 409);
+  if (!result.ok) return fail(result.message, 409);
+  await sendEmail({
+    to: staffAlertEmails(),
+    ...staffProofDecisionEmail({ reference: found.proof.quoteReference, version: found.proof.version, decision, comment, customer: session.user.email }),
+  });
+  return Response.json({ ok: true });
 }

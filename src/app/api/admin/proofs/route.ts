@@ -3,6 +3,9 @@ import { sameOrigin } from "@/lib/auth/session";
 import { cleanText } from "@/lib/clean";
 import { fileExtensions, sniffType } from "@/lib/files";
 import { proofMaxBytes, uploadProof } from "@/lib/proofs/store";
+import { sendEmail } from "@/lib/email/send";
+import { proofReadyEmail } from "@/lib/email/templates";
+import { findDemoQuote } from "@/lib/quotes/demo-store";
 
 export const runtime = "nodejs";
 
@@ -34,5 +37,8 @@ export async function POST(request: Request) {
     staffNote,
     staffEmail: session.user.email,
   });
-  return result.ok ? Response.json({ ok: true, version: result.version }) : fail(result.message, 409);
+  if (!result.ok) return fail(result.message, 409);
+  const quote = await findDemoQuote(quoteReference);
+  if (quote) await sendEmail({ to: quote.email, ...proofReadyEmail({ reference: quoteReference, version: result.version, note: staffNote }) });
+  return Response.json({ ok: true, version: result.version });
 }

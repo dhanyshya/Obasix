@@ -1,7 +1,9 @@
 import "server-only";
 
 import { recordOrderCommission } from "@/lib/associates/store";
-import type { DemoOrder } from "@/lib/commerce/demo-orders";
+import { isDemoOrder, type DemoOrder } from "@/lib/commerce/demo-orders";
+import { sendEmail, staffAlertEmails } from "@/lib/email/send";
+import { orderConfirmationEmail, staffNewOrderEmail } from "@/lib/email/templates";
 
 /**
  * Runs once per order, when its payment is first confirmed (see markOrderPaid).
@@ -18,5 +20,12 @@ export async function afterOrderPaid(input: { order: DemoOrder; referralCode: st
     });
   } catch {
     // The payment stands even if the associate ledger can't be written; staff can add it later.
+  }
+  // Demo orders are simulations: nobody should get an email about them.
+  if (!isDemoOrder(input.order)) {
+    await Promise.all([
+      sendEmail({ to: input.order.email, ...orderConfirmationEmail(input.order) }),
+      sendEmail({ to: staffAlertEmails(), ...staffNewOrderEmail(input.order) }),
+    ]);
   }
 }

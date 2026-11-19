@@ -1,7 +1,10 @@
 import { readAdminSession } from "@/lib/admin/auth";
 import { sameOrigin } from "@/lib/auth/session";
 import { cleanText } from "@/lib/clean";
-import { staffAdvanceOrder, staffCancelOrder } from "@/lib/commerce/order-store";
+import { isDemoOrder } from "@/lib/commerce/demo-orders";
+import { findDemoOrderById, staffAdvanceOrder, staffCancelOrder } from "@/lib/commerce/order-store";
+import { sendEmail } from "@/lib/email/send";
+import { orderDispatchedEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 
@@ -18,6 +21,10 @@ export async function POST(request: Request) {
   let result;
   if (body?.action === "advance") {
     result = staffAdvanceOrder(orderId, { courier: cleanText(body?.courier, 60), trackingNumber: cleanText(body?.trackingNumber, 60) }, staff);
+    const order = result.ok ? findDemoOrderById(orderId) : null;
+    if (order && order.status === "Dispatched" && !isDemoOrder(order)) {
+      await sendEmail({ to: order.email, ...orderDispatchedEmail(order) });
+    }
   } else if (body?.action === "cancel") {
     result = staffCancelOrder(orderId, cleanText(body?.note, 300), staff);
   } else {

@@ -1,3 +1,6 @@
+import { emailConfigured, sendEmail } from "@/lib/email/send";
+import { passwordResetEmail } from "@/lib/email/templates";
+import { siteUrl } from "@/lib/site";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { getProductById } from "@/data/catalogue";
 import { mergeCartLines, normalizeCartLines, toCartItems, type SavedCartLine } from "@/lib/auth/cart";
@@ -96,10 +99,21 @@ async function login(body: Record<string, unknown>) {
   return Response.json({ ok: true, user: publicUser(row.id), ...merged });
 }
 
-function forgot(body: Record<string, unknown>) {
+async function forgot(body: Record<string, unknown>) {
   const email = clean(body.email, 120).toLowerCase();
   if (!emailOk(email)) return Response.json({ ok: false, errors: { email: "Enter a valid email address." } }, { status: 400 });
   const row = authDatabase().prepare("SELECT id FROM users WHERE email = ?").get(email) as { id: string } | undefined;
+  if (emailConfigured()) {
+    if (row) {
+      const token = randomBytes(32).toString("base64url");
+      authDatabase()
+        .prepare("INSERT INTO password_resets (token_hash, user_id, expires_at, used_at) VALUES (?, ?, ?, NULL)")
+        .run(createHash("sha256").update(token).digest("base64url"), row.id, Date.now() + 30 * 60 * 1000);
+      await sendEmail({ to: email, ...passwordResetEmail(`${siteUrl}/reset-password?token=${encodeURIComponent(token)}`) });
+    }
+    // Same answer whether or not the account exists, so addresses can't be probed.
+    return Response.json({ ok: true, delivered: true, message: "If an account uses that email, we've sent a link to reset the password. It expires in 30 minutes." });
+  }
   if (process.env.NODE_ENV !== "development" || !row) {
     return Response.json({
       ok: true,

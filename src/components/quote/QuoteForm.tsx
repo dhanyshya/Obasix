@@ -184,6 +184,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
         reference?: string;
         message?: string;
         required?: string[];
+        notified?: boolean;
       };
       if (!response.ok || !result.saved || !result.reference) {
         setFormError(
@@ -194,7 +195,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
         setSubmitting(false);
         return;
       }
-      router.push(`/quote/confirmation?ref=${encodeURIComponent(result.reference)}`);
+      router.push(`/quote/confirmation?ref=${encodeURIComponent(result.reference)}${result.notified ? "&emailed=1" : ""}`);
     } catch {
       setFormError("The quote could not be sent. Your details are still in the form.");
       setSubmitting(false);

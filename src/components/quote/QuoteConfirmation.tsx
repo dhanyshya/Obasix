@@ -47,6 +47,7 @@ type ConfirmedQuote = {
 export function QuoteConfirmation() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("ref") ?? "";
+  const emailed = searchParams.get("emailed") === "1";
   const [quote, setQuote] = useState<ConfirmedQuote | null>(null);
   const [lookupFailed, setLookupFailed] = useState(false);
   const missing = !reference || lookupFailed;
@@ -146,7 +147,9 @@ export function QuoteConfirmation() {
             borderRadius: "16px",
           }}
         >
-          Demo mode — this request is saved locally for this storefront. No email was sent.
+          {emailed
+            ? "We've emailed you a copy of this request. Our team has been notified too."
+            : "This request is saved on our server. No confirmation email was sent, so keep this reference."}
         </Alert>
 
         <Box sx={{ textAlign: "center" }}>

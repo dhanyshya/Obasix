@@ -11,6 +11,7 @@ Set these in Vercel (Project → Settings → Environment Variables) for Product
 | `NEXT_PUBLIC_SITE_URL` | Links in emails and the sitemap, e.g. `https://www.obasix.com` | Your domain |
 | `AUTH_SECRET` | Required in production for sign-in | Any long random string |
 | `OBASIX_ADMIN_EMAILS` | Staff who can open `/admin` (comma-separated) | OBASIX staff list |
+| `TRUST_PROXY_HEADERS` | Only if you host somewhere other than Vercel behind a proxy you control: set to `1` so rate limits read `X-Forwarded-For`. On Vercel, leave it unset | — |
 | `DATABASE_URL` | Postgres for accounts, orders, quotes, proofs, channels and stock | Vercel → Storage → Neon Postgres |
 | `BLOB_READ_WRITE_TOKEN` | Private storage for quote attachments and design proofs | Vercel → Storage → Blob (private store) |
 

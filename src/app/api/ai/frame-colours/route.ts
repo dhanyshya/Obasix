@@ -28,7 +28,7 @@ const Suggestions = z.object({
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return fail("The request was rejected.", 403);
   if (!claudeConfigured()) return fail("Design suggestions aren't switched on yet.", 503);
-  if (!allowAiAttempt(`${clientAddress(request)}:frame-colours`)) return fail("Too many requests. Wait a minute and try again.", 429);
+  if (!(await allowAiAttempt(`${clientAddress(request)}:frame-colours`))) return fail("Too many requests. Wait a minute and try again.", 429);
 
   const form = await request.formData().catch(() => null);
   const photo = form?.get("photo");

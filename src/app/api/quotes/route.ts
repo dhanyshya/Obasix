@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { clientAddress } from "@/lib/rateLimit";
 import {
   catalogueLine,
   cleanText,
@@ -23,10 +24,6 @@ function quoteMode() {
   return "unconfigured" as const;
 }
 
-
-function clientKey(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-}
 
 export async function POST(request: Request) {
   const mode = quoteMode();
@@ -64,7 +61,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!allowQuoteAttempt(clientKey(request))) {
+  if (!(await allowQuoteAttempt(clientAddress(request)))) {
     return Response.json(
       { ok: false, saved: false, notified: false, message: "Too many quote attempts. Wait a few minutes and try again." },
       { status: 429 },

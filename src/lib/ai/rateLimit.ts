@@ -1,18 +1,8 @@
-const WINDOW_MS = 60_000;
-const MAX_REQUESTS = 20;
+import "server-only";
 
-type Bucket = { count: number; resetAt: number };
+import { allowAttempt } from "@/lib/rateLimit";
 
-const buckets = new Map<string, Bucket>();
-
-export function allowAiAttempt(key: string): boolean {
-  const now = Date.now();
-  const existing = buckets.get(key);
-  if (!existing || existing.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + WINDOW_MS });
-    return true;
-  }
-  if (existing.count >= MAX_REQUESTS) return false;
-  existing.count += 1;
-  return true;
+/** AI requests: 20 a minute per visitor, shared across server instances. */
+export function allowAiAttempt(key: string) {
+  return allowAttempt(`ai:${key}`, 20, 60_000);
 }

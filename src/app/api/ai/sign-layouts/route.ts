@@ -26,7 +26,7 @@ const Layouts = z.object({
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return fail("The request was rejected.", 403);
   if (!claudeConfigured()) return fail("Layout suggestions aren't switched on yet.", 503);
-  if (!allowAiAttempt(`${clientAddress(request)}:sign-layouts`)) return fail("Too many requests. Wait a minute and try again.", 429);
+  if (!(await allowAiAttempt(`${clientAddress(request)}:sign-layouts`))) return fail("Too many requests. Wait a minute and try again.", 429);
 
   const body = (await request.json().catch(() => null)) as { design?: unknown } | null;
   const design = typeof body?.design === "string" ? decodeDesign(new URLSearchParams(body.design.slice(0, 4000))) : null;

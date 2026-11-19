@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ensureSchema } from "@/lib/db";
+import { allowAttempt } from "@/lib/rateLimit";
 
 export type StoredQuoteLine = {
   productId: string;
@@ -95,18 +96,8 @@ export async function saveDemoQuote(quote: StoredQuote) {
   return parse(await database.get<{ payload: string }>("SELECT payload FROM quote_requests WHERE idempotency_key = ?", quote.idempotencyKey))!;
 }
 
-const hits = new Map<string, number[]>();
-
 export function allowQuoteAttempt(key: string, limit = 12, windowMs = 10 * 60 * 1000) {
-  const now = Date.now();
-  const recent = (hits.get(key) ?? []).filter((time) => now - time < windowMs);
-  if (recent.length >= limit) {
-    hits.set(key, recent);
-    return false;
-  }
-  recent.push(now);
-  hits.set(key, recent);
-  return true;
+  return allowAttempt(`quote:${key}`, limit, windowMs);
 }
 
 /** All stored quotes, newest first (staff view). */

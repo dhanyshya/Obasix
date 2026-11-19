@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!allowAuthAttempt(`${clientAddress(request)}:track`, 30)) {
+  if (!(await allowAuthAttempt(`${clientAddress(request)}:track`, 30))) {
     return Response.json({ ok: false, message: "Too many lookups. Wait a few minutes and try again." }, { status: 429 });
   }
   const order = await findDemoOrderById(orderNumber);

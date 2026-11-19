@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   if (!authConfigured()) return unavailable();
   if (!sameOrigin(request)) return Response.json({ ok: false, message: "The account request was rejected." }, { status: 403 });
   const action = new URL(request.url).searchParams.get("action");
-  if (!allowAuthAttempt(`${clientAddress(request)}:${action}`)) {
+  if (!(await allowAuthAttempt(`${clientAddress(request)}:${action}`))) {
     return Response.json({ ok: false, message: "Too many attempts. Wait a few minutes and try again." }, { status: 429 });
   }
   const body =

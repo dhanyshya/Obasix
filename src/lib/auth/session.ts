@@ -3,6 +3,7 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { authDb } from "@/lib/auth/db";
+import { allowAttempt, clientAddress } from "@/lib/rateLimit";
 
 const cookieName = "obasix_session";
 const sessionMs = 14 * 24 * 60 * 60 * 1000;
@@ -73,20 +74,9 @@ export function sameOrigin(request: Request) {
   }
 }
 
-const hits = new Map<string, number[]>();
-
+/** Sign-in, sign-up and lookup limits: shared across server instances. */
 export function allowAuthAttempt(key: string, limit = 8) {
-  const now = Date.now();
-  const recent = (hits.get(key) ?? []).filter((time) => now - time < 10 * 60 * 1000);
-  if (recent.length >= limit) {
-    hits.set(key, recent);
-    return false;
-  }
-  recent.push(now);
-  hits.set(key, recent);
-  return true;
+  return allowAttempt(`auth:${key}`, limit, 10 * 60 * 1000);
 }
 
-export function clientAddress(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-}
+export { clientAddress };

@@ -124,7 +124,7 @@ export function SignageStudio() {
 
         <Panel title="2. Size">
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }} role="radiogroup" aria-label="Standard sizes">
-            {type.presets.map((preset) => (
+            {[...type.presets].sort((a, b) => a.widthCm * a.heightCm - b.widthCm * b.heightCm).map((preset) => (
               <Choice
                 key={`${preset.widthCm}x${preset.heightCm}`}
                 selected={preset.widthCm === design.widthCm && preset.heightCm === design.heightCm}

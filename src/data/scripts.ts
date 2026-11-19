@@ -58,8 +58,8 @@ export const scriptFontStack = signScripts
   .map((s) => `var(${s.fontVar})`)
   .join(", ");
 
-/** Characters any script may use: digits, spaces, punctuation, joiners and the danda. */
-const neutral = /[\s0-9.,:;'’"“”()&/@#+\-–—!?|·‌‍।॥]/;
+/** Characters any script may use: digits, spaces, punctuation, arrows, ₹, joiners and the danda. */
+const neutral = /[\s0-9.,:;'’"“”()&/@#+\-–—!?|·×₹%\u2190-\u21FF\u200C\u200D\u0964\u0965]/;
 
 export function scriptsIn(text: string): SignScript[] {
   const found = new Set<SignScript>();

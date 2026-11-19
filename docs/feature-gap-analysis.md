@@ -16,7 +16,7 @@ What stands between the current app and a live production store, in priority ord
 
 - **Catalogue accuracy:** run a full SKU and price check against obasix.com and obasix.in. Add verified glass boards and the missing SCUV, SMWB and CWBPB variants.
 - **Quote API integration:** wire `QUOTE_API_URL` to the sales system or CRM. Add a staff view of stored quotes and their attachments.
-- **Stock and availability:** obasix.com has pre-order items, but the app has no stock model. The app never claims something is in stock.
+- **Stock and availability:** built. Staff enter on-hand counts at /admin/stock; paid orders deduct them. Untracked products show no availability, so nothing appears until OBASIX enters real counts.
 - **Tax and shipping:** checkout shows a catalogue subtotal only. GST and shipping rules need to be confirmed with OBASIX.
 - **Promotions:** OBASIX5 and the sale terms are unverified, so they are not implemented.
 - **Lint debt:** resolved. The React Compiler errors are fixed; six effects that restore state from browser storage after hydration keep a commented rule exception. Four unused style constants remain as warnings.

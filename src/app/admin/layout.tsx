@@ -21,6 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Typography sx={{ ...signType.code, fontSize: 13, color: brand.signalInk }}>OBASIX STAFF</Typography>
             <Box component={Link} href="/admin/orders" sx={{ fontSize: 14, fontWeight: 600 }}>Orders</Box>
             <Box component={Link} href="/admin/quotes" sx={{ fontSize: 14, fontWeight: 600 }}>Quotes</Box>
+            <Box component={Link} href="/admin/stock" sx={{ fontSize: 14, fontWeight: 600 }}>Stock</Box>
             <Box component={Link} href="/admin/associates" sx={{ fontSize: 14, fontWeight: 600 }}>Associates</Box>
             <Box component={Link} href="/admin/distributors" sx={{ fontSize: 14, fontWeight: 600 }}>Distributors</Box>
             <Box component={Link} href="/admin/partners" sx={{ fontSize: 14, fontWeight: 600 }}>Partners</Box>

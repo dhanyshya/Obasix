@@ -16,6 +16,10 @@ export const quoteBoardTypes = [
   "Cork Pin-up Board",
   "Planning Board",
   "OEM / Private Label",
+  "Acoustic Panel",
+  "Illuminated Sign",
+  "Modular Display System",
+  "Interactive Display",
   "Custom Board",
   "Nameplate / Signage",
 ] as const;

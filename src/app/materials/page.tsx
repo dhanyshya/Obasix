@@ -7,8 +7,8 @@ import { materialRanges } from "@/data/materials";
 import { brandTokens as brand } from "@/theme/brandTokens";
 
 export const metadata = {
-  title: "Glass, Cork, Felt and Fabric Boards",
-  description: "Made-to-order glass writing boards and cork, felt and multicolour fabric pin-up boards, sized and coloured for your space.",
+  title: "Made-to-order Boards",
+  description: "Glass writing boards, cork, felt and multicolour fabric pin-up boards, and acoustic panels, made to your size and colours.",
 };
 
 export default function MaterialsPage() {
@@ -16,11 +16,11 @@ export default function MaterialsPage() {
     <Box sx={{ overflowX: "hidden", bgcolor: brand.white }}>
       <PageMasthead
         code="Made to order"
-        title="Glass, cork, felt and fabric."
-        lede="Writing and pin-up surfaces made to your size and colour. Choose the size, colour and finish, and we'll quote it and send a proof before we make it."
-        crumbs={[{ href: "/", label: "Home" }, { label: "Glass, Cork, Felt & Fabric" }]}
+        title="Made-to-order boards."
+        lede="Glass, cork, felt, fabric and acoustic surfaces made to your size and colour. Choose the size, colour and finish, and we'll quote it and send a proof before we make it."
+        crumbs={[{ href: "/", label: "Home" }, { label: "Made-to-order Boards" }]}
       />
-      <Box component="section" aria-label="Ranges" sx={{ ...pageMax, ...pagePad, py: { xs: 5, md: 7 }, display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" } }}>
+      <Box component="section" aria-label="Ranges" sx={{ ...pageMax, ...pagePad, py: { xs: 5, md: 7 }, display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" } }}>
         {materialRanges.map((range) => (
           <Box
             key={range.slug}

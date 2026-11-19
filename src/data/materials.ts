@@ -11,7 +11,7 @@ export type MaterialColour = { id: string; name: string; hex: string };
 export type MaterialOption = { id: string; name: string; description: string };
 
 export type MaterialRange = {
-  slug: "glass" | "felt" | "fabric" | "cork";
+  slug: "glass" | "felt" | "fabric" | "cork" | "acoustic";
   name: string;
   /** Matches an entry in quoteBoardTypes so the quote form accepts it. */
   quoteBoardType: string;
@@ -162,6 +162,40 @@ export const materialRanges: MaterialRange[] = [
       ],
     },
     maxSideFt: 6,
+  },
+  {
+    slug: "acoustic",
+    name: "Acoustic panels",
+    quoteBoardType: "Acoustic Panel",
+    tagline: "Quieter rooms you can still pin to.",
+    summary:
+      "Thick felt-faced panels that soften echo in meeting rooms, classrooms and open offices, and double as a pin-up surface. Made to your layout and colours.",
+    surface: "felt",
+    build: [
+      "Thick felt-faced acoustic panels on a rigid backing",
+      "Square or bevelled edges; panels can be laid out as a wall feature",
+      "Pin-able surface, so panels work as notice areas too",
+      "We plan the layout from your room size; performance figures are shared with the quote",
+    ],
+    goodFor: ["Meeting and conference rooms", "Classrooms and auditoria", "Open offices and call areas"],
+    care: "Vacuum lightly with a brush head. Spot-clean with a damp cloth; don't soak.",
+    sizes: [size(2, 2), size(2, 4), size(4, 4)],
+    colours: [
+      { id: "charcoal", name: "Charcoal", hex: "#3A3B3D" },
+      { id: "light-grey", name: "Light grey", hex: "#B9BCBF" },
+      { id: "sage", name: "Sage", hex: "#8FA58A" },
+      { id: "navy", name: "Navy", hex: "#273A5C" },
+      { id: "terracotta", name: "Terracotta", hex: "#B9643F" },
+      { id: "oat", name: "Oat", hex: "#D9CDB4" },
+    ],
+    options: {
+      label: "Edge",
+      choices: [
+        { id: "square", name: "Square edge", description: "Clean lines for panels laid edge to edge." },
+        { id: "bevelled", name: "Bevelled edge", description: "Shadow line between panels; hides small gaps." },
+      ],
+    },
+    maxSideFt: 4,
   },
 ];
 

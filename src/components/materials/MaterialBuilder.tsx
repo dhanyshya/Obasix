@@ -68,7 +68,7 @@ function Preview({ range, width, height, colours, option }: { range: MaterialRan
 }
 
 export function MaterialBuilder({ range }: { range: MaterialRange }) {
-  const multi = range.slug === "fabric";
+  const multi = range.slug === "fabric" || range.slug === "acoustic";
   const [sizeId, setSizeId] = useState(range.sizes[1]?.id ?? range.sizes[0].id);
   const [custom, setCustom] = useState({ w: "", h: "" });
   const [colours, setColours] = useState<string[]>([range.colours[0].id]);

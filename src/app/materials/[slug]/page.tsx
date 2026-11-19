@@ -25,7 +25,7 @@ export default async function MaterialRangePage({ params }: { params: Promise<{ 
         code="Made to order"
         title={range.name}
         lede={range.summary}
-        crumbs={[{ href: "/", label: "Home" }, { href: "/materials", label: "Glass, Cork, Felt & Fabric" }, { label: range.name }]}
+        crumbs={[{ href: "/", label: "Home" }, { href: "/materials", label: "Made-to-order Boards" }, { label: range.name }]}
       />
       <Box sx={{ ...pageMax, ...pagePad, py: { xs: 5, md: 7 } }}>
         <MaterialBuilder range={range} />

@@ -1,11 +1,13 @@
 import { getProductById } from "@/data/catalogue";
 import { images } from "@/data/images";
+import { defaultPlanner, encodePlanner, getPlannerTemplate } from "@/data/planners";
 import { defaultDesign, encodeDesign, getSignType } from "@/data/signage";
 
 /**
  * Solution kits from the Reimagination Program: one package per space, scaled by a unit
  * (a meeting room, a classroom, a home). Catalogue boards are priced and go straight to the cart;
- * signage is made to order, so it's quoted and designed in the sign studio.
+ * signage and printed planning boards are made to order, so they're quoted and designed in the
+ * sign studio or the planner designer.
  */
 
 export type KitScope = "unit" | "kit";
@@ -28,6 +30,16 @@ export interface KitSignLine {
   optional?: boolean;
 }
 
+export interface KitPlannerLine {
+  templateId: string;
+  per: KitScope;
+  quantity: number;
+  role: string;
+  /** Header title suggested for this kit. */
+  title?: string;
+  optional?: boolean;
+}
+
 export interface Kit {
   id: string;
   name: string;
@@ -42,6 +54,7 @@ export interface Kit {
   projectThreshold: number;
   products: KitProductLine[];
   signs: KitSignLine[];
+  planners: KitPlannerLine[];
 }
 
 export const kits: Kit[] = [
@@ -51,7 +64,7 @@ export const kits: Kit[] = [
     audience: "Offices, co-working and corporate fit-outs",
     headline: "Every meeting room planned, labelled and ready",
     summary:
-      "A magnetic board, accessories and a door sign for each meeting room, plus a reception sign and a mobile board for the floor.",
+      "A magnetic board, accessories and a door sign for each meeting room, plus reception branding, a floor directory, desk plates and a team planning board.",
     image: images.wallModernOffice,
     unit: { singular: "meeting room", plural: "meeting rooms" },
     defaultUnits: 4,
@@ -66,6 +79,11 @@ export const kits: Kit[] = [
     signs: [
       { typeId: "cabin-door-sign", per: "unit", quantity: 1, role: "Room name on each door", lines: ["Meeting Room", "Seats 8"] },
       { typeId: "reception-sign", per: "kit", quantity: 1, role: "Company name at reception", optional: true },
+      { typeId: "office-directory", per: "kit", quantity: 1, role: "Floor directory by the lifts or entrance", optional: true },
+      { typeId: "desk-nameplate", per: "kit", quantity: 10, role: "Desk plates for the team (change the number in the studio)", optional: true },
+    ],
+    planners: [
+      { templateId: "task", per: "kit", quantity: 1, role: "Team planning board", title: "Team tasks", optional: true },
     ],
   },
   {
@@ -74,7 +92,7 @@ export const kits: Kit[] = [
     audience: "Schools, colleges and coaching institutes",
     headline: "Classrooms fitted out in one order",
     summary:
-      "A large writing board, a pin-up board for notices and student work, and accessories for each classroom, with door signs and wayfinding for the building.",
+      "A large writing board, a pin-up board, a timetable display and accessories for each classroom, with door signs, wayfinding and administration signage for the building.",
     image: images.wallClassroom,
     unit: { singular: "classroom", plural: "classrooms" },
     defaultUnits: 6,
@@ -90,6 +108,10 @@ export const kits: Kit[] = [
     signs: [
       { typeId: "cabin-door-sign", per: "unit", quantity: 1, role: "Classroom name or number", lines: ["Class 6A", "Room 104"] },
       { typeId: "wayfinding-sign", per: "kit", quantity: 2, role: "Wayfinding to office, labs and exits", optional: true },
+      { typeId: "office-directory", per: "kit", quantity: 1, role: "Administration block directory", lines: ["Administration", "Principal  ·  101", "Office & Fees  ·  102", "Staff Room  ·  103"], optional: true },
+    ],
+    planners: [
+      { templateId: "timetable", per: "unit", quantity: 1, role: "Timetable display in each classroom", title: "Class timetable" },
     ],
   },
   {
@@ -98,7 +120,7 @@ export const kits: Kit[] = [
     audience: "Homeowners, builders and housing societies",
     headline: "A home's name, number and study wall",
     summary:
-      "A nameplate and house number at the entrance, with a compact board and pin-up for the study. Builders can scale it across every unit in a project.",
+      "A nameplate and house number for each home, with a study board and pin-up. Builders and societies can add the tower directory, lift lobby signs, entrance board and a society notice board.",
     image: images.wallHomeOffice,
     unit: { singular: "home", plural: "homes" },
     defaultUnits: 1,
@@ -111,6 +133,12 @@ export const kits: Kit[] = [
     signs: [
       { typeId: "flat-nameplate", per: "unit", quantity: 1, role: "Family nameplate at the door" },
       { typeId: "house-number", per: "unit", quantity: 1, role: "House or flat number" },
+      { typeId: "tower-directory", per: "kit", quantity: 1, role: "Tower directory in the lobby", optional: true },
+      { typeId: "lift-lobby-sign", per: "kit", quantity: 1, role: "Lift lobby sign (one per tower; change the number in the studio)", optional: true },
+      { typeId: "society-entrance-board", per: "kit", quantity: 1, role: "Society name at the entrance gate", optional: true },
+    ],
+    planners: [
+      { templateId: "society", per: "kit", quantity: 1, role: "Society notice board for the lobby or clubhouse", optional: true },
     ],
   },
 ];
@@ -132,12 +160,24 @@ export function signStudioHref(line: KitSignLine, units: number) {
   return `/signage/design?${encodeDesign(design)}`;
 }
 
-/** Fails loudly at build time if a kit points at a product or sign type that no longer exists. */
+/** A planner designer link pre-filled with the kit's template, title and quantity. */
+export function plannerHref(line: KitPlannerLine, units: number) {
+  const template = getPlannerTemplate(line.templateId);
+  if (!template) return "/planning";
+  const design = { ...defaultPlanner(template), quantity: Math.min(999, lineQuantity(line, units)) };
+  if (line.title) design.title = line.title;
+  return `/planning?${encodePlanner(design)}`;
+}
+
+/** Fails loudly at build time if a kit points at a product, sign type or planner that no longer exists. */
 for (const kit of kits) {
   for (const line of kit.products) {
     if (!getProductById(line.productId)) throw new Error(`Kit ${kit.id}: unknown product ${line.productId}`);
   }
   for (const line of kit.signs) {
     if (!getSignType(line.typeId)) throw new Error(`Kit ${kit.id}: unknown sign type ${line.typeId}`);
+  }
+  for (const line of kit.planners) {
+    if (!getPlannerTemplate(line.templateId)) throw new Error(`Kit ${kit.id}: unknown planner ${line.templateId}`);
   }
 }

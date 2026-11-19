@@ -12,7 +12,8 @@ import Link from "@/components/Link";
 import { signType } from "@/components/home/directory/sign";
 import { useCart } from "@/context/CartContext";
 import { getProductById } from "@/data/catalogue";
-import { getKit, lineQuantity, signStudioHref } from "@/data/kits";
+import { getKit, lineQuantity, plannerHref, signStudioHref } from "@/data/kits";
+import { getPlannerTemplate } from "@/data/planners";
 import { getSignType } from "@/data/signage";
 import { formatPrice } from "@/lib/format";
 import { defaultCartConfiguration } from "@/lib/productActions";
@@ -64,8 +65,17 @@ export function KitBuilder({ kitId }: { kitId: string }) {
     included: !skipped.has(`s:${line.typeId}`),
   }));
 
+  const plannerLines = kit.planners.map((line) => ({
+    line,
+    template: getPlannerTemplate(line.templateId)!,
+    quantity: lineQuantity(line, units),
+    included: !skipped.has(`b:${line.templateId}`),
+  }));
+
   const chosenProducts = productLines.filter((l) => l.included);
   const chosenSigns = signLines.filter((l) => l.included);
+  const chosenPlanners = plannerLines.filter((l) => l.included);
+  const madeToOrderCount = [...chosenSigns, ...chosenPlanners].reduce((s, l) => s + l.quantity, 0);
   const boardsTotal = chosenProducts.reduce((sum, l) => sum + l.total, 0);
   const tooBigForCart = chosenProducts.some((l) => l.quantity > CART_LINE_MAX);
   const isProject = units >= kit.projectThreshold;
@@ -76,12 +86,16 @@ export function KitBuilder({ kitId }: { kitId: string }) {
       `${kit.name} for ${units} ${unitLabel}`,
       ...chosenProducts.map((l) => `${l.quantity} × ${l.product.shortName} (${l.product.sku})`),
       ...chosenSigns.map((l) => `${l.quantity} × ${l.type.name} (made to order)`),
+      ...chosenPlanners.map((l) => `${l.quantity} × ${l.template.name} (printed, made to order)`),
     ].join(" · ");
     const params = new URLSearchParams({
       product: kit.name,
       quantity: String(units),
       config: summary,
-      notes: chosenSigns.length > 0 ? "Please include the signage in the quote. I can share names and numbers for each sign." : "",
+      notes:
+        chosenSigns.length + chosenPlanners.length > 0
+          ? "Please include the signs and printed boards in the quote. I can share names, numbers and layouts for each."
+          : "",
     });
     return `/quote?${params.toString()}`;
   })();
@@ -144,10 +158,10 @@ export function KitBuilder({ kitId }: { kitId: string }) {
         </Box>
 
         <Typography component="h2" sx={{ ...signType.plate, fontSize: 20, mt: 4, mb: 0.5 }}>
-          Signage, made to order
+          Signs and printed boards, made to order
         </Typography>
         <Typography sx={{ fontSize: 14, color: brand.body, mb: 1 }}>
-          Signs carry your names and numbers, so they&apos;re quoted. Open any sign in the studio to design it with the kit&apos;s quantity filled in.
+          These carry your names, numbers and layouts, so they&apos;re quoted. Open any of them to design it with the kit&apos;s quantity filled in.
         </Typography>
         <Box role="list" sx={{ borderBottom: `1px solid ${brand.line}` }}>
           {signLines.map(({ line, type, quantity, included }) => (
@@ -171,6 +185,27 @@ export function KitBuilder({ kitId }: { kitId: string }) {
               </Box>
             </Box>
           ))}
+          {plannerLines.map(({ line, template, quantity, included }) => (
+            <Box role="listitem" key={line.templateId} sx={{ ...row, opacity: included ? 1 : 0.55 }}>
+              <Checkbox
+                checked={included}
+                disabled={!line.optional}
+                onChange={() => toggle(`b:${line.templateId}`)}
+                slotProps={{ input: { "aria-label": `Include ${template.name}` } }}
+              />
+              <Box sx={{ minWidth: 0 }}>
+                <Typography sx={{ fontWeight: 600 }}>{template.name}</Typography>
+                <Typography sx={{ fontSize: 13, color: brand.muted }}>
+                  {line.role} · {line.per === "unit" ? `${line.quantity} per ${kit.unit.singular}` : `${line.quantity} per kit`}
+                  {line.optional ? " · optional" : ""}
+                </Typography>
+              </Box>
+              <Typography sx={{ fontSize: 14, fontVariantNumeric: "tabular-nums", textAlign: { xs: "right", sm: "left" } }}>× {quantity}</Typography>
+              <Box sx={{ textAlign: "right", gridColumn: { xs: "2 / 4", sm: "auto" } }}>
+                <Box component={Link} href={plannerHref(line, units)} sx={{ fontSize: 14, fontWeight: 600 }}>Design board</Box>
+              </Box>
+            </Box>
+          ))}
         </Box>
       </Box>
 
@@ -187,8 +222,8 @@ export function KitBuilder({ kitId }: { kitId: string }) {
           <Typography sx={{ fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{formatPrice(boardsTotal)}</Typography>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-          <Typography sx={{ color: brand.body }}>Signage</Typography>
-          <Typography sx={{ color: brand.muted }}>{chosenSigns.length > 0 ? `${chosenSigns.reduce((s, l) => s + l.quantity, 0)} signs, quoted` : "None"}</Typography>
+          <Typography sx={{ color: brand.body }}>Made to order</Typography>
+          <Typography sx={{ color: brand.muted }}>{madeToOrderCount > 0 ? `${madeToOrderCount} ${madeToOrderCount === 1 ? "item" : "items"}, quoted` : "None"}</Typography>
         </Box>
         <Typography sx={{ fontSize: 13, color: brand.muted }}>Catalogue prices. Freight and installation are confirmed with your order.</Typography>
 
@@ -212,7 +247,7 @@ export function KitBuilder({ kitId }: { kitId: string }) {
         )}
         {added ? (
           <Alert severity="success" role="status">
-            Boards added. <Link href="/cart">View cart</Link>. Design the signs separately and request a quote for them.
+            Boards added. <Link href="/cart">View cart</Link>. Design the signs and printed boards separately and request a quote for them.
           </Alert>
         ) : null}
       </Box>

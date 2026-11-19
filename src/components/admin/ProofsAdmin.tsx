@@ -18,10 +18,10 @@ const statusText: Record<Proof["status"], string> = {
   superseded: "Superseded",
 };
 
-function UploadForm() {
+function UploadForm({ initialReference }: { initialReference: string }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [reference, setReference] = useState("");
+  const [reference, setReference] = useState(initialReference);
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [sent, setSent] = useState("");
@@ -68,7 +68,7 @@ function UploadForm() {
   );
 }
 
-export function ProofsAdmin({ proofs }: { proofs: Proof[] }) {
+export function ProofsAdmin({ proofs, initialReference = "" }: { proofs: Proof[]; initialReference?: string }) {
   // Latest version per quote, newest first.
   const latest = new Map<string, Proof>();
   for (const proof of proofs) {
@@ -86,7 +86,7 @@ export function ProofsAdmin({ proofs }: { proofs: Proof[] }) {
           Nothing custom goes into production until the customer approves a proof. {waiting > 0 ? `${waiting} ${waiting === 1 ? "quote needs" : "quotes need"} a revised proof.` : ""}
         </Typography>
       </Box>
-      <UploadForm />
+      <UploadForm initialReference={initialReference} />
       <Box sx={{ overflowX: "auto" }}>
         <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", "& th, & td": { textAlign: "left", p: 1.25, borderBottom: `1px solid ${brand.line}`, verticalAlign: "top", fontSize: 14 } }}>
           <thead>

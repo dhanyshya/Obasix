@@ -94,3 +94,8 @@ export function allowQuoteAttempt(key: string, limit = 12, windowMs = 10 * 60 * 
   hits.set(key, recent);
   return true;
 }
+
+/** All stored quotes, newest first (staff view). */
+export function listDemoQuotes() {
+  return withLock(async () => (await readAll()).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+}

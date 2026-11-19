@@ -19,6 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Box sx={{ ...pageMax, ...pagePad, py: 2, display: "flex", justifyContent: "space-between", gap: 2, flexWrap: "wrap" }}>
           <Box component="nav" aria-label="Staff" sx={{ display: "flex", alignItems: "center", gap: 2.5, flexWrap: "wrap" }}>
             <Typography sx={{ ...signType.code, fontSize: 13, color: brand.signalInk }}>OBASIX STAFF</Typography>
+            <Box component={Link} href="/admin/quotes" sx={{ fontSize: 14, fontWeight: 600 }}>Quotes</Box>
             <Box component={Link} href="/admin/associates" sx={{ fontSize: 14, fontWeight: 600 }}>Associates</Box>
             <Box component={Link} href="/admin/distributors" sx={{ fontSize: 14, fontWeight: 600 }}>Distributors</Box>
             <Box component={Link} href="/admin/partners" sx={{ fontSize: 14, fontWeight: 600 }}>Partners</Box>

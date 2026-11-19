@@ -22,6 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Box component={Link} href="/admin/associates" sx={{ fontSize: 14, fontWeight: 600 }}>Associates</Box>
             <Box component={Link} href="/admin/distributors" sx={{ fontSize: 14, fontWeight: 600 }}>Distributors</Box>
             <Box component={Link} href="/admin/partners" sx={{ fontSize: 14, fontWeight: 600 }}>Partners</Box>
+            <Box component={Link} href="/admin/proofs" sx={{ fontSize: 14, fontWeight: 600 }}>Proofs</Box>
           </Box>
           <Typography sx={{ fontSize: 13, color: brand.muted }}>Signed in as {session.user.email}</Typography>
         </Box>

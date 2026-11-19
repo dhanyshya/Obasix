@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const decision = body?.decision;
   if (decision !== "approved" && decision !== "changes") return fail("Choose approve or request changes.");
-  const found = findProof(cleanText(body?.proofId, 20));
+  const found = await findProof(cleanText(body?.proofId, 20));
   // Same answer for "doesn't exist" and "not yours", so proof IDs can't be probed.
   if (!found || !(await customerCanSeeQuote(found.proof.quoteReference, session.user.id, session.user.email))) {
     return fail("That proof wasn't found.", 404);
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   }
   const comment = cleanText(body?.comment, 1000);
   if (decision === "changes" && comment.length < 5) return fail("Tell us what to change.");
-  const result = decideProof({
+  const result = await decideProof({
     proofId: found.proof.id,
     decision,
     comment,

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const session = await readSession();
   if (!session) return Response.json({ ok: false, message: "Sign in to join the associate programme." }, { status: 401 });
 
-  const existing = findAssociateByUser(session.user.id);
+  const existing = await findAssociateByUser(session.user.id);
   if (existing) return Response.json({ ok: true, associate: existing });
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -33,6 +33,6 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, message: "Accept the programme terms to continue." }, { status: 400 });
   }
 
-  const associate = registerAssociate({ userId: session.user.id, name: session.user.name, profession, city, firm });
+  const associate = await registerAssociate({ userId: session.user.id, name: session.user.name, profession, city, firm });
   return Response.json({ ok: true, associate });
 }

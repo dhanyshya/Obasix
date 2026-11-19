@@ -2,7 +2,7 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 import { getProductById } from "@/data/catalogue";
-import { authDatabase } from "@/lib/auth/db";
+import { ensureSchema } from "@/lib/db";
 import { normalizeCartLines, type SavedCartLine } from "@/lib/auth/cart";
 import { findDemoOrderById } from "@/lib/commerce/order-store";
 
@@ -18,11 +18,9 @@ export type CompanyRole = "owner" | "buyer";
 export const maxListsPerCompany = 30;
 export const maxMembersPerCompany = 50;
 
-let ready = false;
 function db() {
-  const database = authDatabase();
-  if (!ready) {
-    database.exec(`
+  return ensureSchema("company", async (database) => {
+    await database.exec(`
       CREATE TABLE IF NOT EXISTS companies (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -50,9 +48,7 @@ function db() {
       );
       CREATE INDEX IF NOT EXISTS reorder_lists_company ON reorder_lists(company_id);
     `);
-    ready = true;
-  }
-  return database;
+  });
 }
 
 const normEmail = (email: string) => email.trim().toLowerCase();
@@ -82,84 +78,66 @@ const toCompany = (row: CompanyRow): Company => ({
   createdAt: row.created_at,
 });
 
-export function findMembership(email: string): CompanyMembership | null {
-  const row = db()
-    .prepare(
-      `SELECT companies.*, company_members.role FROM company_members
-       JOIN companies ON companies.id = company_members.company_id WHERE company_members.email = ?`,
-    )
-    .get(normEmail(email)) as (CompanyRow & { role: CompanyRole }) | undefined;
+export async function findMembership(email: string): Promise<CompanyMembership | null> {
+  const row = (await (await db()).get(`SELECT companies.*, company_members.role FROM company_members
+       JOIN companies ON companies.id = company_members.company_id WHERE company_members.email = ?`, normEmail(email))) as (CompanyRow & { role: CompanyRole }) | undefined;
   return row ? { company: toCompany(row), role: row.role } : null;
 }
 
-export function createCompany(input: { ownerEmail: string; name: string; gstin: string; billingAddress: string }) {
+export async function createCompany(input: { ownerEmail: string; name: string; gstin: string; billingAddress: string }) {
   const email = normEmail(input.ownerEmail);
-  const existing = findMembership(email);
+  const existing = await findMembership(email);
   if (existing) return { ok: false as const, message: `You're already part of ${existing.company.name}.` };
   const id = `CO-${randomBytes(4).toString("hex").toUpperCase()}`;
   const now = new Date().toISOString();
-  const database = db();
-  database.exec("BEGIN");
-  try {
-    database
-      .prepare("INSERT INTO companies (id, name, gstin, billing_address, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)")
-      .run(id, input.name, input.gstin, input.billingAddress, email, now);
-    database
-      .prepare("INSERT INTO company_members (email, company_id, role, added_by, added_at) VALUES (?, ?, 'owner', ?, ?)")
-      .run(email, id, email, now);
-    database.exec("COMMIT");
-  } catch (error) {
-    database.exec("ROLLBACK");
-    throw error;
-  }
-  return { ok: true as const, membership: findMembership(email)! };
+  await (await db()).transaction(async (tx) => {
+    await tx.run("INSERT INTO companies (id, name, gstin, billing_address, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)", id, input.name, input.gstin, input.billingAddress, email, now);
+    await tx.run("INSERT INTO company_members (email, company_id, role, added_by, added_at) VALUES (?, ?, 'owner', ?, ?)", email, id, email, now);
+  });
+  return { ok: true as const, membership: (await findMembership(email))! };
 }
 
-export function listMembers(companyId: string): CompanyMember[] {
-  const rows = db()
-    .prepare("SELECT email, role, added_by, added_at FROM company_members WHERE company_id = ? ORDER BY role DESC, added_at")
-    .all(companyId) as { email: string; role: CompanyRole; added_by: string; added_at: string }[];
+export async function listMembers(companyId: string): Promise<CompanyMember[]> {
+  const rows = (await (await db()).all("SELECT email, role, added_by, added_at FROM company_members WHERE company_id = ? ORDER BY role DESC, added_at", companyId)) as { email: string; role: CompanyRole; added_by: string; added_at: string }[];
   return rows.map((r) => ({ email: r.email, role: r.role, addedBy: r.added_by, addedAt: r.added_at }));
 }
 
-export function addMember(companyId: string, email: string, role: CompanyRole, addedBy: string) {
+export async function addMember(companyId: string, email: string, role: CompanyRole, addedBy: string) {
   const target = normEmail(email);
-  const existing = findMembership(target);
+  const existing = await findMembership(target);
   if (existing) {
     return existing.company.id === companyId
       ? { ok: false as const, message: `${target} is already in your company.` }
       : { ok: false as const, message: `${target} already belongs to another company account.` };
   }
-  if (listMembers(companyId).length >= maxMembersPerCompany) {
+  if ((await listMembers(companyId)).length >= maxMembersPerCompany) {
     return { ok: false as const, message: `A company can have up to ${maxMembersPerCompany} people.` };
   }
-  db()
-    .prepare("INSERT INTO company_members (email, company_id, role, added_by, added_at) VALUES (?, ?, ?, ?, ?)")
-    .run(target, companyId, role, normEmail(addedBy), new Date().toISOString());
+  (await (await db()).run("INSERT INTO company_members (email, company_id, role, added_by, added_at) VALUES (?, ?, ?, ?, ?)", target, companyId, role, normEmail(addedBy), new Date().toISOString()));
   return { ok: true as const };
 }
 
-export function removeMember(companyId: string, email: string) {
+export async function removeMember(companyId: string, email: string) {
   const target = normEmail(email);
-  const members = listMembers(companyId);
+  const members = await listMembers(companyId);
   const member = members.find((m) => m.email === target);
   if (!member) return { ok: false as const, message: "That person isn't in your company." };
   if (member.role === "owner" && members.filter((m) => m.role === "owner").length === 1) {
     return { ok: false as const, message: "A company needs at least one owner. Make someone else an owner first." };
   }
-  db().prepare("DELETE FROM company_members WHERE email = ? AND company_id = ?").run(target, companyId);
+  (await (await db()).run("DELETE FROM company_members WHERE email = ? AND company_id = ?", target, companyId));
   return { ok: true as const };
 }
 
-export function setMemberRole(companyId: string, email: string, role: CompanyRole) {
+export async function setMemberRole(companyId: string, email: string, role: CompanyRole) {
   const target = normEmail(email);
-  const members = listMembers(companyId);
+  const members = await listMembers(companyId);
   const member = members.find((m) => m.email === target);
   if (!member) return { ok: false as const, message: "That person isn't in your company." };
   if (member.role === "owner" && role !== "owner" && members.filter((m) => m.role === "owner").length === 1) {
     return { ok: false as const, message: "A company needs at least one owner." };
   }
-  db().prepare("UPDATE company_members SET role = ? WHERE email = ? AND company_id = ?").run(role, target, companyId);
+  (await (await db()).run("UPDATE company_members SET role = ? WHERE email = ? AND company_id = ?", role, target, companyId));
   return { ok: true as const };
 }
 
@@ -184,34 +162,32 @@ function toList(row: ListRow): ReorderList {
   };
 }
 
-export function listReorderLists(companyId: string): ReorderList[] {
-  const rows = db().prepare("SELECT * FROM reorder_lists WHERE company_id = ? ORDER BY created_at DESC").all(companyId) as ListRow[];
+export async function listReorderLists(companyId: string): Promise<ReorderList[]> {
+  const rows = (await (await db()).all("SELECT * FROM reorder_lists WHERE company_id = ? ORDER BY created_at DESC", companyId)) as ListRow[];
   return rows.map(toList);
 }
 
-export function saveReorderList(input: { companyId: string; name: string; lines: unknown; source: string; createdBy: string }) {
+export async function saveReorderList(input: { companyId: string; name: string; lines: unknown; source: string; createdBy: string }) {
   const lines = normalizeCartLines(input.lines);
   if (lines.length === 0) return { ok: false as const, message: "There's nothing to save: the list has no catalogue products." };
-  const count = (db().prepare("SELECT COUNT(*) AS n FROM reorder_lists WHERE company_id = ?").get(input.companyId) as { n: number }).n;
+  const count = ((await (await db()).get("SELECT COUNT(*) AS n FROM reorder_lists WHERE company_id = ?", input.companyId)) as { n: number }).n;
   if (count >= maxListsPerCompany) return { ok: false as const, message: `A company can keep up to ${maxListsPerCompany} lists. Delete one first.` };
   const id = `RL-${randomBytes(4).toString("hex").toUpperCase()}`;
-  db()
-    .prepare("INSERT INTO reorder_lists (id, company_id, name, lines, source, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
-    .run(id, input.companyId, input.name, JSON.stringify(lines), input.source, normEmail(input.createdBy), new Date().toISOString());
+  (await (await db()).run("INSERT INTO reorder_lists (id, company_id, name, lines, source, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)", id, input.companyId, input.name, JSON.stringify(lines), input.source, normEmail(input.createdBy), new Date().toISOString()));
   return { ok: true as const, id };
 }
 
 /** Lines from one of the user's own orders, ready to save as a list. Null if the order isn't theirs. */
-export function linesFromOrder(orderId: string, userId: string) {
-  const order = findDemoOrderById(orderId);
+export async function linesFromOrder(orderId: string, userId: string) {
+  const order = await findDemoOrderById(orderId);
   if (!order) return null;
   // Only orders placed while signed in to this account: guest orders can't be claimed by email.
-  const owner = db().prepare("SELECT user_id FROM demo_orders WHERE id = ?").get(orderId) as { user_id: string | null } | undefined;
+  const owner = (await (await db()).get("SELECT user_id FROM demo_orders WHERE id = ?", orderId)) as { user_id: string | null } | undefined;
   if (!owner?.user_id || owner.user_id !== userId) return null;
   return order.items.map((item) => ({ productId: item.productId, quantity: Math.min(item.quantity, 99), configuration: item.configuration }));
 }
 
-export function deleteReorderList(companyId: string, listId: string) {
-  const result = db().prepare("DELETE FROM reorder_lists WHERE id = ? AND company_id = ?").run(listId, companyId);
+export async function deleteReorderList(companyId: string, listId: string) {
+  const result = (await (await db()).run("DELETE FROM reorder_lists WHERE id = ? AND company_id = ?", listId, companyId));
   return Number(result.changes) > 0;
 }

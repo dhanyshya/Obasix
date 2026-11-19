@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const session = await readSession();
   if (!session) return fail("Sign in first.", 401);
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
-  const partner = findPartner(session.user.id);
+  const partner = await findPartner(session.user.id);
 
   if (body?.action === "apply") {
     if (partner && partner.status !== "rejected") return Response.json({ ok: true });
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     if (city.length < 2 || state.length < 2) return fail("Enter your city and state.");
     if (sectors.length === 0) return fail("Choose at least one sector you work in.");
     if (body.accept !== true) return fail("Accept the partner terms to apply.");
-    applyAsPartner({ userId: session.user.id, companyName, partnerType: body.partnerType as PartnerType, gstin, city, state, sectors, notes });
+    await applyAsPartner({ userId: session.user.id, companyName, partnerType: body.partnerType as PartnerType, gstin, city, state, sectors, notes });
     return Response.json({ ok: true });
   }
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     if (scope.length < 10) return fail("Describe the scope: rooms, boards, signage and quantities.");
     if (!Number.isFinite(expectedValue) || expectedValue < 1 || expectedValue > 1e9) return fail("Enter the expected project value in rupees.");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(expectedDate) || Number.isNaN(Date.parse(expectedDate))) return fail("Enter the expected order date.");
-    const result = registerProject({
+    const result = await registerProject({
       partnerUserId: session.user.id,
       clientName,
       city,

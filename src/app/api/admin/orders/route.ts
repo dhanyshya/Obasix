@@ -20,13 +20,13 @@ export async function POST(request: Request) {
   const staff = session.user.email;
   let result;
   if (body?.action === "advance") {
-    result = staffAdvanceOrder(orderId, { courier: cleanText(body?.courier, 60), trackingNumber: cleanText(body?.trackingNumber, 60) }, staff);
-    const order = result.ok ? findDemoOrderById(orderId) : null;
+    result = await staffAdvanceOrder(orderId, { courier: cleanText(body?.courier, 60), trackingNumber: cleanText(body?.trackingNumber, 60) }, staff);
+    const order = result.ok ? await findDemoOrderById(orderId) : null;
     if (order && order.status === "Dispatched" && !isDemoOrder(order)) {
       await sendEmail({ to: order.email, ...orderDispatchedEmail(order) });
     }
   } else if (body?.action === "cancel") {
-    result = staffCancelOrder(orderId, cleanText(body?.note, 300), staff);
+    result = await staffCancelOrder(orderId, cleanText(body?.note, 300), staff);
   } else {
     return fail("Unknown action.");
   }

@@ -15,6 +15,6 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const raw = body?.onHand;
   const onHand = raw === null ? null : Number(raw);
-  const result = setStock(cleanText(body?.productId, 60), onHand, session.user.email);
+  const result = await setStock(cleanText(body?.productId, 60), onHand, session.user.email);
   return result.ok ? Response.json({ ok: true }) : fail(result.message);
 }

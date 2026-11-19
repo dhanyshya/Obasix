@@ -1,6 +1,4 @@
 import { randomBytes } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import {
   catalogueLine,
   cleanText,
@@ -11,6 +9,7 @@ import {
   validateQuoteFields,
 } from "@/lib/quotes/schema";
 import { fileExtensions as extensions, sniffType } from "@/lib/files";
+import { saveFile } from "@/lib/storage/files";
 import { sendEmail, staffAlertEmails } from "@/lib/email/send";
 import { quoteReceivedEmail, staffNewQuoteEmail } from "@/lib/email/templates";
 import { allowQuoteAttempt, saveDemoQuote, type StoredQuote } from "@/lib/quotes/demo-store";
@@ -192,28 +191,22 @@ export async function POST(request: Request) {
   };
 
   if (attachment && attachmentBytes && quote.attachment) {
-    // Stored privately on the server (never under /public). Only staff with server access can read it.
-    const dir = path.join(process.cwd(), ".data", "quote-files");
-    await mkdir(dir, { recursive: true });
+    // Stored privately (Vercel Blob or this server's disk), never public. Only staff can download it.
     const stored = `${quote.reference}.${extensions[attachment.type]}`;
-    await writeFile(path.join(dir, stored), attachmentBytes);
+    await saveFile(`quote-files/${stored}`, attachmentBytes, attachment.type);
     quote.attachment = { ...quote.attachment, storedAs: stored };
   }
 
   const saved = await saveDemoQuote(quote);
   try {
     const { readSession } = await import("@/lib/auth/session");
-    const { authDatabase } = await import("@/lib/auth/db");
+    const { authDb } = await import("@/lib/auth/db");
     const session = await readSession();
     if (session) {
-      authDatabase()
-        .prepare("INSERT OR REPLACE INTO customer_quotes (reference, user_id, summary, created_at) VALUES (?, ?, ?, ?)")
-        .run(
-          saved.reference,
+      (await (await authDb()).run("INSERT INTO customer_quotes (reference, user_id, summary, created_at) VALUES (?, ?, ?, ?) ON CONFLICT (reference) DO UPDATE SET user_id = excluded.user_id, summary = excluded.summary, created_at = excluded.created_at", saved.reference,
           session.user.id,
           [saved.product, saved.boardType, saved.dimensions, `qty ${saved.quantity}`].filter(Boolean).join(" · "),
-          saved.createdAt,
-        );
+          saved.createdAt,));
     }
   } catch {
     // The demo quote is already saved. Account history is unavailable if the account store cannot be opened.
@@ -226,8 +219,8 @@ export async function POST(request: Request) {
     const session = await readSession();
     // An associate preparing a quote from their own account is credited directly;
     // otherwise the referral cookie decides.
-    const preparedBy = session ? findAssociateByUser(session.user.id) : null;
-    recordQuoteAttribution({
+    const preparedBy = session ? await findAssociateByUser(session.user.id) : null;
+    await recordQuoteAttribution({
       reference: saved.reference,
       code: preparedBy?.code ?? (await cookies()).get(referralCookieName)?.value,
       buyerUserId: session?.user.id ?? null,

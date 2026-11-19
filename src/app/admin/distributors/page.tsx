@@ -7,5 +7,5 @@ export const metadata: Metadata = { title: "Distributors · Staff" };
 
 export default async function AdminDistributorsPage() {
   await requireAdmin(); // Before loading data: see requireAdmin.
-  return <DistributorsAdmin distributors={listDistributorSummaries()} orders={listAllTradeOrders()} />;
+  return <DistributorsAdmin distributors={await listDistributorSummaries()} orders={await listAllTradeOrders()} />;
 }

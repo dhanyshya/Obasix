@@ -10,8 +10,8 @@ export default async function AdminAssociatesPage() {
   await requireAdmin();
   return (
     <AssociatesAdmin
-      associates={listAssociateSummaries()}
-      commissions={listAdminCommissions()}
+      associates={await listAssociateSummaries()}
+      commissions={await listAdminCommissions()}
       demoOrders={commerceMode() === "demo"}
     />
   );

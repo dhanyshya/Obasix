@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   const paymentId = String(body?.razorpay_payment_id ?? "").slice(0, 60);
   const signature = String(body?.razorpay_signature ?? "").slice(0, 200);
 
-  const record = orderPaymentRecord(orderId);
+  const record = await orderPaymentRecord(orderId);
   if (!record || !record.providerOrderId || record.providerOrderId !== providerOrderId) {
     return Response.json(commerceUnavailable("invalid_request", "That payment doesn't match an order."), { status: 404 });
   }
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  const paid = markOrderPaid(providerOrderId, paymentId)!;
+  const paid = (await markOrderPaid(providerOrderId, paymentId))!;
   if (paid.newlyPaid) await afterOrderPaid(paid);
   return Response.json({ ok: true, order: paid.order });
 }

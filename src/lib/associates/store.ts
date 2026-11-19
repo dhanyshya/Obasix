@@ -1,7 +1,8 @@
 import "server-only";
 
 import { randomBytes } from "node:crypto";
-import { authDatabase } from "@/lib/auth/db";
+import { authDb } from "@/lib/auth/db";
+import { ensureSchema } from "@/lib/db";
 import { findDemoOrderById } from "@/lib/commerce/order-store";
 import { associateCommissionRate, type AssociateProfession } from "@/lib/associates/program";
 
@@ -14,11 +15,9 @@ import { associateCommissionRate, type AssociateProfession } from "@/lib/associa
  * earn two commissions, whichever channel it came through.
  */
 
-let ready = false;
 function db() {
-  const database = authDatabase();
-  if (!ready) {
-    database.exec(`
+  return ensureSchema("associates", async (database) => {
+    await database.exec(`
       CREATE TABLE IF NOT EXISTS associates (
         user_id TEXT PRIMARY KEY,
         code TEXT NOT NULL UNIQUE,
@@ -50,9 +49,7 @@ function db() {
       );
       CREATE INDEX IF NOT EXISTS associate_quotes_code ON associate_quotes(code);
     `);
-    ready = true;
-  }
-  return database;
+  });
 }
 
 export type Associate = {
@@ -94,47 +91,43 @@ export function normalizeCode(value: unknown): string {
     .slice(0, 12);
 }
 
-export function findAssociateByUser(userId: string): Associate | null {
-  const row = db().prepare("SELECT * FROM associates WHERE user_id = ?").get(userId) as AssociateRow | undefined;
+export async function findAssociateByUser(userId: string): Promise<Associate | null> {
+  const row = (await (await db()).get("SELECT * FROM associates WHERE user_id = ?", userId)) as AssociateRow | undefined;
   return row ? toAssociate(row) : null;
 }
 
-export function findAssociateByCode(code: string): Associate | null {
+export async function findAssociateByCode(code: string): Promise<Associate | null> {
   const clean = normalizeCode(code);
   if (clean.length < 6) return null;
-  const row = db().prepare("SELECT * FROM associates WHERE code = ?").get(clean) as AssociateRow | undefined;
+  const row = (await (await db()).get("SELECT * FROM associates WHERE code = ?", clean)) as AssociateRow | undefined;
   return row ? toAssociate(row) : null;
 }
 
 /** A readable code: up to four letters of the name, then four random characters. */
-function generateCode(name: string): string {
+async function generateCode(name: string): Promise<string> {
   const stem = name.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4).padEnd(4, "X");
   const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
   for (let attempt = 0; attempt < 10; attempt++) {
     const bytes = randomBytes(4);
     const tail = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
     const code = `${stem}${tail}`;
-    if (!db().prepare("SELECT 1 FROM associates WHERE code = ?").get(code)) return code;
+    if (!(await (await db()).get("SELECT 1 FROM associates WHERE code = ?", code))) return code;
   }
   throw new Error("Could not allocate a referral code.");
 }
 
-export function registerAssociate(input: {
+export async function registerAssociate(input: {
   userId: string;
   name: string;
   profession: AssociateProfession;
   city: string;
   firm: string;
-}): Associate {
-  const existing = findAssociateByUser(input.userId);
+}): Promise<Associate> {
+  const existing = await findAssociateByUser(input.userId);
   if (existing) return existing;
-  const code = generateCode(input.name);
-  db()
-    .prepare(
-      "INSERT INTO associates (user_id, code, profession, city, firm, status, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?)",
-    )
-    .run(input.userId, code, input.profession, input.city, input.firm, new Date().toISOString());
-  return findAssociateByUser(input.userId)!;
+  const code = await generateCode(input.name);
+  (await (await db()).run("INSERT INTO associates (user_id, code, profession, city, firm, status, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?)", input.userId, code, input.profession, input.city, input.firm, new Date().toISOString()));
+  return (await findAssociateByUser(input.userId))!;
 }
 
 /* ------------------------------------------------------------------ */
@@ -145,12 +138,12 @@ export function registerAssociate(input: {
  * Resolve the referral code to credit, or null. Self-referral is refused: an
  * associate buying for themselves (same account or same email) earns nothing.
  */
-function creditableAssociate(code: string | null | undefined, buyer: { userId: string | null; email: string }) {
+async function creditableAssociate(code: string | null | undefined, buyer: { userId: string | null; email: string }) {
   if (!code) return null;
-  const associate = findAssociateByCode(code);
+  const associate = await findAssociateByCode(code);
   if (!associate || associate.status !== "active") return null;
   if (buyer.userId && buyer.userId === associate.userId) return null;
-  const owner = authDatabase().prepare("SELECT email FROM users WHERE id = ?").get(associate.userId) as
+  const owner = (await (await authDb()).get("SELECT email FROM users WHERE id = ?", associate.userId)) as
     | { email: string }
     | undefined;
   if (owner && owner.email.trim().toLowerCase() === buyer.email.trim().toLowerCase()) return null;
@@ -158,35 +151,29 @@ function creditableAssociate(code: string | null | undefined, buyer: { userId: s
 }
 
 /** Record the commission for a new order. Safe to call twice: the second call is ignored. */
-export function recordOrderCommission(input: {
+export async function recordOrderCommission(input: {
   orderId: string;
   subtotal: number;
   code: string | null | undefined;
   buyerUserId: string | null;
   buyerEmail: string;
 }) {
-  const associate = creditableAssociate(input.code, { userId: input.buyerUserId, email: input.buyerEmail });
+  const associate = await creditableAssociate(input.code, { userId: input.buyerUserId, email: input.buyerEmail });
   if (!associate || input.subtotal <= 0) return null;
   const amount = Math.round(input.subtotal * associateCommissionRate);
-  db()
-    .prepare(
-      `INSERT OR IGNORE INTO associate_commissions (id, code, source_type, source_id, base_amount, rate, amount, status, created_at)
-       VALUES (?, ?, 'order', ?, ?, ?, ?, 'pending', ?)`,
-    )
-    .run(
-      `COM-${randomBytes(5).toString("hex").toUpperCase()}`,
+  (await (await db()).run(`INSERT INTO associate_commissions (id, code, source_type, source_id, base_amount, rate, amount, status, created_at)
+       VALUES (?, ?, 'order', ?, ?, ?, ?, 'pending', ?) ON CONFLICT DO NOTHING`, `COM-${randomBytes(5).toString("hex").toUpperCase()}`,
       associate.code,
       input.orderId,
       input.subtotal,
       associateCommissionRate,
       amount,
-      new Date().toISOString(),
-    );
+      new Date().toISOString(),));
   return associate.code;
 }
 
 /** Link a quote to the associate who prepared or referred it. */
-export function recordQuoteAttribution(input: {
+export async function recordQuoteAttribution(input: {
   reference: string;
   code: string | null | undefined;
   buyerUserId: string | null;
@@ -194,14 +181,12 @@ export function recordQuoteAttribution(input: {
   customer: string;
   summary: string;
 }) {
-  const associate = creditableAssociate(input.code, { userId: null, email: input.buyerEmail });
+  const associate = await creditableAssociate(input.code, { userId: null, email: input.buyerEmail });
   // A signed-in associate may prepare a quote for a customer from their own account,
   // so only the email check applies to quotes.
   void input.buyerUserId;
   if (!associate) return null;
-  db()
-    .prepare("INSERT OR IGNORE INTO associate_quotes (reference, code, customer, summary, created_at) VALUES (?, ?, ?, ?, ?)")
-    .run(input.reference, associate.code, input.customer, input.summary, new Date().toISOString());
+  (await (await db()).run("INSERT INTO associate_quotes (reference, code, customer, summary, created_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING", input.reference, associate.code, input.customer, input.summary, new Date().toISOString()));
   return associate.code;
 }
 
@@ -233,10 +218,8 @@ export type AttributedQuote = {
  * Commission becomes payable only once the order is delivered, so returns and
  * cancellations never need clawing back.
  */
-export function listCommissions(code: string): CommissionEntry[] {
-  const rows = db()
-    .prepare("SELECT * FROM associate_commissions WHERE code = ? ORDER BY created_at DESC LIMIT 200")
-    .all(code) as {
+export async function listCommissions(code: string): Promise<CommissionEntry[]> {
+  const rows = (await (await db()).all("SELECT * FROM associate_commissions WHERE code = ? ORDER BY created_at DESC LIMIT 200", code)) as {
     id: string;
     source_id: string;
     base_amount: number;
@@ -245,8 +228,8 @@ export function listCommissions(code: string): CommissionEntry[] {
     status: string;
     created_at: string;
   }[];
-  return rows.map((row) => {
-    const order = findDemoOrderById(row.source_id);
+  return await Promise.all(rows.map(async (row) => {
+    const order = await findDemoOrderById(row.source_id);
     const orderStatus = order?.status ?? "Unknown";
     const state: CommissionState =
       row.status === "paid"
@@ -266,13 +249,11 @@ export function listCommissions(code: string): CommissionEntry[] {
       orderStatus,
       createdAt: row.created_at,
     };
-  });
+  }));
 }
 
-export function listAttributedQuotes(code: string): AttributedQuote[] {
-  const rows = db()
-    .prepare("SELECT * FROM associate_quotes WHERE code = ? ORDER BY created_at DESC LIMIT 100")
-    .all(code) as { reference: string; customer: string; summary: string; created_at: string }[];
+export async function listAttributedQuotes(code: string): Promise<AttributedQuote[]> {
+  const rows = (await (await db()).all("SELECT * FROM associate_quotes WHERE code = ? ORDER BY created_at DESC LIMIT 100", code)) as { reference: string; customer: string; summary: string; created_at: string }[];
   return rows.map((row) => ({ reference: row.reference, customer: row.customer, summary: row.summary, createdAt: row.created_at }));
 }
 
@@ -280,17 +261,14 @@ export function listAttributedQuotes(code: string): AttributedQuote[] {
 /* Staff administration                                                */
 /* ------------------------------------------------------------------ */
 
-let payoutColumnsReady = false;
+/** The commission table plus the payout columns added for the staff view. */
 function adminDb() {
-  const database = db();
-  if (!payoutColumnsReady) {
-    const columns = (database.prepare("PRAGMA table_info(associate_commissions)").all() as { name: string }[]).map((c) => c.name);
-    if (!columns.includes("paid_at")) database.exec("ALTER TABLE associate_commissions ADD COLUMN paid_at TEXT");
-    if (!columns.includes("payout_ref")) database.exec("ALTER TABLE associate_commissions ADD COLUMN payout_ref TEXT NOT NULL DEFAULT ''");
-    if (!columns.includes("void_reason")) database.exec("ALTER TABLE associate_commissions ADD COLUMN void_reason TEXT NOT NULL DEFAULT ''");
-    payoutColumnsReady = true;
-  }
-  return database;
+  return ensureSchema("associates-payouts", async () => {
+    const database = await db();
+    await database.addColumn("associate_commissions", "paid_at", "TEXT");
+    await database.addColumn("associate_commissions", "payout_ref", "TEXT NOT NULL DEFAULT ''");
+    await database.addColumn("associate_commissions", "void_reason", "TEXT NOT NULL DEFAULT ''");
+  });
 }
 
 export type AssociateSummary = Associate & {
@@ -313,19 +291,15 @@ export type AdminCommission = CommissionEntry & {
   voidReason: string;
 };
 
-export function listAdminCommissions(): AdminCommission[] {
-  const rows = adminDb()
-    .prepare(
-      `SELECT c.*, u.name AS associate_name
+export async function listAdminCommissions(): Promise<AdminCommission[]> {
+  const rows = (await (await adminDb()).all(`SELECT c.*, u.name AS associate_name
        FROM associate_commissions c
        LEFT JOIN associates a ON a.code = c.code
        LEFT JOIN users u ON u.id = a.user_id
-       ORDER BY c.created_at DESC LIMIT 500`,
-    )
-    .all() as { id: string; code: string; associate_name: string | null; paid_at: string | null; payout_ref: string; void_reason: string }[];
+       ORDER BY c.created_at DESC LIMIT 500`)) as { id: string; code: string; associate_name: string | null; paid_at: string | null; payout_ref: string; void_reason: string }[];
   const byCode = new Map<string, CommissionEntry[]>();
-  return rows.map((row) => {
-    if (!byCode.has(row.code)) byCode.set(row.code, listCommissions(row.code));
+  return await Promise.all(rows.map(async (row) => {
+    if (!byCode.has(row.code)) byCode.set(row.code, await listCommissions(row.code));
     const entry = byCode.get(row.code)!.find((c) => c.id === row.id)!;
     return {
       ...entry,
@@ -335,17 +309,13 @@ export function listAdminCommissions(): AdminCommission[] {
       payoutRef: row.payout_ref,
       voidReason: row.void_reason,
     };
-  });
+  }));
 }
 
-export function listAssociateSummaries(): AssociateSummary[] {
-  const rows = adminDb()
-    .prepare(
-      `SELECT a.*, u.name, u.email, u.phone FROM associates a JOIN users u ON u.id = a.user_id ORDER BY a.created_at DESC`,
-    )
-    .all() as (AssociateRow & { name: string; email: string; phone: string })[];
-  return rows.map((row) => {
-    const commissions = listCommissions(row.code);
+export async function listAssociateSummaries(): Promise<AssociateSummary[]> {
+  const rows = (await (await adminDb()).all(`SELECT a.*, u.name, u.email, u.phone FROM associates a JOIN users u ON u.id = a.user_id ORDER BY a.created_at DESC`)) as (AssociateRow & { name: string; email: string; phone: string })[];
+  return await Promise.all(rows.map(async (row) => {
+    const commissions = await listCommissions(row.code);
     const total = (state: CommissionState) => commissions.filter((c) => c.state === state).reduce((s, c) => s + c.amount, 0);
     const live = commissions.filter((c) => c.state !== "Void");
     return {
@@ -358,37 +328,36 @@ export function listAssociateSummaries(): AssociateSummary[] {
       awaiting: total("Awaiting delivery"),
       payable: total("Payable"),
       paid: total("Paid"),
-      quotes: listAttributedQuotes(row.code).length,
+      quotes: (await listAttributedQuotes(row.code)).length,
     };
-  });
+  }));
 }
 
-export function setAssociateStatus(code: string, status: "active" | "paused") {
-  return Number(adminDb().prepare("UPDATE associates SET status = ? WHERE code = ?").run(status, normalizeCode(code)).changes) > 0;
+export async function setAssociateStatus(code: string, status: "active" | "paused") {
+  return Number((await (await adminDb()).run("UPDATE associates SET status = ? WHERE code = ?", status, normalizeCode(code))).changes) > 0;
 }
 
 /**
  * Mark commissions paid. Only entries that are currently payable (order
  * delivered, not void, not already paid) change; the rest are reported back.
  */
-export function markCommissionsPaid(ids: string[], payoutRef: string) {
-  const payable = new Set(listAdminCommissions().filter((c) => c.state === "Payable").map((c) => c.id));
+export async function markCommissionsPaid(ids: string[], payoutRef: string) {
+  const payable = new Set((await listAdminCommissions()).filter((c) => c.state === "Payable").map((c) => c.id));
   const paidAt = new Date().toISOString();
-  const update = adminDb().prepare(
-    "UPDATE associate_commissions SET status = 'paid', paid_at = ?, payout_ref = ? WHERE id = ? AND status = 'pending'",
-  );
+  const database = await adminDb();
   const paid: string[] = [];
   const skipped: string[] = [];
   for (const id of ids) {
-    if (payable.has(id) && Number(update.run(paidAt, payoutRef, id).changes) > 0) paid.push(id);
+    const update = payable.has(id)
+      ? await database.run("UPDATE associate_commissions SET status = 'paid', paid_at = ?, payout_ref = ? WHERE id = ? AND status = 'pending'", paidAt, payoutRef, id)
+      : { changes: 0 };
+    if (update.changes > 0) paid.push(id);
     else skipped.push(id);
   }
   return { paid, skipped };
 }
 
-export function voidCommission(id: string, reason: string) {
-  const result = adminDb()
-    .prepare("UPDATE associate_commissions SET status = 'void', void_reason = ? WHERE id = ? AND status = 'pending'")
-    .run(reason, id);
+export async function voidCommission(id: string, reason: string) {
+  const result = (await (await adminDb()).run("UPDATE associate_commissions SET status = 'void', void_reason = ? WHERE id = ? AND status = 'pending'", reason, id));
   return Number(result.changes) > 0;
 }

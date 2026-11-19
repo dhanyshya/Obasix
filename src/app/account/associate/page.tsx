@@ -24,7 +24,7 @@ const stateColour: Record<CommissionState, string> = {
 export default async function AccountAssociatePage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
-  const associate = findAssociateByUser(session.user.id);
+  const associate = await findAssociateByUser(session.user.id);
 
   if (!associate) {
     return (
@@ -43,8 +43,8 @@ export default async function AccountAssociatePage() {
 
   const host = (await headers()).get("host") ?? "localhost:3000";
   const origin = `${host.startsWith("localhost") ? "http" : "https"}://${host}`;
-  const commissions = listCommissions(associate.code);
-  const quotes = listAttributedQuotes(associate.code);
+  const commissions = await listCommissions(associate.code);
+  const quotes = await listAttributedQuotes(associate.code);
   const sum = (state: CommissionState) =>
     commissions.filter((c) => c.state === state).reduce((total, c) => total + c.amount, 0);
   const referredSales = commissions.filter((c) => c.state !== "Void").reduce((total, c) => total + c.baseAmount, 0);

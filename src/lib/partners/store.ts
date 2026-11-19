@@ -1,7 +1,7 @@
 import "server-only";
 
 import { randomBytes } from "node:crypto";
-import { authDatabase } from "@/lib/auth/db";
+import { ensureSchema } from "@/lib/db";
 import { findDemoOrderById } from "@/lib/commerce/order-store";
 import {
   clientKey,
@@ -25,11 +25,9 @@ import {
  * to one project only.
  */
 
-let ready = false;
 function db() {
-  const database = authDatabase();
-  if (!ready) {
-    database.exec(`
+  return ensureSchema("partners", async (database) => {
+    await database.exec(`
       CREATE TABLE IF NOT EXISTS partners (
         user_id TEXT PRIMARY KEY,
         company_name TEXT NOT NULL,
@@ -70,9 +68,7 @@ function db() {
       CREATE INDEX IF NOT EXISTS partner_projects_partner ON partner_projects(partner_user_id);
       CREATE INDEX IF NOT EXISTS partner_projects_client ON partner_projects(client_key);
     `);
-    ready = true;
-  }
-  return database;
+  });
 }
 
 export type PartnerStatus = "pending" | "approved" | "rejected" | "suspended";
@@ -191,12 +187,12 @@ const toProject = (row: ProjectRow): Project => ({
   updatedBy: row.updated_by,
 });
 
-export function findPartner(userId: string): Partner | null {
-  const row = db().prepare("SELECT * FROM partners WHERE user_id = ?").get(userId) as PartnerRow | undefined;
+export async function findPartner(userId: string): Promise<Partner | null> {
+  const row = (await (await db()).get("SELECT * FROM partners WHERE user_id = ?", userId)) as PartnerRow | undefined;
   return row ? toPartner(row) : null;
 }
 
-export function applyAsPartner(input: {
+export async function applyAsPartner(input: {
   userId: string;
   companyName: string;
   partnerType: PartnerType;
@@ -207,23 +203,19 @@ export function applyAsPartner(input: {
   notes: string;
 }) {
   // A rejected applicant may apply again; the new application replaces the old one.
-  db()
-    .prepare(
-      `INSERT INTO partners (user_id, company_name, partner_type, gstin, city, state, sectors, notes, status, created_at)
+  (await (await db()).run(`INSERT INTO partners (user_id, company_name, partner_type, gstin, city, state, sectors, notes, status, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
        ON CONFLICT(user_id) DO UPDATE SET company_name = excluded.company_name, partner_type = excluded.partner_type,
          gstin = excluded.gstin, city = excluded.city, state = excluded.state, sectors = excluded.sectors,
          notes = excluded.notes, status = 'pending', decision_note = '', decided_by = '', decided_at = NULL,
          created_at = excluded.created_at
-       WHERE partners.status = 'rejected'`,
-    )
-    .run(input.userId, input.companyName, input.partnerType, input.gstin, input.city, input.state, JSON.stringify(input.sectors), input.notes, new Date().toISOString());
-  return findPartner(input.userId)!;
+       WHERE partners.status = 'rejected'`, input.userId, input.companyName, input.partnerType, input.gstin, input.city, input.state, JSON.stringify(input.sectors), input.notes, new Date().toISOString()));
+  return (await findPartner(input.userId))!;
 }
 
 export type RegisterResult = { ok: true; project: Project } | { ok: false; message: string };
 
-export function registerProject(input: {
+export async function registerProject(input: {
   partnerUserId: string;
   clientName: string;
   city: string;
@@ -231,32 +223,23 @@ export function registerProject(input: {
   scope: string;
   expectedValue: number;
   expectedDate: string;
-}): RegisterResult {
+}): Promise<RegisterResult> {
   if (input.expectedValue < minimumProjectValue) {
     return { ok: false, message: `Projects start at ₹${minimumProjectValue.toLocaleString("en-IN")}. Smaller orders can go through the website or the associate programme.` };
   }
   const key = clientKey(input.clientName, input.city);
   const now = new Date();
-  const open = db()
-    .prepare(
-      `SELECT id, partner_user_id FROM partner_projects
-       WHERE client_key = ? AND status NOT IN ('Lost', 'Paid') AND protected_until > ? ORDER BY created_at LIMIT 1`,
-    )
-    .get(key, now.toISOString()) as { id: string; partner_user_id: string } | undefined;
+  const open = (await (await db()).get(`SELECT id, partner_user_id FROM partner_projects
+       WHERE client_key = ? AND status NOT IN ('Lost', 'Paid') AND protected_until > ? ORDER BY created_at LIMIT 1`, key, now.toISOString())) as { id: string; partner_user_id: string } | undefined;
   if (open?.partner_user_id === input.partnerUserId) {
     return { ok: false, message: `You already registered this client (${open.id}).` };
   }
 
   const id = `PRJ-${randomBytes(3).toString("hex").toUpperCase()}`;
   const protectedUntil = new Date(now.getTime() + projectProtectionDays * 86400000).toISOString();
-  db()
-    .prepare(
-      `INSERT INTO partner_projects (id, partner_user_id, client_name, client_key, city, sector, scope, expected_value, expected_date,
+  (await (await db()).run(`INSERT INTO partner_projects (id, partner_user_id, client_name, client_key, city, sector, scope, expected_value, expected_date,
          conflict_with, protected_until, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(
-      id,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, id,
       input.partnerUserId,
       input.clientName,
       key,
@@ -269,18 +252,17 @@ export function registerProject(input: {
       open?.id ?? "",
       protectedUntil,
       now.toISOString(),
-      now.toISOString(),
-    );
-  return { ok: true, project: findProject(id)! };
+      now.toISOString(),));
+  return { ok: true, project: (await findProject(id))! };
 }
 
-export function findProject(id: string) {
-  const row = db().prepare("SELECT * FROM partner_projects WHERE id = ?").get(id) as ProjectRow | undefined;
+export async function findProject(id: string) {
+  const row = (await (await db()).get("SELECT * FROM partner_projects WHERE id = ?", id)) as ProjectRow | undefined;
   return row ? toProject(row) : null;
 }
 
-export function listPartnerProjects(partnerUserId: string): Project[] {
-  const rows = db().prepare("SELECT * FROM partner_projects WHERE partner_user_id = ? ORDER BY created_at DESC").all(partnerUserId) as ProjectRow[];
+export async function listPartnerProjects(partnerUserId: string): Promise<Project[]> {
+  const rows = (await (await db()).all("SELECT * FROM partner_projects WHERE partner_user_id = ? ORDER BY created_at DESC", partnerUserId)) as ProjectRow[];
   return rows.map(toProject);
 }
 
@@ -288,16 +270,12 @@ export function listPartnerProjects(partnerUserId: string): Project[] {
 
 export type PartnerSummary = Partner & { name: string; email: string; phone: string; projects: number; wonValue: number; earned: number };
 
-export function listPartnerSummaries(): PartnerSummary[] {
-  const rows = db()
-    .prepare(
-      `SELECT partners.*, users.name AS user_name, users.email AS user_email, users.phone AS user_phone
+export async function listPartnerSummaries(): Promise<PartnerSummary[]> {
+  const rows = (await (await db()).all(`SELECT partners.*, users.name AS user_name, users.email AS user_email, users.phone AS user_phone
        FROM partners LEFT JOIN users ON users.id = partners.user_id
-       ORDER BY CASE partners.status WHEN 'pending' THEN 0 ELSE 1 END, partners.created_at DESC`,
-    )
-    .all() as (PartnerRow & { user_name: string | null; user_email: string | null; user_phone: string | null })[];
-  return rows.map((row) => {
-    const projects = listPartnerProjects(row.user_id);
+       ORDER BY CASE partners.status WHEN 'pending' THEN 0 ELSE 1 END, partners.created_at DESC`)) as (PartnerRow & { user_name: string | null; user_email: string | null; user_phone: string | null })[];
+  return await Promise.all(rows.map(async (row) => {
+    const projects = await listPartnerProjects(row.user_id);
     const won = projects.filter((p) => ["Won", "In production", "Delivered", "Paid"].includes(p.status));
     return {
       ...toPartner(row),
@@ -308,35 +286,29 @@ export function listPartnerSummaries(): PartnerSummary[] {
       wonValue: won.reduce((s, p) => s + p.quotedValue, 0),
       earned: projects.filter((p) => p.status === "Paid").reduce((s, p) => s + p.earning, 0),
     };
-  });
+  }));
 }
 
 export type ProjectWithPartner = Project & { partnerCompany: string; partnerEmail: string };
 
-export function listAllProjects(): ProjectWithPartner[] {
-  const rows = db()
-    .prepare(
-      `SELECT partner_projects.*, partners.company_name AS partner_company, users.email AS partner_email
+export async function listAllProjects(): Promise<ProjectWithPartner[]> {
+  const rows = (await (await db()).all(`SELECT partner_projects.*, partners.company_name AS partner_company, users.email AS partner_email
        FROM partner_projects
        LEFT JOIN partners ON partners.user_id = partner_projects.partner_user_id
        LEFT JOIN users ON users.id = partner_projects.partner_user_id
-       ORDER BY CASE partner_projects.status WHEN 'Submitted' THEN 0 WHEN 'Delivered' THEN 1 ELSE 2 END, partner_projects.created_at DESC`,
-    )
-    .all() as (ProjectRow & { partner_company: string | null; partner_email: string | null })[];
+       ORDER BY CASE partner_projects.status WHEN 'Submitted' THEN 0 WHEN 'Delivered' THEN 1 ELSE 2 END, partner_projects.created_at DESC`)) as (ProjectRow & { partner_company: string | null; partner_email: string | null })[];
   return rows.map((row) => ({ ...toProject(row), partnerCompany: row.partner_company ?? "Unknown", partnerEmail: row.partner_email ?? "" }));
 }
 
-export function decidePartner(input: { userId: string; status: Exclude<PartnerStatus, "pending">; note: string; staffEmail: string }) {
-  const result = db()
-    .prepare("UPDATE partners SET status = ?, decision_note = ?, decided_by = ?, decided_at = ? WHERE user_id = ?")
-    .run(input.status, input.note, input.staffEmail, new Date().toISOString(), input.userId);
+export async function decidePartner(input: { userId: string; status: Exclude<PartnerStatus, "pending">; note: string; staffEmail: string }) {
+  const result = (await (await db()).run("UPDATE partners SET status = ?, decision_note = ?, decided_by = ?, decided_at = ? WHERE user_id = ?", input.status, input.note, input.staffEmail, new Date().toISOString(), input.userId));
   return Number(result.changes) > 0;
 }
 
 /** True when a live associate commission already sits on this order. */
-function orderHasAssociateCommission(orderId: string) {
+async function orderHasAssociateCommission(orderId: string) {
   try {
-    const row = db().prepare("SELECT status FROM associate_commissions WHERE source_id = ?").get(orderId) as { status: string } | undefined;
+    const row = (await (await db()).get("SELECT status FROM associate_commissions WHERE source_id = ?", orderId)) as { status: string } | undefined;
     return Boolean(row && row.status !== "void");
   } catch {
     return false; // The associate tables don't exist yet, so there can't be a commission.
@@ -349,16 +321,14 @@ export type ProjectAction =
   | { action: "lose"; note: string }
   | { action: "pay"; payoutRef: string };
 
-export function updateProject(id: string, change: ProjectAction, staffEmail: string): RegisterResult {
-  const project = findProject(id);
+export async function updateProject(id: string, change: ProjectAction, staffEmail: string): Promise<RegisterResult> {
+  const project = await findProject(id);
   if (!project) return { ok: false, message: "Project not found." };
   const now = new Date().toISOString();
-  const set = (fields: Record<string, string | number | null>) => {
+  const set = async (fields: Record<string, string | number | null>) => {
     const keys = Object.keys(fields);
-    db()
-      .prepare(`UPDATE partner_projects SET ${keys.map((k) => `${k} = ?`).join(", ")}, updated_at = ?, updated_by = ? WHERE id = ?`)
-      .run(...keys.map((k) => fields[k]), now, staffEmail, id);
-    return { ok: true as const, project: findProject(id)! };
+    (await (await db()).run(`UPDATE partner_projects SET ${keys.map((k) => `${k} = ?`).join(", ")}, updated_at = ?, updated_by = ? WHERE id = ?`, ...keys.map((k) => fields[k]), now, staffEmail, id));
+    return { ok: true as const, project: (await findProject(id))! };
   };
 
   switch (change.action) {
@@ -377,11 +347,11 @@ export function updateProject(id: string, change: ProjectAction, staffEmail: str
       const fields: Record<string, string | number | null> = { status: next, staff_note: change.note || project.staffNote };
       if (next === "Won" && change.linkedOrderId) {
         const orderId = change.linkedOrderId;
-        if (!findDemoOrderById(orderId)) return { ok: false, message: `No website order ${orderId} was found.` };
-        if (orderHasAssociateCommission(orderId)) {
+        if (!await findDemoOrderById(orderId)) return { ok: false, message: `No website order ${orderId} was found.` };
+        if (await orderHasAssociateCommission(orderId)) {
           return { ok: false, message: `Order ${orderId} already earns an associate commission. Void it first: one order earns one payout.` };
         }
-        const taken = db().prepare("SELECT id FROM partner_projects WHERE linked_order_id = ? AND id != ?").get(orderId, id) as { id: string } | undefined;
+        const taken = (await (await db()).get("SELECT id FROM partner_projects WHERE linked_order_id = ? AND id != ?", orderId, id)) as { id: string } | undefined;
         if (taken) return { ok: false, message: `Order ${orderId} already belongs to ${taken.id}.` };
         fields.linked_order_id = orderId;
       }

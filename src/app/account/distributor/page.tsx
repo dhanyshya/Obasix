@@ -28,7 +28,7 @@ const heading = { fontSize: { xs: 34, md: 46 } } as const;
 export default async function AccountDistributorPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
-  const distributor = findDistributor(session.user.id);
+  const distributor = await findDistributor(session.user.id);
 
   if (!distributor || distributor.status === "rejected") {
     return (
@@ -69,12 +69,12 @@ export default async function AccountDistributorPage() {
   }
 
   const tier = tierById(distributor.tier);
-  const used = creditUsed(session.user.id);
+  const used = await creditUsed(session.user.id);
   const available = Math.max(distributor.creditLimit - used, 0);
-  const purchases = quarterPurchases(session.user.id);
+  const purchases = await quarterPurchases(session.user.id);
   const quarter = financialQuarter(new Date());
   const progress = distributor.quarterlyTarget > 0 ? Math.min(purchases / distributor.quarterlyTarget, 1) : 0;
-  const orders = listTradeOrders(session.user.id);
+  const orders = await listTradeOrders(session.user.id);
 
   const products: TradeProduct[] = getAllProducts()
     .filter((p) => p.price > 0)

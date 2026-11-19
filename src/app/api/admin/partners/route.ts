@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const status = body?.status;
     if (status !== "approved" && status !== "rejected" && status !== "suspended") return fail("Choose a decision.");
     if (status !== "approved" && note.length < 3) return fail("Add a note explaining the decision.");
-    return decidePartner({ userId: cleanText(body?.userId, 60), status, note, staffEmail })
+    return await decidePartner({ userId: cleanText(body?.userId, 60), status, note, staffEmail })
       ? Response.json({ ok: true })
       : fail("No partner application found.", 404);
   }
@@ -33,17 +33,17 @@ export async function POST(request: Request) {
       const marginPercent = Number(body?.marginPercent);
       if (!Number.isFinite(quotedValue) || quotedValue > 1e9) return fail("Enter the quoted value in rupees.");
       if (!Number.isFinite(marginPercent)) return fail("Enter the negotiated margin as a percentage.");
-      result = updateProject(projectId, { action: "quote", quotedValue, marginRate: Math.round(marginPercent * 10) / 1000, note }, staffEmail);
+      result = await updateProject(projectId, { action: "quote", quotedValue, marginRate: Math.round(marginPercent * 10) / 1000, note }, staffEmail);
       break;
     }
     case "advance":
-      result = updateProject(projectId, { action: "advance", linkedOrderId: cleanText(body?.linkedOrderId, 40) || undefined, note }, staffEmail);
+      result = await updateProject(projectId, { action: "advance", linkedOrderId: cleanText(body?.linkedOrderId, 40) || undefined, note }, staffEmail);
       break;
     case "lose":
-      result = updateProject(projectId, { action: "lose", note }, staffEmail);
+      result = await updateProject(projectId, { action: "lose", note }, staffEmail);
       break;
     case "pay":
-      result = updateProject(projectId, { action: "pay", payoutRef: cleanText(body?.payoutRef, 60) }, staffEmail);
+      result = await updateProject(projectId, { action: "pay", payoutRef: cleanText(body?.payoutRef, 60) }, staffEmail);
       break;
     default:
       return fail("Unknown action.");

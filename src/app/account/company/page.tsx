@@ -16,10 +16,10 @@ export default async function AccountCompanyPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
   const me = session.user.email.toLowerCase();
-  const membership = findMembership(me);
+  const membership = await findMembership(me);
 
   // Past orders, priced at today's catalogue; retired products drop out.
-  const orders: PanelOrder[] = listDemoOrdersForUser(session.user.id)
+  const orders: PanelOrder[] = (await listDemoOrdersForUser(session.user.id))
     .slice(0, 10)
     .map((order) => {
       const lines = order.items.flatMap((item) => {
@@ -52,8 +52,8 @@ export default async function AccountCompanyPage() {
 
   const { company, role } = membership;
   const isOwner = role === "owner";
-  const members = listMembers(company.id).map((m) => ({ email: m.email, role: m.role }));
-  const lists = listReorderLists(company.id);
+  const members = (await listMembers(company.id)).map((m) => ({ email: m.email, role: m.role }));
+  const lists = await listReorderLists(company.id);
 
   return (
     <Box sx={{ display: "grid", gap: { xs: 3, md: 4 } }}>

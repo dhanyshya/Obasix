@@ -35,11 +35,11 @@ export async function POST(request: Request) {
     const billingAddress = cleanText(body?.billingAddress, 300);
     if (name.length < 2) return fail("Enter your company name.");
     if (gstin && !isValidGstin(gstin)) return fail("Enter a valid 15-character GSTIN, or leave it blank.");
-    const result = createCompany({ ownerEmail: me, name, gstin, billingAddress });
+    const result = await createCompany({ ownerEmail: me, name, gstin, billingAddress });
     return result.ok ? done() : fail(result.message, 409);
   }
 
-  const membership = findMembership(me);
+  const membership = await findMembership(me);
   if (!membership) return fail("You're not part of a company account.", 403);
   const companyId = membership.company.id;
   const isOwner = membership.role === "owner";
@@ -53,15 +53,15 @@ export async function POST(request: Request) {
       if (!isEmail(email)) return fail("Enter a valid email address.");
       if (action === "add-member") {
         const role = isRole(body?.role) ? body.role : "buyer";
-        const result = addMember(companyId, email, role, me);
+        const result = await addMember(companyId, email, role, me);
         return result.ok ? done() : fail(result.message, 409);
       }
       if (action === "set-role") {
         if (!isRole(body?.role)) return fail("Choose owner or buyer.");
-        const result = setMemberRole(companyId, email, body.role);
+        const result = await setMemberRole(companyId, email, body.role);
         return result.ok ? done() : fail(result.message, 409);
       }
-      const result = removeMember(companyId, email);
+      const result = await removeMember(companyId, email);
       return result.ok ? done() : fail(result.message, 409);
     }
 
@@ -71,19 +71,19 @@ export async function POST(request: Request) {
       let lines: unknown = body?.lines;
       let source = "Saved from cart";
       if (typeof body?.orderId === "string") {
-        const fromOrder = linesFromOrder(body.orderId, session.user.id);
+        const fromOrder = await linesFromOrder(body.orderId, session.user.id);
         if (!fromOrder) return fail("That order wasn't found in your account.", 404);
         lines = fromOrder;
         source = `Saved from order ${body.orderId}`;
       }
-      const result = saveReorderList({ companyId, name, lines, source, createdBy: me });
+      const result = await saveReorderList({ companyId, name, lines, source, createdBy: me });
       return result.ok ? Response.json({ ok: true, id: result.id }) : fail(result.message);
     }
 
     case "delete-list": {
       if (!isOwner) return fail("Only company owners can delete shared lists.", 403);
       const listId = cleanText(body?.listId, 20);
-      return deleteReorderList(companyId, listId) ? done() : fail("That list wasn't found.", 404);
+      return await deleteReorderList(companyId, listId) ? done() : fail("That list wasn't found.", 404);
     }
 
     default:

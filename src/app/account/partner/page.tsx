@@ -38,7 +38,7 @@ function earningText(p: Project) {
 export default async function AccountPartnerPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
-  const partner = findPartner(session.user.id);
+  const partner = await findPartner(session.user.id);
 
   if (!partner || partner.status === "rejected") {
     return (
@@ -73,7 +73,7 @@ export default async function AccountPartnerPage() {
     );
   }
 
-  const projects = listPartnerProjects(session.user.id);
+  const projects = await listPartnerProjects(session.user.id);
   const open = projects.filter((p) => ["Submitted", "Quoted"].includes(p.status));
   const won = projects.filter((p) => ["Won", "In production", "Delivered", "Paid"].includes(p.status));
   const stats = [

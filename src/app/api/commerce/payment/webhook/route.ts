@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   }
   const payment = event.payload?.payment?.entity;
   if ((event.event === "payment.captured" || event.event === "order.paid") && payment?.order_id && payment.id) {
-    const paid = markOrderPaid(payment.order_id, payment.id);
+    const paid = await markOrderPaid(payment.order_id, payment.id);
     if (paid?.newlyPaid) await afterOrderPaid(paid);
   }
   // Acknowledge every signed event, including ones we don't act on, so Razorpay doesn't retry them.

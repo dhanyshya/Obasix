@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
   if (mode === "real") {
     // Live: save the order unpaid, priced on the server, then open a matching Razorpay order.
-    const result = createDemoOrder({
+    const result = await createDemoOrder({
       idempotencyKey: key,
       userId: session?.user.id ?? null,
       method: "online", // The customer picks UPI, card or netbanking inside Razorpay's checkout.
@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       referralCode,
     });
     if (!result.ok) return invalid(result.message, 422);
-    const record = orderPaymentRecord(result.order.id)!;
+    const record = (await orderPaymentRecord(result.order.id))!;
     if (record.order.paymentStatus === "paid") {
       return Response.json({ ok: true, mode: "real", alreadyPaid: true, order: record.order });
     }
@@ -103,8 +103,8 @@ export async function POST(request: Request) {
           receipt: result.order.id,
           notes: { obasix_order: result.order.id },
         });
-        attachProviderOrder(result.order.id, razorpayOrder.id);
-        providerOrderId = orderPaymentRecord(result.order.id)!.providerOrderId;
+        await attachProviderOrder(result.order.id, razorpayOrder.id);
+        providerOrderId = (await orderPaymentRecord(result.order.id))!.providerOrderId;
       } catch {
         return Response.json(
           commerceUnavailable("payment_failed", "We couldn't start the payment. Nothing was charged. Try again in a moment."),
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
   // Demo mode: the order is stored on this server, priced from the catalogue. No payment is taken.
   const method = clean(body.method, 8) as DemoPaymentMethod;
   if (!demoMethods.includes(method)) return invalid("Choose UPI, Card, or Cash on Delivery.");
-  const result = createDemoOrder({
+  const result = await createDemoOrder({
     idempotencyKey: key,
     userId: session?.user.id ?? null,
     method,
@@ -151,9 +151,9 @@ export async function GET(request: Request) {
   }
   const url = new URL(request.url);
   const id = clean(url.searchParams.get("id"), 40).toUpperCase();
-  const order = id ? findDemoOrderById(id) : null;
+  const order = id ? await findDemoOrderById(id) : null;
   const session = await readSession();
-  const owned = Boolean(order && session && listDemoOrdersForUser(session.user.id).some((o) => o.id === id));
+  const owned = Boolean(order && session && (await listDemoOrdersForUser(session.user.id)).some((o) => o.id === id));
   if (!order || !owned) {
     return Response.json({ ok: false, message: "No order matches that reference." }, { status: 404 });
   }

@@ -12,7 +12,7 @@ import { orderConfirmationEmail, staffNewOrderEmail } from "@/lib/email/template
  */
 export async function afterOrderPaid(input: { order: DemoOrder; referralCode: string | null; userId: string | null }) {
   try {
-    recordOrderCommission({
+    await recordOrderCommission({
       orderId: input.order.id,
       subtotal: input.order.subtotal,
       code: input.referralCode,
@@ -25,7 +25,7 @@ export async function afterOrderPaid(input: { order: DemoOrder; referralCode: st
   // Demo orders are simulations: they don't touch stock, and nobody should get an email about them.
   if (!isDemoOrder(input.order)) {
     try {
-      deductStock(input.order.items, input.order.id);
+      await deductStock(input.order.items, input.order.id);
     } catch {
       // Stock is a guide for staff; a failed update mustn't undo a confirmed payment.
     }

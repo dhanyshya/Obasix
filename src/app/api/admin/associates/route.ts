@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   const action = clean(body?.action, 30);
 
   if (action === "pause" || action === "activate") {
-    const ok = setAssociateStatus(clean(body?.code, 12), action === "pause" ? "paused" : "active");
+    const ok = await setAssociateStatus(clean(body?.code, 12), action === "pause" ? "paused" : "active");
     return ok ? Response.json({ ok: true }) : fail("No associate has that code.", 404);
   }
 
@@ -34,21 +34,21 @@ export async function POST(request: Request) {
     const payoutRef = clean(body?.payoutRef, 60);
     if (ids.length === 0) return fail("Select at least one payable commission.");
     if (payoutRef.length < 3) return fail("Enter the bank transfer or UTR reference for this payout.");
-    const result = markCommissionsPaid(ids, payoutRef);
+    const result = await markCommissionsPaid(ids, payoutRef);
     return Response.json({ ok: true, ...result });
   }
 
   if (action === "void") {
     const reason = clean(body?.reason, 200);
     if (reason.length < 3) return fail("Give a reason for voiding this commission.");
-    return voidCommission(clean(body?.id, 20), reason)
+    return await voidCommission(clean(body?.id, 20), reason)
       ? Response.json({ ok: true })
       : fail("Only unpaid commissions can be voided.", 409);
   }
 
   if (action === "advance-order") {
     if (commerceMode() !== "demo") return fail("Order status is managed by the order system.", 409);
-    const order = advanceDemoOrderStatus(clean(body?.orderId, 40));
+    const order = await advanceDemoOrderStatus(clean(body?.orderId, 40));
     return order ? Response.json({ ok: true, status: order.status }) : fail("No order has that reference.", 404);
   }
 

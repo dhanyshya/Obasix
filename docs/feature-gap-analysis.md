@@ -7,10 +7,9 @@ What stands between the current app and a live production store, in priority ord
 | Gap | Why it matters | What's needed |
 |---|---|---|
 | Razorpay keys not yet added | Live payments are built (Razorpay Standard Checkout with signed callback and webhook, staff order management) but need a merchant account | Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `RAZORPAY_WEBHOOK_SECRET`; point a webhook for `payment.captured` and `order.paid` at `/api/commerce/payment/webhook`. Confirm GST and shipping first: checkout charges the catalogue subtotal only. |
-| No production order store | Demo orders live in a local SQLite file | A managed database such as Postgres, plus an `orders` table with the same shape as `demo_orders`. The `order-store.ts` interface can be kept. |
-| Local SQLite and file storage | Breaks on serverless or multi-instance hosting | Managed Postgres and object storage for quote files |
+| Postgres and Blob not yet provisioned | The site runs on Postgres and private Vercel Blob storage (tested on Postgres 18) but uses the local SQLite file and disk until configured | Create a Neon Postgres database and a private Blob store in Vercel, then set `DATABASE_URL` and `BLOB_READ_WRITE_TOKEN`. Tables are created on first request. See docs/going-live.md. |
 | Resend key not yet added | Email is built (order confirmation and dispatch, password reset, quote and proof notices, staff alerts) but sends nothing until configured | Verify the sending domain in Resend, then set `RESEND_API_KEY`, `EMAIL_FROM` (e.g. `OBASIX <orders@obasix.com>`) and optionally `OBASIX_STAFF_ALERT_EMAILS`. Set `NEXT_PUBLIC_SITE_URL` so links point at the live site. |
-| In-memory rate limits | Don't hold across instances and can be bypassed with a spoofed header | Shared rate limiting using a trusted client IP |
+| In-memory rate limits | Don't hold across instances and can be bypassed with a spoofed `X-Forwarded-For` header (confirmed in testing) | Shared rate limiting using a trusted client IP |
 
 ## P1: completeness
 

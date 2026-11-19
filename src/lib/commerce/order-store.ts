@@ -2,7 +2,7 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 import { getProductById } from "@/data/catalogue";
-import { authDatabase } from "@/lib/auth/db";
+import { ensureSchema } from "@/lib/db";
 import { normalizeCartLines } from "@/lib/auth/cart";
 import type { DemoOrder, DemoOrderAddress, DemoPaymentMethod } from "@/lib/commerce/demo-orders";
 import type { OrderStatus } from "@/lib/commerce/types";
@@ -16,11 +16,9 @@ export const orderStatusFlow: OrderStatus[] = [
   "Delivered",
 ];
 
-let ready = false;
 function db() {
-  const database = authDatabase();
-  if (!ready) {
-    database.exec(`
+  return ensureSchema("orders", async (database) => {
+    await database.exec(`
       CREATE TABLE IF NOT EXISTS demo_orders (
         id TEXT PRIMARY KEY,
         idempotency_key TEXT NOT NULL UNIQUE,
@@ -38,24 +36,18 @@ function db() {
       CREATE INDEX IF NOT EXISTS demo_orders_user ON demo_orders(user_id);
     `);
     // Columns added for live payments. Older rows are demo orders, which count as paid.
-    const columns = new Set((database.prepare("PRAGMA table_info(demo_orders)").all() as { name: string }[]).map((c) => c.name));
-    const add = (name: string, type: string) => {
-      if (!columns.has(name)) database.exec(`ALTER TABLE demo_orders ADD COLUMN ${name} ${type}`);
-    };
-    add("payment_status", "TEXT NOT NULL DEFAULT 'paid'");
-    add("provider_order_id", "TEXT");
-    add("provider_payment_id", "TEXT");
-    add("referral_code", "TEXT");
-    add("paid_at", "TEXT");
-    add("courier", "TEXT");
-    add("tracking_number", "TEXT");
-    add("staff_note", "TEXT");
-    add("updated_by", "TEXT");
-    add("updated_at", "TEXT");
-    database.exec("CREATE UNIQUE INDEX IF NOT EXISTS demo_orders_provider_order ON demo_orders(provider_order_id) WHERE provider_order_id IS NOT NULL");
-    ready = true;
-  }
-  return database;
+    await database.addColumn("demo_orders", "payment_status", "TEXT NOT NULL DEFAULT 'paid'");
+    await database.addColumn("demo_orders", "provider_order_id", "TEXT");
+    await database.addColumn("demo_orders", "provider_payment_id", "TEXT");
+    await database.addColumn("demo_orders", "referral_code", "TEXT");
+    await database.addColumn("demo_orders", "paid_at", "TEXT");
+    await database.addColumn("demo_orders", "courier", "TEXT");
+    await database.addColumn("demo_orders", "tracking_number", "TEXT");
+    await database.addColumn("demo_orders", "staff_note", "TEXT");
+    await database.addColumn("demo_orders", "updated_by", "TEXT");
+    await database.addColumn("demo_orders", "updated_at", "TEXT");
+    await database.exec("CREATE UNIQUE INDEX IF NOT EXISTS demo_orders_provider_order ON demo_orders(provider_order_id) WHERE provider_order_id IS NOT NULL");
+  });
 }
 
 type Row = {
@@ -117,8 +109,8 @@ export type CreateOrderInput = {
 export type CreateOrderResult = { ok: true; order: DemoOrder } | { ok: false; message: string };
 
 /** Prices every line from the server catalogue; custom-size lines are quote-only and rejected. */
-export function createDemoOrder(input: CreateOrderInput): CreateOrderResult {
-  const existing = db().prepare("SELECT * FROM demo_orders WHERE idempotency_key = ?").get(input.idempotencyKey) as Row | undefined;
+export async function createDemoOrder(input: CreateOrderInput): Promise<CreateOrderResult> {
+  const existing = (await (await db()).get("SELECT * FROM demo_orders WHERE idempotency_key = ?", input.idempotencyKey)) as Row | undefined;
   if (existing) return { ok: true, order: toOrder(existing) };
 
   const lines = normalizeCartLines(input.lines);
@@ -143,13 +135,8 @@ export function createDemoOrder(input: CreateOrderInput): CreateOrderResult {
   const id = `${input.pendingPayment ? "OBX" : "OBX-DEMO"}-${randomBytes(4).toString("hex").toUpperCase()}`;
   const createdAt = new Date().toISOString();
 
-  db()
-    .prepare(
-      `INSERT INTO demo_orders (id, idempotency_key, user_id, email, phone, customer_name, method, items, subtotal, status, shipping, created_at, payment_status, referral_code)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(
-      id,
+  (await (await db()).run(`INSERT INTO demo_orders (id, idempotency_key, user_id, email, phone, customer_name, method, items, subtotal, status, shipping, created_at, payment_status, referral_code)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, id,
       input.idempotencyKey,
       input.userId,
       input.email,
@@ -162,13 +149,12 @@ export function createDemoOrder(input: CreateOrderInput): CreateOrderResult {
       JSON.stringify(input.shipping),
       createdAt,
       input.pendingPayment ? "pending" : "paid",
-      input.referralCode ?? null,
-    );
-  return { ok: true, order: findDemoOrderById(id)! };
+      input.referralCode ?? null,));
+  return { ok: true, order: (await findDemoOrderById(id))! };
 }
 
-export function findDemoOrderById(id: string) {
-  const row = db().prepare("SELECT * FROM demo_orders WHERE id = ?").get(id) as Row | undefined;
+export async function findDemoOrderById(id: string) {
+  const row = (await (await db()).get("SELECT * FROM demo_orders WHERE id = ?", id)) as Row | undefined;
   return row ? toOrder(row) : null;
 }
 
@@ -182,53 +168,49 @@ export function contactMatchesOrder(order: DemoOrder, contact: string) {
   return digits.slice(-10) === stored.slice(-10);
 }
 
-export function listDemoOrdersForUser(userId: string) {
-  const rows = db().prepare("SELECT * FROM demo_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 50").all(userId) as Row[];
+export async function listDemoOrdersForUser(userId: string) {
+  const rows = (await (await db()).all("SELECT * FROM demo_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 50", userId)) as Row[];
   return rows.map(toOrder);
 }
 
-export function advanceDemoOrderStatus(id: string) {
-  const order = findDemoOrderById(id);
+export async function advanceDemoOrderStatus(id: string) {
+  const order = await findDemoOrderById(id);
   if (!order) return null;
   const index = orderStatusFlow.indexOf(order.status);
   const next = orderStatusFlow[Math.min(index + 1, orderStatusFlow.length - 1)];
-  db().prepare("UPDATE demo_orders SET status = ? WHERE id = ?").run(next, id);
+  (await (await db()).run("UPDATE demo_orders SET status = ? WHERE id = ?", next, id));
   return { ...order, status: next };
 }
 
 /** Row details the payment routes need but the customer-facing order shape leaves out. */
-export function orderPaymentRecord(id: string) {
-  const row = db().prepare("SELECT * FROM demo_orders WHERE id = ?").get(id) as Row | undefined;
+export async function orderPaymentRecord(id: string) {
+  const row = (await (await db()).get("SELECT * FROM demo_orders WHERE id = ?", id)) as Row | undefined;
   return row
     ? { order: toOrder(row), providerOrderId: row.provider_order_id, referralCode: row.referral_code, userId: row.user_id }
     : null;
 }
 
-export function attachProviderOrder(id: string, providerOrderId: string) {
-  db().prepare("UPDATE demo_orders SET provider_order_id = ? WHERE id = ? AND provider_order_id IS NULL").run(providerOrderId, id);
+export async function attachProviderOrder(id: string, providerOrderId: string) {
+  (await (await db()).run("UPDATE demo_orders SET provider_order_id = ? WHERE id = ? AND provider_order_id IS NULL", providerOrderId, id));
 }
 
 /**
  * Marks an order paid exactly once. Returns newlyPaid=false when it was already
  * paid, so commission and emails run once even if the callback and webhook both arrive.
  */
-export function markOrderPaid(providerOrderId: string, providerPaymentId: string) {
-  const row = db().prepare("SELECT * FROM demo_orders WHERE provider_order_id = ?").get(providerOrderId) as Row | undefined;
+export async function markOrderPaid(providerOrderId: string, providerPaymentId: string) {
+  const row = (await (await db()).get("SELECT * FROM demo_orders WHERE provider_order_id = ?", providerOrderId)) as Row | undefined;
   if (!row) return null;
-  const update = db()
-    .prepare(
-      "UPDATE demo_orders SET payment_status = 'paid', status = 'Payment Confirmed', provider_payment_id = ?, paid_at = ? WHERE id = ? AND payment_status = 'pending'",
-    )
-    .run(providerPaymentId, new Date().toISOString(), row.id);
-  const order = findDemoOrderById(row.id)!;
+  const update = (await (await db()).run("UPDATE demo_orders SET payment_status = 'paid', status = 'Payment Confirmed', provider_payment_id = ?, paid_at = ? WHERE id = ? AND payment_status = 'pending'", providerPaymentId, new Date().toISOString(), row.id));
+  const order = (await findDemoOrderById(row.id))!;
   return { order, newlyPaid: Number(update.changes) === 1, referralCode: row.referral_code, userId: row.user_id };
 }
 
 export type StaffOrder = DemoOrder & { staffNote: string; updatedBy: string | null; providerPaymentId: string | null };
 
 /** Every order, newest first, for the staff screen. */
-export function listAllOrders(limit = 200): StaffOrder[] {
-  const rows = db().prepare("SELECT * FROM demo_orders ORDER BY created_at DESC LIMIT ?").all(limit) as (Row & { provider_payment_id: string | null })[];
+export async function listAllOrders(limit = 200): Promise<StaffOrder[]> {
+  const rows = (await (await db()).all("SELECT * FROM demo_orders ORDER BY created_at DESC LIMIT ?", limit)) as (Row & { provider_payment_id: string | null })[];
   return rows.map((row) => ({ ...toOrder(row), staffNote: row.staff_note ?? "", updatedBy: row.updated_by, providerPaymentId: row.provider_payment_id }));
 }
 
@@ -246,8 +228,8 @@ export function nextStaffStatus(status: string) {
 type StaffResult = { ok: true } | { ok: false; message: string };
 
 /** Moves a paid order one step towards delivery. Dispatch needs the courier and tracking number. */
-export function staffAdvanceOrder(id: string, input: { courier?: string; trackingNumber?: string }, staffEmail: string): StaffResult {
-  const order = findDemoOrderById(id);
+export async function staffAdvanceOrder(id: string, input: { courier?: string; trackingNumber?: string }, staffEmail: string): Promise<StaffResult> {
+  const order = await findDemoOrderById(id);
   if (!order) return { ok: false, message: "No order matches that number." };
   if (order.paymentStatus === "pending") return { ok: false, message: "This order hasn't been paid yet." };
   const next = nextStaffStatus(order.status);
@@ -258,25 +240,19 @@ export function staffAdvanceOrder(id: string, input: { courier?: string; trackin
   const now = new Date().toISOString();
   const update =
     next === "Dispatched"
-      ? db()
-          .prepare("UPDATE demo_orders SET status = ?, courier = ?, tracking_number = ?, updated_by = ?, updated_at = ? WHERE id = ? AND status = ?")
-          .run(next, input.courier!, input.trackingNumber!, staffEmail, now, id, order.status)
-      : db()
-          .prepare("UPDATE demo_orders SET status = ?, updated_by = ?, updated_at = ? WHERE id = ? AND status = ?")
-          .run(next, staffEmail, now, id, order.status);
+      ? (await (await db()).run("UPDATE demo_orders SET status = ?, courier = ?, tracking_number = ?, updated_by = ?, updated_at = ? WHERE id = ? AND status = ?", next, input.courier!, input.trackingNumber!, staffEmail, now, id, order.status))
+      : (await (await db()).run("UPDATE demo_orders SET status = ?, updated_by = ?, updated_at = ? WHERE id = ? AND status = ?", next, staffEmail, now, id, order.status));
   return Number(update.changes) === 1 ? { ok: true } : { ok: false, message: "The order changed meanwhile. Reload and try again." };
 }
 
 /** Cancels an order before it's dispatched. A paid order's refund is issued in the Razorpay dashboard. */
-export function staffCancelOrder(id: string, note: string, staffEmail: string): StaffResult {
-  const order = findDemoOrderById(id);
+export async function staffCancelOrder(id: string, note: string, staffEmail: string): Promise<StaffResult> {
+  const order = await findDemoOrderById(id);
   if (!order) return { ok: false, message: "No order matches that number." };
   if (!["Pending Payment", "Order Placed", "Payment Confirmed", "Processing"].includes(order.status)) {
     return { ok: false, message: "Orders can be cancelled only before dispatch." };
   }
   if (note.length < 5) return { ok: false, message: "Add a note explaining the cancellation." };
-  db()
-    .prepare("UPDATE demo_orders SET status = 'Cancelled', staff_note = ?, updated_by = ?, updated_at = ? WHERE id = ?")
-    .run(note, staffEmail, new Date().toISOString(), id);
+  (await (await db()).run("UPDATE demo_orders SET status = 'Cancelled', staff_note = ?, updated_by = ?, updated_at = ? WHERE id = ?", note, staffEmail, new Date().toISOString(), id));
   return { ok: true };
 }

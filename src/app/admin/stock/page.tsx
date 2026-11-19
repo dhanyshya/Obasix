@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Stock · Staff" };
 
 export default async function AdminStockPage() {
   await requireAdmin(); // Before loading data: see requireAdmin.
-  const levels = new Map(listStock().map((level) => [level.productId, level]));
+  const levels = new Map((await listStock()).map((level) => [level.productId, level]));
   const rows = getAllProducts().map((p) => ({
     id: p.id,
     name: p.shortName,

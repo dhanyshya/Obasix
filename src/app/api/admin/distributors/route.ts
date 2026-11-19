@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(reviewDate)) return fail("Set the next territory review date.");
     }
     if (status !== "approved" && note.length < 3) return fail("Add a note explaining the decision.");
-    const ok = decideDistributor({
+    const ok = await decideDistributor({
       userId: cleanText(body?.userId, 60),
       status,
       tier,
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   if (action === "record-payment" || action === "advance" || action === "cancel") {
     const paymentRef = cleanText(body?.paymentRef, 60);
     if (action === "record-payment" && paymentRef.length < 3) return fail("Enter the payment or UTR reference.");
-    const result = updateTradeOrder({ id: cleanText(body?.orderId, 40), action, paymentRef, staffEmail });
+    const result = await updateTradeOrder({ id: cleanText(body?.orderId, 40), action, paymentRef, staffEmail });
     return result.ok ? Response.json({ ok: true, order: result.order }) : fail(result.message, 409);
   }
 

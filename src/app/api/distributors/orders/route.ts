@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const terms = body?.paymentTerms === "credit" ? "credit" : body?.paymentTerms === "advance" ? "advance" : null;
   if (!terms) return fail("Choose credit or advance payment.");
 
-  const result = placeTradeOrder({
+  const result = await placeTradeOrder({
     userId: session.user.id,
     idempotencyKey: `${session.user.id}:${key}`,
     lines: body?.lines,

@@ -8,5 +8,5 @@ export const metadata: Metadata = { title: "Orders · Staff" };
 
 export default async function AdminOrdersPage() {
   await requireAdmin(); // Before loading data: see requireAdmin.
-  return <OrdersAdmin orders={listAllOrders()} live={commerceMode() === "real"} />;
+  return <OrdersAdmin orders={await listAllOrders()} live={commerceMode() === "real"} />;
 }

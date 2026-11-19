@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const session = await readSession();
   if (!session) return fail("Sign in to apply.", 401);
 
-  const existing = findDistributor(session.user.id);
+  const existing = await findDistributor(session.user.id);
   if (existing && existing.status !== "rejected") return Response.json({ ok: true, distributor: existing });
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   if (territoryRequest.length < 2) return fail("Tell us which area you want to cover.");
   if (body?.accept !== true) return fail("Accept the distributor terms to apply.");
 
-  const distributor = applyAsDistributor({
+  const distributor = await applyAsDistributor({
     userId: session.user.id,
     businessName,
     businessType: businessType as BusinessType,

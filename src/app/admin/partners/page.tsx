@@ -7,5 +7,5 @@ export const metadata: Metadata = { title: "Partners · Staff" };
 
 export default async function AdminPartnersPage() {
   await requireAdmin(); // Before loading data: see requireAdmin.
-  return <PartnersAdmin partners={listPartnerSummaries()} projects={listAllProjects()} />;
+  return <PartnersAdmin partners={await listPartnerSummaries()} projects={await listAllProjects()} />;
 }

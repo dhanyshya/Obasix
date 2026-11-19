@@ -2,7 +2,7 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 import { getProductById } from "@/data/catalogue";
-import { authDatabase } from "@/lib/auth/db";
+import { ensureSchema } from "@/lib/db";
 import {
   financialQuarter,
   minimumTradeOrder,
@@ -18,11 +18,9 @@ import {
  * commission, so one sale can't be paid out through two channels.
  */
 
-let ready = false;
 function db() {
-  const database = authDatabase();
-  if (!ready) {
-    database.exec(`
+  return ensureSchema("distributors", async (database) => {
+    await database.exec(`
       CREATE TABLE IF NOT EXISTS distributors (
         user_id TEXT PRIMARY KEY,
         business_name TEXT NOT NULL,
@@ -61,9 +59,7 @@ function db() {
       );
       CREATE INDEX IF NOT EXISTS distributor_orders_user ON distributor_orders(user_id);
     `);
-    ready = true;
-  }
-  return database;
+  });
 }
 
 export type DistributorStatus = "pending" | "approved" | "rejected" | "suspended";
@@ -133,12 +129,12 @@ function toDistributor(row: DistributorRow): Distributor {
   };
 }
 
-export function findDistributor(userId: string): Distributor | null {
-  const row = db().prepare("SELECT * FROM distributors WHERE user_id = ?").get(userId) as DistributorRow | undefined;
+export async function findDistributor(userId: string): Promise<Distributor | null> {
+  const row = (await (await db()).get("SELECT * FROM distributors WHERE user_id = ?", userId)) as DistributorRow | undefined;
   return row ? toDistributor(row) : null;
 }
 
-export function applyAsDistributor(input: {
+export async function applyAsDistributor(input: {
   userId: string;
   businessName: string;
   businessType: BusinessType;
@@ -147,27 +143,26 @@ export function applyAsDistributor(input: {
   state: string;
   territoryRequest: string;
   notes: string;
-}): Distributor {
-  const existing = findDistributor(input.userId);
+}): Promise<Distributor> {
+  const existing = await findDistributor(input.userId);
   if (existing && existing.status !== "rejected") return existing;
-  db()
-    .prepare(
-      `INSERT OR REPLACE INTO distributors
-        (user_id, business_name, business_type, gstin, city, state, territory_request, notes, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
-    )
-    .run(
-      input.userId,
-      input.businessName,
-      input.businessType,
-      input.gstin,
-      input.city,
-      input.state,
-      input.territoryRequest,
-      input.notes,
-      new Date().toISOString(),
-    );
-  return findDistributor(input.userId)!;
+  // A re-application replaces the rejected row entirely, so tier, credit and notes start fresh.
+  const database = await db();
+  await database.transaction(async (tx) => {
+    await tx.run("DELETE FROM distributors WHERE user_id = ?", input.userId);
+    (await tx.run(`INSERT INTO distributors
+          (user_id, business_name, business_type, gstin, city, state, territory_request, notes, status, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`, input.userId,
+        input.businessName,
+        input.businessType,
+        input.gstin,
+        input.city,
+        input.state,
+        input.territoryRequest,
+        input.notes,
+        new Date().toISOString()));
+  });
+  return (await findDistributor(input.userId))!;
 }
 
 /* ------------------------------------------------------------------ */
@@ -241,23 +236,23 @@ export function tradePrice(listPrice: number, discount: number) {
   return Math.round(listPrice * (1 - discount));
 }
 
-export function listTradeOrders(userId: string): TradeOrder[] {
+export async function listTradeOrders(userId: string): Promise<TradeOrder[]> {
   return (
-    db().prepare("SELECT * FROM distributor_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 100").all(userId) as OrderRow[]
+    (await (await db()).all("SELECT * FROM distributor_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 100", userId)) as OrderRow[]
   ).map(toOrder);
 }
 
 /** Credit in use: unpaid credit orders that haven't been cancelled. */
-export function creditUsed(userId: string) {
-  return listTradeOrders(userId)
+export async function creditUsed(userId: string) {
+  return (await listTradeOrders(userId))
     .filter((o) => o.paymentTerms === "credit" && !o.paidAt && o.status !== "Cancelled")
     .reduce((sum, o) => sum + o.netTotal, 0);
 }
 
 /** Net purchases this financial quarter, for the target. */
-export function quarterPurchases(userId: string, now = new Date()) {
+export async function quarterPurchases(userId: string, now = new Date()) {
   const { start, end } = financialQuarter(now);
-  return listTradeOrders(userId)
+  return (await listTradeOrders(userId))
     .filter((o) => o.status !== "Cancelled")
     .filter((o) => {
       const at = new Date(o.createdAt);
@@ -268,21 +263,21 @@ export function quarterPurchases(userId: string, now = new Date()) {
 
 export type PlaceTradeOrderResult = { ok: true; order: TradeOrder } | { ok: false; message: string };
 
-export function placeTradeOrder(input: {
+export async function placeTradeOrder(input: {
   userId: string;
   idempotencyKey: string;
   lines: unknown;
   paymentTerms: PaymentTerms;
   reference: string;
-}): PlaceTradeOrderResult {
-  const replay = db().prepare("SELECT * FROM distributor_orders WHERE idempotency_key = ?").get(input.idempotencyKey) as
+}): Promise<PlaceTradeOrderResult> {
+  const replay = (await (await db()).get("SELECT * FROM distributor_orders WHERE idempotency_key = ?", input.idempotencyKey)) as
     | OrderRow
     | undefined;
   if (replay) {
     return replay.user_id === input.userId ? { ok: true, order: toOrder(replay) } : { ok: false, message: "Duplicate request." };
   }
 
-  const distributor = findDistributor(input.userId);
+  const distributor = await findDistributor(input.userId);
   if (!distributor || distributor.status !== "approved") {
     return { ok: false, message: "Trade ordering opens once your distributor account is approved." };
   }
@@ -318,7 +313,7 @@ export function placeTradeOrder(input: {
     return { ok: false, message: `The minimum trade order is ₹${minimumTradeOrder.toLocaleString("en-IN")} at trade price.` };
   }
   if (input.paymentTerms === "credit") {
-    const available = distributor.creditLimit - creditUsed(input.userId);
+    const available = distributor.creditLimit - (await creditUsed(input.userId));
     if (netTotal > available) {
       return {
         ok: false,
@@ -328,14 +323,9 @@ export function placeTradeOrder(input: {
   }
 
   const id = `OBX-TRADE-${randomBytes(4).toString("hex").toUpperCase()}`;
-  db()
-    .prepare(
-      `INSERT INTO distributor_orders
+  (await (await db()).run(`INSERT INTO distributor_orders
         (id, user_id, idempotency_key, items, list_subtotal, discount_rate, net_total, payment_terms, status, reference, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(
-      id,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, id,
       input.userId,
       input.idempotencyKey,
       JSON.stringify(items),
@@ -345,9 +335,8 @@ export function placeTradeOrder(input: {
       input.paymentTerms,
       input.paymentTerms === "credit" ? "Confirmed" : "Awaiting payment",
       input.reference,
-      new Date().toISOString(),
-    );
-  const row = db().prepare("SELECT * FROM distributor_orders WHERE id = ?").get(id) as OrderRow;
+      new Date().toISOString(),));
+  const row = (await (await db()).get("SELECT * FROM distributor_orders WHERE id = ?", id)) as OrderRow;
   return { ok: true, order: toOrder(row) };
 }
 
@@ -364,25 +353,23 @@ export type DistributorSummary = Distributor & {
   orderCount: number;
 };
 
-export function listDistributorSummaries(): DistributorSummary[] {
-  const rows = db()
-    .prepare(
-      `SELECT d.*, u.name, u.email, u.phone FROM distributors d JOIN users u ON u.id = d.user_id
-       ORDER BY CASE d.status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'suspended' THEN 2 ELSE 3 END, d.created_at DESC`,
-    )
-    .all() as (DistributorRow & { name: string; email: string; phone: string })[];
-  return rows.map((row) => ({
-    ...toDistributor(row),
-    name: row.name,
-    email: row.email,
-    phone: row.phone,
-    creditUsed: creditUsed(row.user_id),
-    quarterPurchases: quarterPurchases(row.user_id),
-    orderCount: listTradeOrders(row.user_id).length,
-  }));
+export async function listDistributorSummaries(): Promise<DistributorSummary[]> {
+  const rows = (await (await db()).all(`SELECT d.*, u.name, u.email, u.phone FROM distributors d JOIN users u ON u.id = d.user_id
+       ORDER BY CASE d.status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'suspended' THEN 2 ELSE 3 END, d.created_at DESC`)) as (DistributorRow & { name: string; email: string; phone: string })[];
+  return Promise.all(
+    rows.map(async (row) => ({
+      ...toDistributor(row),
+      name: row.name,
+      email: row.email,
+      phone: row.phone,
+      creditUsed: await creditUsed(row.user_id),
+      quarterPurchases: await quarterPurchases(row.user_id),
+      orderCount: (await listTradeOrders(row.user_id)).length,
+    })),
+  );
 }
 
-export function decideDistributor(input: {
+export async function decideDistributor(input: {
   userId: string;
   status: "approved" | "rejected" | "suspended";
   tier: DistributorTierId;
@@ -393,14 +380,9 @@ export function decideDistributor(input: {
   note: string;
   staffEmail: string;
 }) {
-  const result = db()
-    .prepare(
-      `UPDATE distributors SET status = ?, tier = ?, territory = ?, credit_limit = ?, quarterly_target = ?,
+  const result = (await (await db()).run(`UPDATE distributors SET status = ?, tier = ?, territory = ?, credit_limit = ?, quarterly_target = ?,
          review_date = ?, decision_note = ?, decided_at = ?, decided_by = ?
-       WHERE user_id = ?`,
-    )
-    .run(
-      input.status,
+       WHERE user_id = ?`, input.status,
       input.tier,
       input.territory,
       input.creditLimit,
@@ -409,20 +391,15 @@ export function decideDistributor(input: {
       input.note,
       new Date().toISOString(),
       input.staffEmail,
-      input.userId,
-    );
+      input.userId,));
   return Number(result.changes) > 0;
 }
 
 export type AdminTradeOrder = TradeOrder & { businessName: string };
 
-export function listAllTradeOrders(): AdminTradeOrder[] {
-  const rows = db()
-    .prepare(
-      `SELECT o.*, d.business_name FROM distributor_orders o LEFT JOIN distributors d ON d.user_id = o.user_id
-       ORDER BY o.created_at DESC LIMIT 300`,
-    )
-    .all() as (OrderRow & { business_name: string | null })[];
+export async function listAllTradeOrders(): Promise<AdminTradeOrder[]> {
+  const rows = (await (await db()).all(`SELECT o.*, d.business_name FROM distributor_orders o LEFT JOIN distributors d ON d.user_id = o.user_id
+       ORDER BY o.created_at DESC LIMIT 300`)) as (OrderRow & { business_name: string | null })[];
   return rows.map((row) => ({ ...toOrder(row), businessName: row.business_name ?? "Unknown" }));
 }
 
@@ -431,13 +408,13 @@ const nextStatus: Partial<Record<TradeOrderStatus, TradeOrderStatus>> = {
   Dispatched: "Delivered",
 };
 
-export function updateTradeOrder(input: {
+export async function updateTradeOrder(input: {
   id: string;
   action: "record-payment" | "advance" | "cancel";
   paymentRef?: string;
   staffEmail: string;
-}): { ok: true; order: TradeOrder } | { ok: false; message: string } {
-  const row = db().prepare("SELECT * FROM distributor_orders WHERE id = ?").get(input.id) as OrderRow | undefined;
+}): Promise<{ ok: true; order: TradeOrder } | { ok: false; message: string }> {
+  const row = (await (await db()).get("SELECT * FROM distributor_orders WHERE id = ?", input.id)) as OrderRow | undefined;
   if (!row) return { ok: false, message: "No trade order has that reference." };
   const order = toOrder(row);
   const now = new Date().toISOString();
@@ -446,9 +423,7 @@ export function updateTradeOrder(input: {
     if (order.paidAt) return { ok: false, message: "Payment is already recorded for this order." };
     if (order.status === "Cancelled") return { ok: false, message: "This order is cancelled." };
     const status = order.status === "Awaiting payment" ? "Confirmed" : order.status;
-    db()
-      .prepare("UPDATE distributor_orders SET paid_at = ?, payment_ref = ?, status = ?, updated_by = ? WHERE id = ?")
-      .run(now, input.paymentRef ?? "", status, input.staffEmail, order.id);
+    (await (await db()).run("UPDATE distributor_orders SET paid_at = ?, payment_ref = ?, status = ?, updated_by = ? WHERE id = ?", now, input.paymentRef ?? "", status, input.staffEmail, order.id));
   } else if (input.action === "advance") {
     const next = nextStatus[order.status];
     if (!next) {
@@ -457,14 +432,14 @@ export function updateTradeOrder(input: {
         message: order.status === "Awaiting payment" ? "Record the advance payment before dispatch." : "This order can't move forward.",
       };
     }
-    db().prepare("UPDATE distributor_orders SET status = ?, updated_by = ? WHERE id = ?").run(next, input.staffEmail, order.id);
+    (await (await db()).run("UPDATE distributor_orders SET status = ?, updated_by = ? WHERE id = ?", next, input.staffEmail, order.id));
   } else {
     if (order.status === "Dispatched" || order.status === "Delivered") {
       return { ok: false, message: "Dispatched orders can't be cancelled here. Raise a return instead." };
     }
     if (order.status === "Cancelled") return { ok: false, message: "This order is already cancelled." };
-    db().prepare("UPDATE distributor_orders SET status = 'Cancelled', updated_by = ? WHERE id = ?").run(input.staffEmail, order.id);
+    (await (await db()).run("UPDATE distributor_orders SET status = 'Cancelled', updated_by = ? WHERE id = ?", input.staffEmail, order.id));
   }
-  const updated = db().prepare("SELECT * FROM distributor_orders WHERE id = ?").get(order.id) as OrderRow;
+  const updated = (await (await db()).get("SELECT * FROM distributor_orders WHERE id = ?", order.id)) as OrderRow;
   return { ok: true, order: toOrder(updated) };
 }

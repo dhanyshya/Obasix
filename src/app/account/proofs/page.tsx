@@ -24,8 +24,7 @@ export default async function AccountProofsPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
   const references = [...(await quoteReferencesForCustomer(session.user.id, session.user.email))];
-  const threads = references
-    .map((reference) => ({ reference, proofs: listProofsForQuote(reference) }))
+  const threads = (await Promise.all(references.map(async (reference) => ({ reference, proofs: await listProofsForQuote(reference) }))))
     .filter((thread) => thread.proofs.length > 0)
     .sort((a, b) => b.proofs[0].createdAt.localeCompare(a.proofs[0].createdAt));
 

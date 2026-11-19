@@ -39,7 +39,7 @@ export default async function AdminQuotesPage({ searchParams }: { searchParams: 
 
   // Latest proof per quote.
   const latestProof = new Map<string, Proof>();
-  for (const proof of listAllProofs(1000)) {
+  for (const proof of await listAllProofs(1000)) {
     const current = latestProof.get(proof.quoteReference);
     if (!current || proof.version > current.version) latestProof.set(proof.quoteReference, proof);
   }

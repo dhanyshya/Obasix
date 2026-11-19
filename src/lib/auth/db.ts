@@ -1,19 +1,11 @@
 import "server-only";
 
-import { mkdirSync } from "node:fs";
-import path from "node:path";
-import { DatabaseSync } from "node:sqlite";
+import { ensureSchema } from "@/lib/db";
 
-const databasePath = process.env.OBASIX_AUTH_DB || path.join(process.cwd(), ".data", "auth.sqlite");
-
-let database: DatabaseSync | null = null;
-
-export function authDatabase() {
-  if (database) return database;
-  mkdirSync(path.dirname(databasePath), { recursive: true });
-  database = new DatabaseSync(databasePath);
-  database.exec("PRAGMA journal_mode = WAL;");
-  database.exec(`
+/** Accounts, sessions, carts and wishlists. Returns the database once these tables exist. */
+export function authDb() {
+  return ensureSchema("auth", async (db) => {
+    await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       email TEXT NOT NULL UNIQUE,
@@ -27,13 +19,13 @@ export function authDatabase() {
     CREATE TABLE IF NOT EXISTS sessions (
       token_hash TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
-      expires_at INTEGER NOT NULL
+      expires_at BIGINT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS password_resets (
       token_hash TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
-      expires_at INTEGER NOT NULL,
-      used_at INTEGER
+      expires_at BIGINT NOT NULL,
+      used_at BIGINT
     );
     CREATE TABLE IF NOT EXISTS addresses (
       id TEXT PRIMARY KEY,
@@ -68,7 +60,7 @@ export function authDatabase() {
       payload TEXT NOT NULL
     );
   `);
-  return database;
+  });
 }
 
 export function authConfigured() {

@@ -63,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- refresh() only sets state after awaiting the session fetch
     void refresh();
     // The saved account is loaded once. Later cart edits are saved separately.
     // eslint-disable-next-line react-hooks/exhaustive-deps

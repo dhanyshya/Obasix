@@ -52,13 +52,14 @@ export function WallOverlayCanvas({
     origin: OverlayTransform;
   } | null>(null);
   const [dragging, setDragging] = useState(false);
-  const [boardSrcState, setBoardSrcState] = useState<string | null | undefined>(undefined);
+  // The isolated image, tagged with the source it was made from; a different source means "still preparing".
+  const [isolated, setIsolated] = useState<{ from: string; url: string | null } | null>(null);
+  const boardSrcState = isolated && isolated.from === boardSrc ? isolated.url : undefined;
 
   useEffect(() => {
     let cancelled = false;
-    setBoardSrcState(undefined);
     isolateBoardImage(boardSrc).then((url) => {
-      if (!cancelled) setBoardSrcState(url);
+      if (!cancelled) setIsolated({ from: boardSrc, url });
     });
     return () => {
       cancelled = true;
@@ -217,7 +218,7 @@ export function WallOverlayCanvas({
               src={boardSrcState}
               alt={boardAlt}
               draggable={false}
-              onError={() => setBoardSrcState(null)}
+              onError={() => setIsolated({ from: boardSrc, url: null })}
               style={{
                 display: "block",
                 width: "100%",

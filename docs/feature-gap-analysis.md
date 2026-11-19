@@ -19,7 +19,7 @@ What stands between the current app and a live production store, in priority ord
 - **Stock and availability:** obasix.com has pre-order items, but the app has no stock model. The app never claims something is in stock.
 - **Tax and shipping:** checkout shows a catalogue subtotal only. GST and shipping rules need to be confirmed with OBASIX.
 - **Promotions:** OBASIX5 and the sale terms are unverified, so they are not implemented.
-- **Lint debt:** 15 React Compiler errors (setState in effects).
+- **Lint debt:** resolved. The React Compiler errors are fixed; six effects that restore state from browser storage after hydration keep a commented rule exception. Four unused style constants remain as warnings.
 
 ## P2: experience
 

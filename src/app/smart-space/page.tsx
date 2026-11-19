@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -21,10 +21,13 @@ function SmartSpaceContent() {
   const searchParams = useSearchParams();
   const [spaceId, setSpaceId] = useState(searchParams.get("space") ?? "");
 
-  useEffect(() => {
-    const q = searchParams.get("space");
-    if (q) setSpaceId(q);
-  }, [searchParams]);
+  // Follow ?space= when the URL changes (adjusting state during render, not in an effect).
+  const spaceParam = searchParams.get("space");
+  const [lastSpaceParam, setLastSpaceParam] = useState(spaceParam);
+  if (spaceParam !== lastSpaceParam) {
+    setLastSpaceParam(spaceParam);
+    if (spaceParam) setSpaceId(spaceParam);
+  }
 
   const space = getSpaceById(spaceId);
   const recommended = useMemo(

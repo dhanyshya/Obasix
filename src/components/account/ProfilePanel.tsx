@@ -33,11 +33,17 @@ export function ProfilePanel() {
   const [postal, setPostal] = useState("");
   const [country, setCountry] = useState("India");
 
-  useEffect(() => {
-    if (!user) return;
+  // Fill the form when the signed-in user loads or changes.
+  const [filledFor, setFilledFor] = useState<typeof user>(null);
+  if (user && user !== filledFor) {
+    setFilledFor(user);
     setName(user.name);
     setPhone(user.phone);
     setCompany(user.company);
+  }
+
+  useEffect(() => {
+    if (!user) return;
     void fetch("/api/account")
       .then((response) => response.json())
       .then((data) => setAddresses(data.addresses ?? []));

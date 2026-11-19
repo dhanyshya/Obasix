@@ -152,15 +152,14 @@ export function ProductConfigurator({
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [boardPickerOpen, setBoardPickerOpen] = useState(false);
 
-  useEffect(() => {
-    if (!product) return;
-    setAccessoryIds((ids) => ids.filter((id) => product.accessories.includes(id)));
-  }, [product]);
-
-  useEffect(() => {
+  // A different board: drop accessories it doesn't take and start again at the size step.
+  const [configuredFor, setConfiguredFor] = useState(state.productId);
+  if (configuredFor !== state.productId) {
+    setConfiguredFor(state.productId);
     setBoardPickerOpen(false);
     setStep("size");
-  }, [state.productId]);
+    if (product) setAccessoryIds((ids) => ids.filter((id) => product.accessories.includes(id)));
+  }
 
   if (!product || !product.customizable) {
     return null;

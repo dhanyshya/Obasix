@@ -149,6 +149,7 @@ export function SpaceVisualizer() {
           item.sku === urlProductId,
       );
       if (match) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restores the saved preview from localStorage once, after hydration
         chooseProduct(match, urlSizeId);
         setReached(1);
         setStep("upload");

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import ButtonBase from "@mui/material/ButtonBase";
@@ -14,7 +14,6 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import type { SxProps, Theme } from "@mui/material/styles";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckIcon from "@mui/icons-material/Check";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
@@ -177,24 +176,18 @@ export function WallStudio({ wall }: { wall: WallModel }) {
     relatedProducts.some((item) => item.id === id),
   );
 
-  const availableFrames = useMemo(() => {
-    if (!product) return frames;
-    const productFrame = product.frame;
-    return frames.filter((item) => {
-      if (item.id === productFrame) return true;
-      return visualizeFrameGroups.some((group) =>
-        (group.frameIds as readonly string[]).includes(item.id),
+  const availableFrames = !product
+    ? frames
+    : frames.filter(
+        (item) =>
+          item.id === product.frame ||
+          visualizeFrameGroups.some((group) => (group.frameIds as readonly string[]).includes(item.id)),
       );
-    });
-  }, [product]);
 
-  const layoutFeatures = useMemo(() => {
-    const boardType = product?.boardType ?? "magnetic-whiteboard";
-    return featureOptions.filter(
-      (feature) =>
-        feature.id !== "logo-branding" && feature.boardTypes.includes(boardType),
-    );
-  }, [product]);
+  const boardType = product?.boardType ?? "magnetic-whiteboard";
+  const layoutFeatures = featureOptions.filter(
+    (feature) => feature.id !== "logo-branding" && feature.boardTypes.includes(boardType),
+  );
 
   const accessoryTotal = selectedRelatedIds.reduce((sum, id) => {
     return sum + (getProductById(id)?.price ?? 0);
@@ -341,6 +334,7 @@ export function WallStudio({ wall }: { wall: WallModel }) {
       if (raw) {
         const parsed = JSON.parse(raw) as VisualizeState;
         if (parsed.wallId === wall.id) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect -- restores the saved wall design from localStorage, after hydration
           setState(parsed);
           setBoardPlaced(true);
         }

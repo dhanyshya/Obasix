@@ -44,6 +44,34 @@ const methods: { id: DemoPaymentMethod; label: string }[] = [
   { id: "cod", label: "Cash on Delivery" },
 ];
 
+type LiveOrderResponse = {
+  ok: boolean;
+  message?: string;
+  alreadyPaid?: boolean;
+  order?: DemoOrder;
+  razorpay?: { keyId: string; orderId: string; amount: number; currency: string; prefill: { name: string; email: string; contact: string } };
+};
+
+type RazorpayPayment = { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string };
+type RazorpayCheckout = { open: () => void; on: (event: "payment.failed", cb: (failure: { error?: { description?: string } }) => void) => void };
+declare global {
+  interface Window {
+    Razorpay?: new (options: Record<string, unknown> & { handler: (payment: RazorpayPayment) => void }) => RazorpayCheckout;
+  }
+}
+
+/** Razorpay's checkout script, loaded only when the customer starts paying. */
+function loadRazorpay(): Promise<void> {
+  if (window.Razorpay) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Razorpay checkout failed to load"));
+    document.body.appendChild(script);
+  });
+}
+
 function isQuoted(item: CartItem) {
   return item.configuration.customWidthFt != null && item.configuration.customHeightFt != null;
 }
@@ -76,32 +104,75 @@ export function PaymentExperience() {
     };
   }, []);
 
+  /** Live checkout: the server prices and saves the order, then Razorpay's window takes the payment. */
   const startPayment = async () => {
-    if (!draft || mode === "demo") return;
+    if (!draft || mode !== "real") return;
     setAttempt("loading");
     setResult(null);
+    const fail = (message: string): void => {
+      setResult({ ok: false, code: "payment_failed", charged: false, orderCreated: false, message });
+      setAttempt("blocked");
+    };
     try {
-      const response = await fetch("/api/commerce/payment", {
+      const response = await fetch("/api/commerce/orders", {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "idempotency-key": draft.idempotencyKey,
+        headers: { "content-type": "application/json", "idempotency-key": draft.idempotencyKey },
+        body: JSON.stringify({
+          details: { name: draft.details.name, email: draft.details.email, phone: draft.details.phone, shipping: draft.details.shipping },
+          lines: priced.map((item) => ({ productId: item.productId, quantity: item.quantity, configuration: item.configuration })),
+        }),
+      });
+      const body = (await response.json()) as LiveOrderResponse;
+      if (!response.ok || !body.ok || !body.order) return fail(body.message ?? "We couldn't start the payment. Nothing was charged.");
+      if (body.alreadyPaid) return finish(body.order);
+      if (!body.razorpay) return fail("We couldn't start the payment. Nothing was charged.");
+      await loadRazorpay();
+      const order = body.order;
+      const checkout = new window.Razorpay!({
+        key: body.razorpay.keyId,
+        order_id: body.razorpay.orderId,
+        amount: body.razorpay.amount,
+        currency: body.razorpay.currency,
+        name: "OBASIX",
+        description: `Order ${order.id}`,
+        prefill: body.razorpay.prefill,
+        theme: { color: "#164E3B" },
+        handler: async (payment) => {
+          setAttempt("loading");
+          try {
+            const confirm = await fetch("/api/commerce/payment", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ orderId: order.id, ...payment }),
+            });
+            const confirmed = (await confirm.json()) as { ok: boolean; order?: DemoOrder; message?: string };
+            if (!confirm.ok || !confirmed.ok || !confirmed.order) {
+              return fail(confirmed.message ?? `We couldn't confirm the payment. If money left your account, contact us with order ${order.id}.`);
+            }
+            finish(confirmed.order);
+          } catch {
+            fail(`We couldn't confirm the payment. If money left your account, it will be matched to order ${order.id} automatically.`);
+          }
         },
-        body: JSON.stringify({ idempotencyKey: draft.idempotencyKey }),
+        modal: {
+          ondismiss: () => {
+            setAttempt("cancelled");
+          },
+        },
       });
-      const body = (await response.json()) as CommerceResponse;
-      setResult(body);
-      setAttempt("blocked");
+      checkout.on("payment.failed", (failure) => {
+        fail(`Payment failed: ${failure.error?.description ?? "the bank declined it"}. Nothing was charged. You can try again.`);
+      });
+      checkout.open();
     } catch {
-      setResult({
-        ok: false,
-        code: "provider_not_configured",
-        charged: false,
-        orderCreated: false,
-        message: "Payment could not be reached. Nothing was charged.",
-      });
-      setAttempt("blocked");
+      fail("Payment could not be reached. Nothing was charged.");
     }
+  };
+
+  const finish = (order: DemoOrder) => {
+    rememberDemoOrder(order);
+    clearCart();
+    router.push(`/checkout/confirmation?order=${order.id}`);
   };
 
   const simulateSuccess = async () => {
@@ -150,7 +221,7 @@ export function PaymentExperience() {
         lede={
           mode === "demo"
             ? "DEMO MODE — NO REAL PAYMENT. This simulation does not charge a card, send your details, or place an order."
-            : "Card details are not collected here. A payment starts only after the server verifies a provider."
+            : "You pay securely in Razorpay's window by UPI, card or netbanking. OBASIX never sees your card details."
         }
       >
         <PurchaseSteps current={1} />
@@ -258,14 +329,14 @@ export function PaymentExperience() {
                   Ready to pay
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {draft?.details.name} · {draft?.details.email} · {itemCount} {itemCount === 1 ? "item" : "items"} · catalogue subtotal shown in the summary.
+                  {draft?.details.name} · {draft?.details.email} · {itemCount} {itemCount === 1 ? "item" : "items"}.
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5, lineHeight: 1.65 }}>
                   Shipping and tax still need confirmation. They are not added to this amount.
                 </Typography>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
                   <Button variant="contained" onClick={startPayment} disabled={attempt === "loading"}>
-                    {attempt === "loading" ? "Checking payment" : "Continue to payment"}
+                    {attempt === "loading" ? "Opening payment…" : `Pay ${formatPrice(catalogueSubtotal)}`}
                   </Button>
                   <Button
                     variant="outlined"
@@ -280,7 +351,7 @@ export function PaymentExperience() {
                 </Stack>
                 {attempt === "cancelled" ? (
                   <Alert severity="info" role="status" sx={{ mt: 2.5 }}>
-                    Payment was cancelled before a provider was contacted. Nothing was charged.
+                    Payment window closed. Nothing was charged. Your order is saved, so you can pay when you&apos;re ready.
                   </Alert>
                 ) : null}
                 {result ? (
@@ -294,7 +365,6 @@ export function PaymentExperience() {
                     }
                   >
                     <AlertTitle>{result.message}</AlertTitle>
-                    Charged: no. Order created: no.
                     {result.required ? (
                       <Box component="span" sx={{ display: "block", mt: 0.5 }}>
                         Server settings still required: {result.required.join(", ")}.

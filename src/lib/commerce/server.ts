@@ -11,6 +11,7 @@ export function commerceUnavailable(code: CommerceResponse["code"], message: str
     charged: false,
     orderCreated: false,
     message,
-    required: [...commerceRequirements],
+    // Only worth telling the browser when payment isn't set up at all.
+    ...(code === "provider_not_configured" ? { required: [...commerceRequirements] } : {}),
   };
 }

@@ -8,7 +8,7 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "@/components/Link";
-import { demoPaymentMethodLabel, type DemoOrder } from "@/lib/commerce/demo-orders";
+import { demoPaymentMethodLabel, isDemoOrder, type DemoOrder } from "@/lib/commerce/demo-orders";
 import { formatPrice } from "@/lib/format";
 
 type State =
@@ -55,7 +55,7 @@ export function OrdersPanel() {
       {state.kind === "ready" && state.available ? (
         <>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5, maxWidth: 620 }}>
-            Demo mode: these orders were placed while signed in on this server. No payment was taken.
+            Orders placed while signed in to this account. Orders marked Demo were simulations; no payment was taken for them.
           </Typography>
           {state.orders.length === 0 ? (
             <Box sx={{ mt: 3 }}>
@@ -72,8 +72,8 @@ export function OrdersPanel() {
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
                       {order.id}
                     </Typography>
-                    <Chip size="small" label={order.status} color="success" variant="outlined" />
-                    <Chip size="small" label="Demo" variant="outlined" />
+                    <Chip size="small" label={order.status} color={order.paymentStatus === "pending" ? "warning" : "success"} variant="outlined" />
+                    {isDemoOrder(order) ? <Chip size="small" label="Demo" variant="outlined" /> : null}
                   </Stack>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
                     {order.createdAt?.slice(0, 10)} · {demoPaymentMethodLabel[order.method]} ·{" "}

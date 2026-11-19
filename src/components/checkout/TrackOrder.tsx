@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import type { DemoOrder } from "@/lib/commerce/demo-orders";
+import { isDemoOrder, type DemoOrder } from "@/lib/commerce/demo-orders";
 import { formatPrice } from "@/lib/format";
 import type { CommerceResponse } from "@/lib/commerce/types";
 
@@ -116,9 +116,11 @@ export function TrackOrder() {
       ) : null}
       {demo ? (
         <Alert severity="success" icon={false} role="status" sx={{ mt: 2, alignItems: "flex-start" }}>
-          <Typography variant="overline" sx={{ display: "block", lineHeight: 1.6 }}>
-            DEMO MODE — NO REAL PAYMENT
-          </Typography>
+          {isDemoOrder(demo) ? (
+            <Typography variant="overline" sx={{ display: "block", lineHeight: 1.6 }}>
+              DEMO MODE — NO REAL PAYMENT
+            </Typography>
+          ) : null}
           <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>
             {demo.id}
           </Typography>
@@ -136,9 +138,13 @@ export function TrackOrder() {
             Catalogue subtotal {formatPrice(demo.subtotal)}
           </Typography>
           <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
-            Courier, tracking number, and delivery date are not available for this demo.
+            {isDemoOrder(demo)
+              ? "Courier, tracking number, and delivery date are not available for this demo."
+              : demo.trackingNumber
+                ? `Shipped with ${demo.courier}. Tracking number: ${demo.trackingNumber}.`
+                : "We'll email you the courier and tracking number when your order is dispatched."}
           </Typography>
-          {demo.status !== "Delivered" ? (
+          {isDemoOrder(demo) && demo.status !== "Delivered" ? (
             <Button
               variant="outlined"
               size="small"

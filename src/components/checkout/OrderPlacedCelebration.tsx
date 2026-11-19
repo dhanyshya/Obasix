@@ -27,6 +27,7 @@ import { Confetti } from "@/components/checkout/Confetti";
 import {
   completedTimelineSteps,
   demoPaymentMethodLabel,
+  isDemoOrder,
   orderTimelineSteps,
   type DemoOrder,
 } from "@/lib/commerce/demo-orders";
@@ -137,8 +138,9 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
   const dateLabel = formatDate(order.createdAt);
   const timeLabel = formatTime(order.createdAt);
   const addressLines = formatAddress(order);
+  const demo = isDemoOrder(order);
   const paymentStatus =
-    order.paymentStatus === "paid" ? "Paid · Demo simulation" : "Awaiting confirmation";
+    order.paymentStatus === "pending" ? "Awaiting payment" : demo ? "Paid · Demo simulation" : "Paid";
 
   return (
     <Box
@@ -289,6 +291,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
         </Box>
 
         {/* ——— Demo notice ——— */}
+        {demo ? (
         <Box
           component="aside"
           role="note"
@@ -315,6 +318,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
             service.
           </Typography>
         </Box>
+        ) : null}
 
         {/* ——— Order details card ——— */}
         <Box
@@ -406,7 +410,7 @@ export function OrderPlacedCelebration({ order }: { order: DemoOrder }) {
                 </Typography>
               ) : (
                 <Typography sx={{ ...valueSx, fontWeight: 500, color: brandTokens.muted }}>
-                  Address not recorded for this demo order.
+                  Address not recorded for this order.
                 </Typography>
               )}
             </Grid>

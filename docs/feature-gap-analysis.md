@@ -6,7 +6,7 @@ What stands between the current app and a live production store, in priority ord
 
 | Gap | Why it matters | What's needed |
 |---|---|---|
-| No payment provider | No real orders can be paid | Integrate a payment gateway such as Razorpay or Cashfree in `/api/commerce/payment`. Verify the webhook signature with `PAYMENT_WEBHOOK_SECRET`. Mark an order paid only from the webhook. |
+| Razorpay keys not yet added | Live payments are built (Razorpay Standard Checkout with signed callback and webhook, staff order management) but need a merchant account | Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `RAZORPAY_WEBHOOK_SECRET`; point a webhook for `payment.captured` and `order.paid` at `/api/commerce/payment/webhook`. Confirm GST and shipping first: checkout charges the catalogue subtotal only. |
 | No production order store | Demo orders live in a local SQLite file | A managed database such as Postgres, plus an `orders` table with the same shape as `demo_orders`. The `order-store.ts` interface can be kept. |
 | Local SQLite and file storage | Breaks on serverless or multi-instance hosting | Managed Postgres and object storage for quote files |
 | No email provider | No password reset, quote alerts or order confirmations in production | A transactional email service |

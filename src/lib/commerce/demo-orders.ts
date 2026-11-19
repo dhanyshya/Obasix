@@ -3,7 +3,7 @@ import type { CartConfiguration } from "@/lib/types";
 
 const STORAGE_KEY = "obasix-demo-orders";
 
-export type DemoPaymentMethod = "upi" | "card" | "cod";
+export type DemoPaymentMethod = "upi" | "card" | "cod" | "online";
 
 export type DemoOrderItem = {
   productId: string;
@@ -35,13 +35,19 @@ export type DemoOrder = {
   createdAt?: string;
   customerName?: string;
   shippingAddress?: DemoOrderAddress;
-  paymentStatus?: "paid";
+  paymentStatus?: "paid" | "pending";
+  courier?: string;
+  trackingNumber?: string;
 };
+
+/** Demo orders are simulations; live orders (paid through Razorpay) have plain OBX- numbers. */
+export const isDemoOrder = (order: Pick<DemoOrder, "id">) => order.id.startsWith("OBX-DEMO-");
 
 export const demoPaymentMethodLabel: Record<DemoPaymentMethod, string> = {
   upi: "UPI",
   card: "Card",
   cod: "Cash on Delivery",
+  online: "Online (Razorpay)",
 };
 
 export const orderTimelineSteps = [

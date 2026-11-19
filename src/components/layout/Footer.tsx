@@ -14,6 +14,7 @@ const columns = [
       { href: "/solutions", label: "Spaces" },
       { href: "/kits", label: "Solution Kits" },
       { href: "/materials", label: "Glass, Felt & Fabric" },
+      { href: "/planning", label: "Planning Boards" },
       { href: "/signage", label: "Nameplates & Signage" },
       { href: "/customize", label: "Customise" },
       { href: "/visualize", label: "Visualise" },

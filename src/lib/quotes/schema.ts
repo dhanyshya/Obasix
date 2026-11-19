@@ -10,6 +10,9 @@ export const quoteBoardTypes = [
   "Pin-up Board",
   "Combination Board",
   "Chalk Board",
+  "Glass Board",
+  "Felt Pin-up Board",
+  "Fabric Pin-up Board",
   "Custom Board",
   "Nameplate / Signage",
 ] as const;

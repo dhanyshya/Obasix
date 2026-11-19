@@ -6,7 +6,7 @@ import { siteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticPaths = ["", "/products", "/customize", "/signage", "/signage/design", "/associates", "/distributors", "/partners", "/visualize", "/smart-space", "/solutions", "/kits", "/kits/workplace", "/kits/education", "/kits/residential", "/quote", "/about", "/orders/track"];
+  const staticPaths = ["", "/products", "/customize", "/signage", "/signage/design", "/associates", "/distributors", "/partners", "/visualize", "/smart-space", "/solutions", "/kits", "/kits/workplace", "/kits/education", "/kits/residential", "/materials", "/materials/glass", "/materials/felt", "/materials/fabric", "/quote", "/about", "/orders/track"];
   return [
     ...staticPaths.map((path) => ({ url: `${siteUrl}${path}`, lastModified: now, priority: path === "" ? 1 : 0.7 })),
     ...getAllProducts().map((product) => ({ url: `${siteUrl}/products/${product.id}`, lastModified: now, priority: 0.8 })),

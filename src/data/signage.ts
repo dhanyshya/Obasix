@@ -9,6 +9,8 @@
  * engineer's review.
  */
 
+import { dominantScript, getTypesetLanguage, graphemeCount, scriptFontStack, scriptsIn, unsupportedCharacters } from "@/data/scripts";
+
 export type SignFamilyId = "home" | "office" | "building";
 
 export type SignMaterialId =
@@ -208,19 +210,19 @@ export const signFonts: { id: SignFontId; name: string; stack: string; weight: n
   {
     id: "modern",
     name: "Modern",
-    stack: "var(--font-display), var(--font-deva), 'Noto Sans Devanagari', Helvetica Neue, sans-serif",
+    stack: `var(--font-display), ${scriptFontStack}, Helvetica Neue, sans-serif`,
     weight: 500,
   },
   {
     id: "classic",
     name: "Classic serif",
-    stack: "Georgia, 'Times New Roman', var(--font-deva), 'Noto Sans Devanagari', serif",
+    stack: `Georgia, 'Times New Roman', ${scriptFontStack}, serif`,
     weight: 400,
   },
   {
     id: "bold",
     name: "Bold",
-    stack: "var(--font-display), var(--font-deva), 'Noto Sans Devanagari', Helvetica Neue, sans-serif",
+    stack: `var(--font-display), ${scriptFontStack}, Helvetica Neue, sans-serif`,
     weight: 700,
   },
 ];
@@ -500,6 +502,8 @@ export interface SignDesign {
   outdoor: boolean;
   quantity: number;
   notes: string;
+  /** Ask our typesetter to add a line in this language (e.g. "Hindi"); empty for none. */
+  typesetLanguage: string;
 }
 
 export function defaultDesign(type: SignType): SignDesign {
@@ -516,18 +520,18 @@ export function defaultDesign(type: SignType): SignDesign {
     outdoor: type.outdoorByDefault && material.outdoor,
     quantity: type.typicalQuantity,
     notes: "",
+    typesetLanguage: "",
   };
 }
 
-/** Rough advance width of a glyph as a share of the font size. */
-const GLYPH_WIDTH = 0.56;
-const LINE_GAP = 1.3;
 
 export interface SignTextLayout {
   /** Font size for each line, in cm. Roughly cap height ×1.4. */
   sizes: number[];
   /** Smallest cap height on the plate, in cm. */
   smallestCapCm: number;
+  /** Line height of each line as a multiple of its font size (taller for Indian scripts). */
+  lineGaps: number[];
 }
 
 /** Relative size of each line: the first line leads, the rest follow. */
@@ -540,21 +544,23 @@ export function lineRatios(layout: SignLayout, count: number): number[] {
 /** Fit the lines inside the plate's safe area. Shared by the preview and the rules. */
 export function layoutText(type: SignType, design: SignDesign): SignTextLayout {
   const lines = design.lines.map((l) => l.trim()).filter(Boolean);
-  if (lines.length === 0) return { sizes: [], smallestCapCm: 0 };
+  if (lines.length === 0) return { sizes: [], smallestCapCm: 0, lineGaps: [] };
+  const scripts = lines.map(dominantScript);
+  const lineGaps = scripts.map((script) => script.lineGap);
   const ratios = lineRatios(type.layout, lines.length);
   const pad = type.layout === "directory" ? 0.12 : 0.1;
   const availW = design.widthCm * (1 - pad * 2);
   const plateH = design.heightCm;
   const availH = plateH * (1 - pad * 2) * (type.layout === "directory" ? 0.92 : 1);
 
-  const byHeight = availH / ratios.reduce((sum, r) => sum + r * LINE_GAP, 0);
+  const byHeight = availH / ratios.reduce((sum, r, i) => sum + r * lineGaps[i], 0);
   const byWidth = Math.min(
-    ...lines.map((line, i) => availW / (Math.max(line.length, 1) * GLYPH_WIDTH * ratios[i])),
+    ...lines.map((line, i) => availW / (Math.max(graphemeCount(line), 1) * scripts[i].glyphWidth * ratios[i])),
   );
   const cap = type.layout === "number" ? 0.75 : 0.6;
   const base = Math.min(byHeight, byWidth, plateH * cap);
   const sizes = ratios.map((r) => base * r);
-  return { sizes, smallestCapCm: Math.min(...sizes) * 0.7 };
+  return { sizes, smallestCapCm: Math.min(...sizes) * 0.7, lineGaps };
 }
 
 export type RuleLevel = "error" | "warning" | "info";
@@ -631,6 +637,16 @@ export function checkDesign(type: SignType, design: SignDesign): SignCheck {
   if (lines.length === 0) {
     results.push({ level: "error", message: "Add the text for your sign." });
   } else {
+    const bad = [...new Set(lines.flatMap(unsupportedCharacters))];
+    if (bad.length > 0) {
+      results.push({
+        level: "error",
+        message: `We can't letter ${bad.slice(0, 5).map((c) => `“${c}”`).join(" ")}. Use English or an Indian script; put logos and symbols in the notes.`,
+      });
+    }
+    if (lines.some((line) => scriptsIn(line).length > 1)) {
+      results.push({ level: "warning", message: "One line mixes two scripts. Bilingual signs read better with each language on its own line." });
+    }
     const { smallestCapCm } = layoutText(type, design);
     if (smallestCapCm < type.minLetterCm) {
       results.push({
@@ -639,13 +655,30 @@ export function checkDesign(type: SignType, design: SignDesign): SignCheck {
       });
     }
     if (design.letteringId === "raised-metal" || design.letteringId === "raised-acrylic") {
-      if (smallestCapCm < 1.5) {
+      const fussiest = lines.map(dominantScript).reduce((a, b) => (b.minRaisedCm > a.minRaisedCm ? b : a));
+      if (smallestCapCm < fussiest.minRaisedCm) {
         results.push({
           level: "warning",
-          message: "Raised letters under 1.5 cm are fragile. Engraving or UV print suits small text better.",
+          message:
+            fussiest.id === "latin"
+              ? "Raised letters under 1.5 cm are fragile. Engraving or UV print suits small text better."
+              : `Raised ${fussiest.name} letters under ${fussiest.minRaisedCm} cm lose their vowel signs and joins. Engraving or UV print suits this size better.`,
         });
       }
     }
+  }
+
+  const indian = [...new Set(lines.flatMap(scriptsIn))].filter((script) => script.id !== "latin");
+  if (indian.length > 0 || design.typesetLanguage) {
+    results.push({
+      level: "info",
+      message: design.typesetLanguage
+        ? `Our typesetter will add the ${design.typesetLanguage} line and a native reader checks it. You approve it on the proof before we make the sign.`
+        : `A native ${indian.map((s) => s.name).join(" and ")} reader checks the spelling and letter forms. You approve them on the proof.`,
+    });
+  }
+  if (design.typesetLanguage && !getTypesetLanguage(design.typesetLanguage)) {
+    results.push({ level: "error", message: "Choose a language from the list for the added line." });
   }
 
   if (!Number.isInteger(design.quantity) || design.quantity < 1) {
@@ -683,6 +716,7 @@ export function describeDesign(type: SignType, design: SignDesign): string {
     mounting,
     design.outdoor ? "Outdoor" : "Indoor",
     `Text: ${text}`,
+    ...(design.typesetLanguage ? [`Add a ${design.typesetLanguage} line (typeset by OBASIX)`] : []),
   ].join(" · ");
 }
 
@@ -700,6 +734,7 @@ export function encodeDesign(design: SignDesign): string {
     o: design.outdoor ? "1" : "0",
     q: String(design.quantity),
   });
+  if (design.typesetLanguage) params.set("tl", design.typesetLanguage);
   design.lines.forEach((line) => params.append("t", line));
   return params.toString();
 }
@@ -729,5 +764,6 @@ export function decodeDesign(params: URLSearchParams): SignDesign | null {
     outdoor: params.has("o") ? params.get("o") === "1" : base.outdoor,
     quantity: Math.max(1, Math.round(num("q", base.quantity))),
     lines: lines.length > 0 ? lines : base.lines,
+    typesetLanguage: getTypesetLanguage(params.get("tl") ?? "")?.language ?? "",
   };
 }

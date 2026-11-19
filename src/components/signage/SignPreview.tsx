@@ -1,3 +1,4 @@
+import { dominantScript } from "@/data/scripts";
 import {
   getSignMaterial,
   layoutText,
@@ -36,20 +37,21 @@ export function SignPreview({
   const vbH = h + baseH + margin * 2;
   const radius = Math.min(w, h) * (type.layout === "number" ? 0.08 : 0.04);
   const lines = design.lines.map((l) => l.trim()).filter(Boolean);
-  const { sizes } = layoutText(type, design);
+  const { sizes, lineGaps } = layoutText(type, design);
   const ratios = lineRatios(type.layout, lines.length);
   const gid = `${idPrefix}-face`;
   const engraved = design.letteringId === "laser-engraved";
   const raised = design.letteringId === "raised-acrylic" || design.letteringId === "raised-metal";
   const ink = engraved ? shade(material.face, -0.35) : material.ink;
 
-  // Vertical placement: block centred, line heights scaled by LINE_GAP.
-  const lineHeights = sizes.map((s) => s * U * 1.3);
+  // Vertical placement: block centred; Indian scripts get taller lines for vowel signs above and below.
+  const lineHeights = sizes.map((s, i) => s * U * lineGaps[i]);
   const block = lineHeights.reduce((a, b) => a + b, 0);
   const left = type.layout === "directory" || type.layout === "wayfinding";
   const textX = left ? margin + w * 0.12 : margin + w / 2;
   const top = margin + (h - block) / 2;
-  const baselines = lineHeights.map((lh, i) => top + lineHeights.slice(0, i).reduce((a, b) => a + b, 0) + lh * 0.78);
+  // Baseline sits so the text's cap height is centred in its line.
+  const baselines = lineHeights.map((lh, i) => top + lineHeights.slice(0, i).reduce((a, b) => a + b, 0) + lh / 2 + sizes[i] * U * 0.36);
 
   const standoffs =
     design.mountingId === "standoff"
@@ -133,12 +135,13 @@ export function SignPreview({
             key={`${i}-${line}`}
             x={textX}
             y={y}
+            lang={dominantScript(line).lang}
             textAnchor={left ? "start" : "middle"}
             fontFamily={font.stack}
             fontWeight={weight}
             fontSize={size}
             fill={ink}
-            letterSpacing={type.layout === "number" ? size * -0.02 : 0}
+            letterSpacing={type.layout === "number" && dominantScript(line).id === "latin" ? size * -0.02 : 0}
             style={raised ? { filter: "drop-shadow(0 0.6px 0.6px rgba(0,0,0,0.35))" } : undefined}
           >
             {line}

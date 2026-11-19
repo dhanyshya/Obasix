@@ -46,7 +46,7 @@ export default function SignagePage() {
       <PageMasthead
         code="Signage"
         title="Nameplates and signs, made to your specification"
-        lede="Design a nameplate, door sign or building directory, check it against our manufacturing rules, and send it for a quotation. Hindi and English lettering on every sign."
+        lede="Design a nameplate, door sign or building directory, check it against our manufacturing rules, and send it for a quotation. Lettering in English, Hindi and the other main Indian scripts, checked by a native reader before we make it."
         crumbs={[{ href: "/", label: "Home" }, { label: "Nameplates & Signage" }]}
       />
 

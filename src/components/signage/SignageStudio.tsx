@@ -10,6 +10,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,6 +18,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import Link from "@/components/Link";
 import { pageMax, pagePad, signType as signTypeStyle } from "@/components/home/directory/sign";
 import { SignPreview } from "@/components/signage/SignPreview";
+import { typesetLanguages } from "@/data/scripts";
 import {
   checkDesign,
   decodeDesign,
@@ -205,7 +207,8 @@ export function SignageStudio() {
 
         <Panel title="4. Text">
           <Typography sx={{ fontSize: 13, color: brand.body, mb: 1.5 }}>
-            Type in English, Hindi or both, for example <span lang="hi">शर्मा निवास</span>.
+            Type in English, Hindi or any of nine Indian scripts, for example <span lang="hi">शर्मा निवास</span> or{" "}
+            <span lang="ta">சர்மா இல்லம்</span>. For a bilingual sign, put each language on its own line.
             {isDirectory ? " The first line is the heading; each further line is one row." : ""}
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
@@ -237,6 +240,23 @@ export function SignageStudio() {
               {isDirectory ? "Add row" : "Add line"}
             </Button>
           ) : null}
+
+          <TextField
+            select
+            size="small"
+            label="Can't type it? We'll add a line in"
+            value={design.typesetLanguage}
+            onChange={(e) => update({ typesetLanguage: e.target.value })}
+            helperText={design.typesetLanguage ? `We'll write your first line in ${design.typesetLanguage} and show it on the proof.` : " "}
+            sx={{ mt: 2, minWidth: 260 }}
+          >
+            <MenuItem value="">No added line</MenuItem>
+            {typesetLanguages.map(({ language, script }) => (
+              <MenuItem key={language} value={language}>
+                {language} <Box component="span" lang={script.lang} sx={{ color: brand.muted, ml: 1, fontFamily: `var(${script.fontVar})` }}>{script.sample}</Box>
+              </MenuItem>
+            ))}
+          </TextField>
 
           <Typography sx={{ fontSize: 13, color: brand.muted, mt: 2, mb: 0.75 }}>Typeface</Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }} role="radiogroup" aria-label="Typeface">

@@ -19,6 +19,7 @@ import Link from "@/components/Link";
 import { pageMax, pagePad, signType as signTypeStyle } from "@/components/home/directory/sign";
 import { SignPreview } from "@/components/signage/SignPreview";
 import { typesetLanguages } from "@/data/scripts";
+import { LayoutIdeas } from "@/components/ai/LayoutIdeas";
 import {
   checkDesign,
   decodeDesign,
@@ -240,6 +241,7 @@ export function SignageStudio() {
               {isDirectory ? "Add row" : "Add line"}
             </Button>
           ) : null}
+          <LayoutIdeas design={design} onUse={(next) => setDesign(next)} />
 
           <TextField
             select

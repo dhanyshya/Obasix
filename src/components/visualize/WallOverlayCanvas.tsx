@@ -271,7 +271,8 @@ export function WallOverlayCanvas({
                     ...(corner === "sw" && { left: -7, bottom: -7 }),
                     ...(corner === "se" && { right: -7, bottom: -7 }),
                   }}
-                  aria-label={`Resize ${corner}`}
+                  // Pointer-only handle: keyboard and screen-reader users resize with the size presets.
+                  aria-hidden
                 />
               ))}
               <Box
@@ -299,7 +300,8 @@ export function WallOverlayCanvas({
                     transform: "translateX(-50%)",
                   },
                 }}
-                aria-label="Rotate board"
+                // Pointer-only handle: the rotation slider is the accessible control.
+                aria-hidden
               />
             </>
           ) : null}

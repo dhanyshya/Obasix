@@ -26,7 +26,7 @@ What stands between the current app and a live production store, in priority ord
 - Visualizer: automated tests for drag, resize and export, and a manual QA pass on touch devices.
 - Homepage: an editorial refresh using verified product photography from OBASIX rather than stock imagery (some hero images come from Unsplash).
 - Product Finder: tests and tuning.
-- AI: streaming responses, and live provider evaluation once a key is configured.
+- AI: frame-colour suggestions from room photos and alternative sign layouts are built on Claude (`claude-opus-5-5`, structured outputs, server-side fallbacks) and switch on with `ANTHROPIC_API_KEY`; tested against a local stand-in only, so check suggestion quality on real photos before launch. The chat assistant still uses its own OpenAI-compatible setting.
 
 ## P3: growth
 

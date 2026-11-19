@@ -492,8 +492,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
             </Typography>
             <Typography id="quote-file-hint" sx={{ mt: 0.5, fontSize: 13, color: quoteTheme.muted, lineHeight: 1.6 }}>
               Optional PNG, JPEG, WebP, or PDF up to {Math.round(quoteAttachmentMaxBytes / (1024 * 1024))} MB.
-              The selected file name is recorded with your request. The binary file itself is not stored by this
-              demo API.
+              It&apos;s stored privately with your request and only our team can open it.
             </Typography>
             <Stack
               direction={{ xs: "column", sm: "row" }}
@@ -504,6 +503,9 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
               <Button
                 component="label"
                 htmlFor="quote-file"
+                // The hidden file input inside is the focusable control; the label is only its visible face.
+                tabIndex={-1}
+                role="none"
                 variant="outlined"
                 color={errors.file ? "error" : "inherit"}
                 startIcon={<UploadFileIcon />}

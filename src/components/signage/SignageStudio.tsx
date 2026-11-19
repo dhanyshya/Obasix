@@ -191,7 +191,7 @@ export function SignageStudio() {
                   />
                   <Box>
                     <Typography sx={{ fontSize: 14, fontWeight: 600, color: brand.charcoal }}>{option.name}</Typography>
-                    <Typography sx={{ fontSize: 12, color: brand.muted }}>{option.outdoor ? "Indoor and outdoor" : "Indoor only"}</Typography>
+                    <Typography sx={{ fontSize: 12, color: brand.body }}>{option.outdoor ? "Indoor and outdoor" : "Indoor only"}</Typography>
                   </Box>
                 </ButtonBase>
               );

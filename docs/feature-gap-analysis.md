@@ -32,5 +32,5 @@ What stands between the current app and a live production store, in priority ord
 
 - B2B: company accounts, multiple buyers, tax-invoice details (GSTIN), reorder from past orders.
 - Analytics: privacy-respecting events for funnel steps.
-- Accessibility: a full WCAG 2.1 AA audit with screen readers. Only automated checks and the motion fix have been done so far.
+- Accessibility: automated WCAG 2.1 AA scan (axe-core) is clean on 41 public, account and staff pages after scrolling content into view. Still needed: a manual pass with NVDA/VoiceOver and keyboard-only testing of the visualizer and studios.
 - Performance: Core Web Vitals measurement on production hosting.

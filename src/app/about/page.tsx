@@ -23,7 +23,8 @@ export const metadata: Metadata = {
   },
 };
 
-const peach = "#164E3B";
+// Light accent for text on the dark green panels (about 9:1 on forestDeep).
+const peach = "#F4B98F";
 
 const principles = [
   {

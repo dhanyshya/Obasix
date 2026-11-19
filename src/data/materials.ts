@@ -11,13 +11,13 @@ export type MaterialColour = { id: string; name: string; hex: string };
 export type MaterialOption = { id: string; name: string; description: string };
 
 export type MaterialRange = {
-  slug: "glass" | "felt" | "fabric";
+  slug: "glass" | "felt" | "fabric" | "cork";
   name: string;
   /** Matches an entry in quoteBoardTypes so the quote form accepts it. */
   quoteBoardType: string;
   tagline: string;
   summary: string;
-  surface: "glass" | "felt" | "fabric";
+  surface: "glass" | "felt" | "fabric" | "cork";
   build: string[];
   goodFor: string[];
   care: string;
@@ -131,6 +131,37 @@ export const materialRanges: MaterialRange[] = [
       ],
     },
     maxSideFt: 8,
+  },
+  {
+    slug: "cork",
+    name: "Cork pin-up boards",
+    quoteBoardType: "Cork Pin-up Board",
+    tagline: "The classic pin board, made to size.",
+    summary:
+      "Natural cork that takes pins easily and closes up behind them. Framed for classrooms and offices, or frameless tiles to cover a wall.",
+    surface: "cork",
+    build: [
+      "Natural cork pinning surface over a rigid backing board",
+      "Pine wood or aluminium frame, or frameless",
+      "Can be combined with a whiteboard section (see combination boards)",
+      "Push pins included",
+    ],
+    goodFor: ["Classrooms and staff rooms", "Home offices and kids' rooms", "Cafés and community notice walls"],
+    care: "Dust with a soft brush. Keep away from direct sun and damp, which dry out or swell cork.",
+    sizes: [size(2, 3), size(3, 4), size(4, 6)],
+    colours: [
+      { id: "natural", name: "Natural cork", hex: "#C69C6D" },
+      { id: "dark", name: "Dark cork", hex: "#8A6544" },
+    ],
+    options: {
+      label: "Frame",
+      choices: [
+        { id: "pine", name: "Pine wood", description: "Warm, natural edge for homes and classrooms." },
+        { id: "aluminium", name: "Aluminium", description: "Clean edge for offices." },
+        { id: "frameless", name: "Frameless", description: "Flat panels fixed edge to edge." },
+      ],
+    },
+    maxSideFt: 6,
   },
 ];
 

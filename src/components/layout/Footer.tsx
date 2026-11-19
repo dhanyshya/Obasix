@@ -13,7 +13,7 @@ const columns = [
       { href: "/products", label: "Collections" },
       { href: "/solutions", label: "Spaces" },
       { href: "/kits", label: "Solution Kits" },
-      { href: "/materials", label: "Glass, Felt & Fabric" },
+      { href: "/materials", label: "Glass, Cork, Felt & Fabric" },
       { href: "/planning", label: "Planning Boards" },
       { href: "/signage", label: "Nameplates & Signage" },
       { href: "/customize", label: "Customise" },
@@ -30,6 +30,7 @@ const columns = [
       { href: "/associates", label: "Associate Programme" },
       { href: "/distributors", label: "Become a Distributor" },
       { href: "/partners", label: "Project Partners" },
+      { href: "/oem", label: "OEM & Private Label" },
     ],
   },
   {

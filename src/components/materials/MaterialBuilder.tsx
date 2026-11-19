@@ -13,15 +13,23 @@ import { brandTokens as brand } from "@/theme/brandTokens";
 
 const maxColours = 3;
 
+/** Organic speckle for cork: SVG turbulence noise, darkened and tiled. */
+const corkGrain = `url("data:image/svg+xml,${encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0 0.05  0 0 0 1.6 -0.55'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>",
+).replace(/%2523/g, "%23")}")`;
+
 /** Flat preview of the board: surface colour(s), with a cue for glass, felt or fabric. */
 function Preview({ range, width, height, colours, option }: { range: MaterialRange; width: number; height: number; colours: string[]; option: string }) {
   const hexes = colours.map((id) => range.colours.find((c) => c.id === id)?.hex ?? "#ddd");
   const ratio = Math.max(0.35, Math.min(3, width / height || 1.5));
-  const framed = (range.slug === "fabric") || (range.slug === "felt" && option === "trim");
+  const framed = range.slug === "fabric" || (range.slug === "felt" && option === "trim") || (range.slug === "cork" && option !== "frameless");
+  const frameColour = option === "pine" ? "#E6CB9A" : option === "heavy" ? "#7d8288" : "#b7bcc1";
   const texture =
     range.surface === "glass"
       ? "linear-gradient(120deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 35%, rgba(255,255,255,0) 70%, rgba(255,255,255,0.18) 100%)"
-      : range.surface === "felt"
+      : range.surface === "cork"
+        ? corkGrain
+        : range.surface === "felt"
         ? "repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0 2px, transparent 2px 4px)"
         : "repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 3px)";
   return (
@@ -35,14 +43,14 @@ function Preview({ range, width, height, colours, option }: { range: MaterialRan
           maxWidth: 520,
           aspectRatio: `${width} / ${height}`,
           display: "flex",
-          border: framed ? `6px solid ${option === "heavy" ? "#7d8288" : "#b7bcc1"}` : "none",
+          border: framed ? `6px solid ${frameColour}` : "none",
           borderRadius: range.surface === "glass" ? "10px" : "2px",
           boxShadow: range.surface === "glass" ? "0 14px 30px rgba(0,0,0,0.18)" : "0 8px 20px rgba(0,0,0,0.12)",
           overflow: "hidden",
         }}
       >
         {hexes.map((hex, i) => (
-          <Box key={i} sx={{ flex: 1, bgcolor: hex, backgroundImage: texture }} />
+          <Box key={i} sx={{ flex: 1, bgcolor: hex, backgroundImage: texture, backgroundSize: range.surface === "cork" ? "160px 160px" : undefined }} />
         ))}
         {range.surface === "glass"
           ? [

@@ -1,4 +1,5 @@
 import { catalogueAssist } from "@/lib/ai/catalogueAssist";
+import { clientAddress } from "@/lib/rateLimit";
 import {
   OBASIX_AI_SYSTEM_PROMPT,
   buildCatalogueContext,
@@ -22,9 +23,6 @@ type ParsedAssistant = {
   customizerLabel?: unknown;
 };
 
-function clientKey(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-}
 
 function cleanText(value: unknown, max = MAX_MESSAGE_LEN): string {
   if (typeof value !== "string") return "";
@@ -110,7 +108,7 @@ export async function POST(request: Request) {
     return Response.json(fallbackPayload(message, "unconfigured"), { status: 503 });
   }
 
-  if (!allowAiAttempt(clientKey(request))) {
+  if (!(await allowAiAttempt(clientAddress(request)))) {
     return Response.json(
       {
         ok: false,

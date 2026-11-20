@@ -23,21 +23,16 @@ export async function POST(request: Request) {
       { status: 503 },
     );
   }
-  if (mode === "real") {
-    return Response.json(
-      commerceUnavailable("provider_not_implemented", "Tracking credentials are present, but no order lookup is implemented."),
-      { status: 501 },
-    );
-  }
 
-  if (!allowAuthAttempt(`${clientAddress(request)}:track`, 30)) {
+  if (!(await allowAuthAttempt(`${clientAddress(request)}:track`, 30))) {
     return Response.json({ ok: false, message: "Too many lookups. Wait a few minutes and try again." }, { status: 429 });
   }
-  const order = findDemoOrderById(orderNumber);
+  const order = await findDemoOrderById(orderNumber);
   // Same response for "no such order" and "wrong contact" so order numbers cannot be probed.
   if (!order || !contactMatchesOrder(order, contact)) {
     return Response.json({ ok: false, found: false, message: "No order matches that order number and contact." }, { status: 404 });
   }
-  const current = body.advance === true ? advanceDemoOrderStatus(order.id)! : order;
-  return Response.json({ ok: true, found: true, mode: "demo", order: current });
+  // Stepping an order forward is a demo-only convenience; live orders change only through staff.
+  const current = mode === "demo" && body.advance === true ? (await advanceDemoOrderStatus(order.id))! : order;
+  return Response.json({ ok: true, found: true, mode, order: current });
 }

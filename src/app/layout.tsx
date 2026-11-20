@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { AIChatbot } from "@/components/ai/AIChatbot";
+import { ReferralCapture } from "@/components/associates/ReferralCapture";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Footer />
             <MobileNav />
             <AIChatbot />
+            <ReferralCapture />
           </Box>
         </AppProviders>
       </body>

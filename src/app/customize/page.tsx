@@ -93,6 +93,7 @@ function CustomizeContent() {
   useEffect(() => {
     const nextResolved = resolveRequestedProduct(searchParams.get("productId"));
     if (nextResolved.status !== "ready") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- restores the board from the URL and this tab's saved layout (sessionStorage), which only exist in the browser
       setState(null);
       return;
     }

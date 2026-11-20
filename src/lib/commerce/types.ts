@@ -42,8 +42,5 @@ export type OrderStatus =
   | "Cancelled"
   | "Pending Payment";
 
-export const commerceRequirements = [
-  "ORDER_API_URL",
-  "ORDER_API_TOKEN",
-  "PAYMENT_WEBHOOK_SECRET",
-] as const;
+/** Server settings that switch checkout from demo to live Razorpay payments. */
+export const commerceRequirements = ["RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RAZORPAY_WEBHOOK_SECRET"] as const;

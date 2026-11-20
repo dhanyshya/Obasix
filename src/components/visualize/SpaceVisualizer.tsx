@@ -1,5 +1,6 @@
 "use client";
 
+import { FrameColourAdvisor } from "@/components/ai/FrameColourAdvisor";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
@@ -149,6 +150,7 @@ export function SpaceVisualizer() {
           item.sku === urlProductId,
       );
       if (match) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restores the saved preview from localStorage once, after hydration
         chooseProduct(match, urlSizeId);
         setReached(1);
         setStep("upload");
@@ -722,7 +724,7 @@ export function SpaceVisualizer() {
                     </Box>
                     <Typography sx={{ mt: 1, fontSize: 12, color: "text.secondary" }}>
                       Processed in your browser for this session. Not uploaded to OBASIX servers unless you
-                      save a preview on this device.
+                      ask for colour suggestions in the next step.
                     </Typography>
                   </Box>
                 ) : (
@@ -850,6 +852,7 @@ export function SpaceVisualizer() {
 
                 <Box sx={{ display: { xs: "block", lg: "none" }, mt: 2.5 }}>{previewPanel}</Box>
 
+                <FrameColourAdvisor wallSrc={wallSrc} productId={productId} />
                 <NavRow onBack={() => go("upload")} onNext={() => go("preview")} next="Live Preview" />
               </Panel>
             ) : null}

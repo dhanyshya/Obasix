@@ -30,6 +30,8 @@ import { MegaMenu } from "./MegaMenu";
 const nav = [
   { href: "/products", label: "Collections", mega: true },
   { href: "/solutions", label: "Spaces" },
+  { href: "/kits", label: "Kits" },
+  { href: "/signage", label: "Signage" },
   { href: "/customize", label: "Customise" },
   { href: "/visualize", label: "Visualise" },
   { href: "/about", label: "About" },

@@ -10,7 +10,18 @@ export const quoteBoardTypes = [
   "Pin-up Board",
   "Combination Board",
   "Chalk Board",
+  "Glass Board",
+  "Felt Pin-up Board",
+  "Fabric Pin-up Board",
+  "Cork Pin-up Board",
+  "Planning Board",
+  "OEM / Private Label",
+  "Acoustic Panel",
+  "Illuminated Sign",
+  "Modular Display System",
+  "Interactive Display",
   "Custom Board",
+  "Nameplate / Signage",
 ] as const;
 
 export const quoteAttachmentTypes = ["image/png", "image/jpeg", "image/webp", "application/pdf"] as const;

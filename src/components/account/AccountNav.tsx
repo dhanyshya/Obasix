@@ -10,8 +10,13 @@ const links = [
   { href: "/account", label: "Overview" },
   { href: "/account/orders", label: "Orders" },
   { href: "/account/quotes", label: "Quotes" },
+  { href: "/account/proofs", label: "Proofs" },
+  { href: "/account/company", label: "Company" },
   { href: "/account/wishlist", label: "Wishlist" },
   { href: "/account/profile", label: "Profile" },
+  { href: "/account/associate", label: "Associate" },
+  { href: "/account/distributor", label: "Distributor" },
+  { href: "/account/partner", label: "Partner" },
 ];
 
 /** Account sections as a directory strip: the current section carries the orange bar. */

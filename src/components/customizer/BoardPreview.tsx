@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -114,9 +114,8 @@ export function BoardPreview({
   const boardAspect = Math.max(0.5, Math.min(2.2, widthFt / Math.max(heightFt, 0.5)));
   const fill = surfaceFill(surfaceType, surfaceHex);
 
-  useEffect(() => {
-    if (!showSide && view === "side") setView("front");
-  }, [showSide, view]);
+  // Without a side image the side view isn't available, whatever was chosen before.
+  const activeView = showSide ? view : "front";
 
   const liveBoard = (
     <Box
@@ -389,7 +388,7 @@ export function BoardPreview({
               }),
       }}
     >
-      {view === "side" && sideImage ? (
+      {activeView === "side" && sideImage ? (
         <Image
           src={sideImage}
           alt={`${productName} side view`}
@@ -442,7 +441,7 @@ export function BoardPreview({
                 exclusive
                 size="small"
                 color="primary"
-                value={view}
+                value={activeView}
                 aria-label="Preview angle"
                 onChange={(_, next: "front" | "side" | null) => {
                   if (next) setView(next);

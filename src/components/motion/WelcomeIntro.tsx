@@ -53,6 +53,7 @@ export function WelcomeIntro() {
     try {
       if (pathname !== "/") {
         markIntroSeen();
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- reads sessionStorage and the reduced-motion setting before first paint; the server render is always empty
         setPhase("done");
         return;
       }

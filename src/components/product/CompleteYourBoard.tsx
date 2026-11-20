@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -226,14 +226,17 @@ export function CompleteYourBoard({ product }: { product: Product }) {
   const [bundleBusy, setBundleBusy] = useState(false);
   const [bundleAdded, setBundleAdded] = useState(false);
 
-  useEffect(() => {
+  // Start fresh for a different product.
+  const [shownFor, setShownFor] = useState(product.id);
+  if (shownFor !== product.id) {
+    setShownFor(product.id);
     setQuantities({});
     setSelected({});
     setAddedIds({});
     setBusyId(null);
     setBundleBusy(false);
     setBundleAdded(false);
-  }, [product.id]);
+  }
 
   if (items.length === 0) return null;
 

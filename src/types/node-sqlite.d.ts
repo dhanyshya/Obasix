@@ -5,7 +5,7 @@ declare module "node:sqlite" {
     prepare(sql: string): {
       get(...args: unknown[]): unknown;
       all(...args: unknown[]): unknown[];
-      run(...args: unknown[]): unknown;
+      run(...args: unknown[]): { changes: number | bigint; lastInsertRowid: number | bigint };
     };
   }
 }

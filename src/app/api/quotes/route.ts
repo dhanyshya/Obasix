@@ -1,6 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { clientAddress } from "@/lib/rateLimit";
 import {
   catalogueLine,
   cleanText,
@@ -10,6 +9,10 @@ import {
   quoteBoardTypes,
   validateQuoteFields,
 } from "@/lib/quotes/schema";
+import { fileExtensions as extensions, sniffType } from "@/lib/files";
+import { saveFile } from "@/lib/storage/files";
+import { sendEmail, staffAlertEmails } from "@/lib/email/send";
+import { quoteReceivedEmail, staffNewQuoteEmail } from "@/lib/email/templates";
 import { allowQuoteAttempt, saveDemoQuote, type StoredQuote } from "@/lib/quotes/demo-store";
 
 export const runtime = "nodejs";
@@ -21,26 +24,6 @@ function quoteMode() {
   return "unconfigured" as const;
 }
 
-/** Confirms the file content matches its declared type (PNG, JPEG, WebP or PDF signatures). */
-function sniffType(bytes: Uint8Array): string | null {
-  const starts = (sig: number[], offset = 0) => sig.every((b, i) => bytes[offset + i] === b);
-  if (starts([0x89, 0x50, 0x4e, 0x47])) return "image/png";
-  if (starts([0xff, 0xd8, 0xff])) return "image/jpeg";
-  if (starts([0x52, 0x49, 0x46, 0x46]) && starts([0x57, 0x45, 0x42, 0x50], 8)) return "image/webp";
-  if (starts([0x25, 0x50, 0x44, 0x46])) return "application/pdf";
-  return null;
-}
-
-const extensions: Record<string, string> = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/webp": "webp",
-  "application/pdf": "pdf",
-};
-
-function clientKey(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-}
 
 export async function POST(request: Request) {
   const mode = quoteMode();
@@ -78,7 +61,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!allowQuoteAttempt(clientKey(request))) {
+  if (!(await allowQuoteAttempt(clientAddress(request)))) {
     return Response.json(
       { ok: false, saved: false, notified: false, message: "Too many quote attempts. Wait a few minutes and try again." },
       { status: 429 },
@@ -205,38 +188,70 @@ export async function POST(request: Request) {
   };
 
   if (attachment && attachmentBytes && quote.attachment) {
-    // Stored privately on the server (never under /public). Only staff with server access can read it.
-    const dir = path.join(process.cwd(), ".data", "quote-files");
-    await mkdir(dir, { recursive: true });
+    // Stored privately (Vercel Blob or this server's disk), never public. Only staff can download it.
     const stored = `${quote.reference}.${extensions[attachment.type]}`;
-    await writeFile(path.join(dir, stored), attachmentBytes);
+    await saveFile(`quote-files/${stored}`, attachmentBytes, attachment.type);
     quote.attachment = { ...quote.attachment, storedAs: stored };
   }
 
   const saved = await saveDemoQuote(quote);
   try {
     const { readSession } = await import("@/lib/auth/session");
-    const { authDatabase } = await import("@/lib/auth/db");
+    const { authDb } = await import("@/lib/auth/db");
     const session = await readSession();
     if (session) {
-      authDatabase()
-        .prepare("INSERT OR REPLACE INTO customer_quotes (reference, user_id, summary, created_at) VALUES (?, ?, ?, ?)")
-        .run(
-          saved.reference,
+      (await (await authDb()).run("INSERT INTO customer_quotes (reference, user_id, summary, created_at) VALUES (?, ?, ?, ?) ON CONFLICT (reference) DO UPDATE SET user_id = excluded.user_id, summary = excluded.summary, created_at = excluded.created_at", saved.reference,
           session.user.id,
           [saved.product, saved.boardType, saved.dimensions, `qty ${saved.quantity}`].filter(Boolean).join(" · "),
-          saved.createdAt,
-        );
+          saved.createdAt,));
     }
   } catch {
     // The demo quote is already saved. Account history is unavailable if the account store cannot be opened.
+  }
+  try {
+    const { cookies } = await import("next/headers");
+    const { readSession } = await import("@/lib/auth/session");
+    const { referralCookieName } = await import("@/lib/associates/program");
+    const { findAssociateByUser, recordQuoteAttribution } = await import("@/lib/associates/store");
+    const session = await readSession();
+    // An associate preparing a quote from their own account is credited directly;
+    // otherwise the referral cookie decides.
+    const preparedBy = session ? await findAssociateByUser(session.user.id) : null;
+    await recordQuoteAttribution({
+      reference: saved.reference,
+      code: preparedBy?.code ?? (await cookies()).get(referralCookieName)?.value,
+      buyerUserId: session?.user.id ?? null,
+      buyerEmail: saved.email,
+      customer: [saved.name, saved.company].filter(Boolean).join(", "),
+      summary: [saved.product, saved.boardType, saved.dimensions, `qty ${saved.quantity}`].filter(Boolean).join(" · "),
+    });
+  } catch {
+    // Attribution is best effort; the quote is already saved.
+  }
+  // A retry with the same idempotency key returns the earlier quote: only email the first time.
+  const isNew = saved.reference === quote.reference;
+  let notified = false;
+  if (isNew) {
+    const summary = saved.configurationSummary || [saved.product, saved.boardType, saved.dimensions, `qty ${saved.quantity}`].filter(Boolean).join(" · ");
+    const [customer] = await Promise.all([
+      sendEmail({ to: saved.email, ...quoteReceivedEmail({ reference: saved.reference, name: saved.name, summary }) }),
+      sendEmail({
+        to: staffAlertEmails(),
+        ...staffNewQuoteEmail({ reference: saved.reference, name: saved.name, company: saved.company, email: saved.email, phone: saved.phone, summary }),
+      }),
+    ]);
+    notified = customer.sent;
   }
   return Response.json({
     ok: true,
     saved: true,
     mode: "demo",
-    notified: false,
+    notified,
     reference: saved.reference,
-    message: "Demo quote saved on this server. No email was sent.",
+    message: !isNew
+      ? "We already have this request."
+      : notified
+        ? "Quote saved. We've emailed you a copy."
+        : "Quote saved on this server. No email was sent.",
   });
 }

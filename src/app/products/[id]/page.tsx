@@ -25,6 +25,7 @@ import {
   getRelatedProducts,
 } from "@/data/catalogue";
 import { CompleteYourBoard } from "@/components/product/CompleteYourBoard";
+import { StockBadge } from "@/components/product/StockBadge";
 import { ProductActions } from "@/components/product/ProductActions";
 import { CompareToggle } from "@/components/compare/CompareToggle";
 import { ProductGallery } from "@/components/product/ProductGallery";
@@ -110,6 +111,7 @@ export default function ProductDetailPage({
                 </Box>
               )}
             </Typography>
+            <StockBadge productId={product.id} />
 
             <Divider sx={{ my: 3 }} />
 

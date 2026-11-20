@@ -12,6 +12,11 @@ const columns = [
     links: [
       { href: "/products", label: "Collections" },
       { href: "/solutions", label: "Spaces" },
+      { href: "/kits", label: "Solution Kits" },
+      { href: "/materials", label: "Made-to-order Boards" },
+      { href: "/planning", label: "Planning Boards" },
+      { href: "/premium", label: "Premium & Smart Displays" },
+      { href: "/signage", label: "Nameplates & Signage" },
       { href: "/customize", label: "Customise" },
       { href: "/visualize", label: "Visualise" },
       { href: "/about#studio", label: "Studio" },
@@ -23,6 +28,10 @@ const columns = [
       { href: "/about", label: "About OBASIX" },
       { href: "/smart-space", label: "Smart Space" },
       { href: "/quote", label: "Start a Project" },
+      { href: "/associates", label: "Associate Programme" },
+      { href: "/distributors", label: "Become a Distributor" },
+      { href: "/partners", label: "Project Partners" },
+      { href: "/oem", label: "OEM & Private Label" },
     ],
   },
   {

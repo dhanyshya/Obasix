@@ -19,12 +19,13 @@ export function ConfirmationExperience() {
 
   useEffect(() => {
     let active = true;
-    const local = orderId.startsWith("OBX-DEMO-") ? findDemoOrder(orderId) : undefined;
+    const local = orderId.startsWith("OBX-") ? findDemoOrder(orderId) : undefined;
     if (local) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the just-placed order lives in this tab's sessionStorage, which only exists in the browser
       setOrder(local);
       return;
     }
-    if (!orderId.startsWith("OBX-DEMO-")) {
+    if (!orderId.startsWith("OBX-")) {
       setOrder(null);
       return;
     }

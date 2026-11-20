@@ -50,3 +50,4 @@ playwright-report/
 # design tool scratch output
 .impeccable/review/
 .impeccable/hook.cache.json
+.playwright-mcp/

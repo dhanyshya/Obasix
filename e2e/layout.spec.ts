@@ -18,6 +18,19 @@ const pages = [
   "/login",
   "/register",
   "/forgot-password",
+  // Added with the Reimagine 2027 work.
+  "/signage",
+  "/signage/design",
+  "/planning",
+  "/kits",
+  "/kits/education",
+  "/materials",
+  "/materials/glass",
+  "/premium",
+  "/oem",
+  "/associates",
+  "/distributors",
+  "/partners",
 ];
 
 // Known, harmless dev-only noise.

@@ -1,8 +1,15 @@
-import { findDemoQuote } from "@/lib/quotes/demo-store";
+import { readSession } from "@/lib/auth/session";
+import { canViewQuote } from "@/lib/quotes/access";
+import { allowQuoteAttempt, findDemoQuote } from "@/lib/quotes/demo-store";
+import { clientAddress } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
-export async function GET(_request: Request, context: { params: Promise<{ reference: string }> }) {
+/** A saved quote, for the person who sent it (see lib/quotes/access.ts). */
+export async function GET(request: Request, context: { params: Promise<{ reference: string }> }) {
+  if (!(await allowQuoteAttempt(`lookup:${clientAddress(request)}`, 60, 10 * 60 * 1000))) {
+    return Response.json({ ok: false, message: "Too many lookups. Wait a few minutes and try again." }, { status: 429 });
+  }
   const { reference } = await context.params;
   if (!reference.startsWith("OBX-QUOTE-DEMO-")) {
     return Response.json(
@@ -11,7 +18,8 @@ export async function GET(_request: Request, context: { params: Promise<{ refere
     );
   }
   const quote = await findDemoQuote(reference);
-  if (!quote) {
+  // Same answer for "no such quote" and "not yours", so references can't be probed.
+  if (!quote || !(await canViewQuote(quote, await readSession()))) {
     return Response.json({ ok: false, message: "No saved demo quote matches that reference." }, { status: 404 });
   }
   return Response.json({

@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "test:e2e:headed": "playwright test --headed --workers=1",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:browsers": "E2E_ALL_BROWSERS=1 playwright test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",
@@ -20,7 +24,7 @@
     "@mui/material-nextjs": "^9.5.0",
     "@vercel/blob": "^2.9.0",
     "motion": "^14.0.0",
-    "next": "16.3.8",
+    "next": "16.4.6",
     "pg": "^8.23.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -34,8 +38,11 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.8",
+    "eslint-config-next": "16.4.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "zod": "$zod"
   }
 }

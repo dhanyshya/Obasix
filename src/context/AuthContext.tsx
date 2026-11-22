@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { useCart } from "@/context/CartContext";
+import { replayCartEdits, useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import type { CartItem } from "@/lib/types";
 
@@ -39,15 +39,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const generation = useRef(0);
   const canSave = useRef(false);
 
-  const applyAccount = (cartItems: CartItem[], ids: string[]) => {
+  /**
+   * Loads the saved cart. Changes the customer made while it was loading (from `editMark`)
+   * are replayed on top, so an item added during page load isn't wiped by the server copy.
+   */
+  const applyAccount = (cartItems: CartItem[], ids: string[], editMark?: number) => {
     canSave.current = false;
-    cart.replaceItems(cartItems);
+    const pending = editMark === undefined ? [] : cart.editsSince(editMark);
+    cart.replaceItems(pending.length ? replayCartEdits(cartItems, pending) : cartItems);
     wishlist.setIds(ids);
     canSave.current = true;
   };
 
   const refresh = async () => {
     const current = ++generation.current;
+    const editMark = cart.editCount();
     const session = (await fetch("/api/auth").then((response) => response.json())) as { user: SessionUser | null };
     if (generation.current !== current) return;
     setUser(session.user);
@@ -58,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const account = (await fetch("/api/account").then((response) => response.json())) as { cart?: CartItem[]; wishlist?: string[] };
     if (generation.current !== current) return;
-    applyAccount(account.cart ?? [], account.wishlist ?? []);
+    applyAccount(account.cart ?? [], account.wishlist ?? [], editMark);
     setReady(true);
   };
 
@@ -69,28 +75,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Signed-in carts save shortly after a change. A save still waiting when the page is hidden or
+  // unloaded (a reload or typed URL within the delay) is sent at once with keepalive so it isn't lost.
+  const pendingSave = useRef<(() => void) | null>(null);
+
   useEffect(() => {
     if (!ready || !user || !canSave.current) return;
-    const timer = window.setTimeout(() => {
+    const lines = cart.items.map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      configuration: item.configuration,
+    }));
+    const ids = wishlist.ids;
+    const send = (keepalive: boolean) => {
+      pendingSave.current = null;
       void fetch("/api/account?action=cart", {
         method: "POST",
+        keepalive,
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          lines: cart.items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            configuration: item.configuration,
-          })),
-        }),
+        body: JSON.stringify({ lines }),
       });
       void fetch("/api/account?action=wishlist-sync", {
         method: "POST",
+        keepalive,
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ids: wishlist.ids }),
+        body: JSON.stringify({ ids }),
       });
-    }, 400);
+    };
+    pendingSave.current = () => send(true);
+    const timer = window.setTimeout(() => send(false), 400);
     return () => window.clearTimeout(timer);
   }, [cart.items, ready, user, wishlist.ids]);
+
+  useEffect(() => {
+    const flush = () => pendingSave.current?.();
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
 
   const submit = async (action: "login" | "register", payload: Record<string, unknown>): Promise<AuthResult> => {
     generation.current += 1;

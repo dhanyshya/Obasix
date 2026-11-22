@@ -1,4 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
+
+// Navigations wait for "networkidle" so clicks and typing land after React hydrates;
+// earlier clicks were sometimes dropped (flaky "compare", and WebKit form tests).
 import path from "node:path";
 import { writeFileSync, mkdirSync } from "node:fs";
 
@@ -10,14 +13,14 @@ writeFileSync(path.join(tmp, "logo.png"), png);
 writeFileSync(path.join(tmp, "ref.pdf"), "%PDF-1.4\n%%EOF\n");
 
 async function addToCartFromPdp(page: Page, id: string) {
-  await page.goto(`/products/${id}`);
+  await page.goto(`/products/${id}`, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: /^Add to Cart$/ }).first().click();
   await expect(page.getByRole("button", { name: /Added/ }).first()).toBeVisible();
 }
 
 test.describe("catalogue", () => {
   test("search by product name", async ({ page }) => {
-    await page.goto("/products?q=ceramic");
+    await page.goto("/products?q=ceramic", { waitUntil: "networkidle" });
     await expect(page.locator("article").first()).toBeVisible();
     const titles = await page.locator("article").allInnerTexts();
     expect(titles.length).toBeGreaterThan(0);
@@ -25,12 +28,12 @@ test.describe("catalogue", () => {
   });
 
   test("search by product code", async ({ page }) => {
-    await page.goto("/products?q=CMWB6090");
+    await page.goto("/products?q=CMWB6090", { waitUntil: "networkidle" });
     await expect(page.locator("article", { hasText: "Classic Magnetic Whiteboard 2×3" }).first()).toBeVisible();
   });
 
   test("sorting by price ascending", async ({ page }) => {
-    await page.goto("/products?sort=price-asc");
+    await page.goto("/products?sort=price-asc", { waitUntil: "networkidle" });
     await expect(page.locator("article").first()).toBeVisible();
     const prices = await page.locator("article").evaluateAll((cards) =>
       cards
@@ -43,13 +46,13 @@ test.describe("catalogue", () => {
   });
 
   test("quick view opens", async ({ page }) => {
-    await page.goto("/products");
+    await page.goto("/products", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: "Quick view" }).first().click();
     await expect(page.getByRole("dialog")).toBeVisible();
   });
 
   test("product detail shows specs, recommendations and JSON-LD", async ({ page }) => {
-    await page.goto("/products/cmwb6090");
+    await page.goto("/products/cmwb6090", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Classic");
     await expect(page.getByText("CMWB6090").first()).toBeVisible();
     const ld = await page.locator('script[type="application/ld+json"]').first().textContent();
@@ -57,11 +60,11 @@ test.describe("catalogue", () => {
   });
 
   test("compare two products", async ({ page }) => {
-    await page.goto("/products/cmwb6090");
+    await page.goto("/products/cmwb6090", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: /^Compare$/ }).first().click();
-    await page.goto("/products/cmwb90120");
+    await page.goto("/products/cmwb90120", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: /^Compare$/ }).first().click();
-    await page.goto("/compare");
+    await page.goto("/compare", { waitUntil: "networkidle" });
     await expect(page.getByRole("table")).toContainText("CMWB6090");
     await expect(page.getByRole("table")).toContainText("CMWB90120");
   });
@@ -70,7 +73,7 @@ test.describe("catalogue", () => {
 test.describe("commerce (demo mode)", () => {
   test("cart → checkout → demo payment → confirmation → tracking", async ({ page }) => {
     await addToCartFromPdp(page, "cmwb6090");
-    await page.goto("/cart");
+    await page.goto("/cart", { waitUntil: "networkidle" });
     await expect(page.getByText("₹1,825").first()).toBeVisible();
     // Guest cart survives reload
     await page.reload();
@@ -94,13 +97,13 @@ test.describe("commerce (demo mode)", () => {
     await expect(page.getByText(/Demo/i).first()).toBeVisible();
 
     // Cart was cleared after the server confirmed the order
-    await page.goto("/cart");
+    await page.goto("/cart", { waitUntil: "networkidle" });
     await expect(page.getByText("Classic Magnetic Whiteboard 2×3")).toHaveCount(0);
 
     // Track from a fresh context (another device)
     const other = await page.context().browser()!.newContext();
     const p2 = await other.newPage();
-    await p2.goto("/orders/track");
+    await p2.goto("/orders/track", { waitUntil: "networkidle" });
     await p2.getByLabel("Order number").fill(orderId);
     await p2.getByLabel("Email or phone").fill("+91 98765 01234");
     await p2.getByRole("button", { name: "Track Order" }).click();
@@ -110,7 +113,7 @@ test.describe("commerce (demo mode)", () => {
   });
 
   test("tracking rejects wrong contact", async ({ page }) => {
-    await page.goto("/orders/track");
+    await page.goto("/orders/track", { waitUntil: "networkidle" });
     await page.getByLabel("Order number").fill("OBX-DEMO-00000000");
     await page.getByLabel("Email or phone").fill("nobody@example.com");
     await page.getByRole("button", { name: "Track Order" }).click();
@@ -120,7 +123,7 @@ test.describe("commerce (demo mode)", () => {
 
 test.describe("quotes", () => {
   test("submits a quote with a PDF attachment", async ({ page }) => {
-    await page.goto("/quote?boardType=Magnetic%20Whiteboard&quantity=10");
+    await page.goto("/quote?boardType=Magnetic%20Whiteboard&quantity=10", { waitUntil: "networkidle" });
     await page.getByLabel("Full Name").fill("E2E Buyer");
     await page.getByLabel("Email Address").fill("buyer@example.com");
     await page.getByLabel("Mobile Number").fill("9876509876");
@@ -136,23 +139,23 @@ test.describe("quotes", () => {
 
 test.describe("design and visualise", () => {
   test("customizer accepts a logo and adds to cart", async ({ page }) => {
-    await page.goto("/customize?productId=cmwb6090");
+    await page.goto("/customize?productId=cmwb6090", { waitUntil: "networkidle" });
     const file = page.locator('input[type="file"][accept="image/png,image/jpeg"]');
     if (await file.count()) await file.first().setInputFiles(path.join(tmp, "logo.png"));
     await page.getByRole("button", { name: /^Add to Cart$/ }).first().click();
-    await page.goto("/cart");
+    await page.goto("/cart", { waitUntil: "networkidle" });
     await expect(page.locator("main")).toContainText("Classic");
   });
 
   test("visualizer wall page renders a canvas or scene", async ({ page }) => {
-    await page.goto("/visualize/modern-office");
+    await page.goto("/visualize/modern-office", { waitUntil: "networkidle" });
     await expect(page.locator("canvas, img").first()).toBeVisible();
   });
 
   test("smart space and solutions list real products", async ({ page }) => {
-    await page.goto("/solutions/office");
+    await page.goto("/solutions/office", { waitUntil: "networkidle" });
     await expect(page.locator('a[href^="/products/"]').first()).toBeVisible();
-    await page.goto("/smart-space");
+    await page.goto("/smart-space", { waitUntil: "networkidle" });
     await expect(page.locator("main")).toContainText(/₹|Office|Classroom/);
   });
 });
@@ -160,20 +163,20 @@ test.describe("design and visualise", () => {
 test.describe("accounts", () => {
   test("register → account → wishlist → saved orders → logout → login → reset", async ({ page }) => {
     const email = `e2e+${Date.now()}@example.com`;
-    await page.goto("/register");
+    await page.goto("/register", { waitUntil: "networkidle" });
     await page.getByLabel("Name").fill("E2E Account");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Password", { exact: true }).fill("correct-horse-1");
     await page.locator('main form button[type="submit"]').click();
     await expect(page).toHaveURL(/\/account/);
 
-    await page.goto("/products");
+    await page.goto("/products", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: "Add to wishlist" }).first().click();
     await page.waitForTimeout(800);
-    await page.goto("/account/wishlist");
+    await page.goto("/account/wishlist", { waitUntil: "networkidle" });
     await expect(page.locator("main")).not.toContainText(/no saved|empty/i);
 
-    await page.goto("/account/orders");
+    await page.goto("/account/orders", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "Orders" })).toBeVisible();
     await expect(page.locator("main")).toContainText(/Demo mode|not placed any orders/);
 
@@ -185,7 +188,7 @@ test.describe("accounts", () => {
 
     // Password recovery (dev-only link)
     await page.context().clearCookies();
-    await page.goto("/forgot-password");
+    await page.goto("/forgot-password", { waitUntil: "networkidle" });
     await page.getByLabel("Email").fill(email);
     await page.locator('main form button[type="submit"]').click();
     const link = page.locator('a[href^="/reset-password?token="]');
@@ -195,7 +198,7 @@ test.describe("accounts", () => {
     await page.locator('main form button[type="submit"]').click();
     await expect(page.getByText(/updated|changed|sign in/i).first()).toBeVisible();
 
-    await page.goto("/login");
+    await page.goto("/login", { waitUntil: "networkidle" });
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Password", { exact: true }).fill("new-horse-battery-2");
     await page.locator('main form button[type="submit"]').click();
@@ -206,7 +209,7 @@ test.describe("accounts", () => {
 test.describe("assistant", () => {
   test("AI chat answers or falls back with real catalogue links", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: "Ask OBASIX design assistant" }).click();
     const box = page.getByRole("textbox").last();
     await box.fill("Which magnetic board suits a meeting room?");

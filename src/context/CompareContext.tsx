@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { getProductById } from "@/data/catalogue";
 
 export const MAX_COMPARE = 4;
@@ -19,7 +19,6 @@ const CompareContext = createContext<CompareContextValue | null>(null);
 
 export function CompareProvider({ children }: { children: ReactNode }) {
   const [ids, setIds] = useState<string[]>([]);
-  const hydrated = useRef(false);
 
   useEffect(() => {
     try {
@@ -32,29 +31,33 @@ export function CompareProvider({ children }: { children: ReactNode }) {
     } catch {
       // Storage unavailable; comparison still works for this page view.
     }
-    hydrated.current = true;
   }, []);
 
-  useEffect(() => {
-    if (!hydrated.current) return;
+  /**
+   * Saves in the same step as the change. Saving from an effect ran after the next paint,
+   * so a product added just before leaving the page was lost (and every page load briefly
+   * wrote an empty list over the saved one).
+   */
+  const update = useCallback((next: string[]) => {
+    setIds(next);
     try {
-      window.localStorage.setItem(KEY, JSON.stringify(ids));
+      window.localStorage.setItem(KEY, JSON.stringify(next));
     } catch {
-      // ignore
+      // Storage unavailable; comparison still works for this page view.
     }
-  }, [ids]);
+  }, []);
 
   const toggle = useCallback(
     (id: string) => {
       if (ids.includes(id)) {
-        setIds((prev) => prev.filter((item) => item !== id));
+        update(ids.filter((item) => item !== id));
         return "removed" as const;
       }
       if (ids.length >= MAX_COMPARE) return "full" as const;
-      setIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      update([...ids, id]);
       return "added" as const;
     },
-    [ids],
+    [ids, update],
   );
 
   const value = useMemo<CompareContextValue>(
@@ -62,11 +65,11 @@ export function CompareProvider({ children }: { children: ReactNode }) {
       ids,
       has: (id) => ids.includes(id),
       toggle,
-      remove: (id) => setIds((prev) => prev.filter((item) => item !== id)),
-      clear: () => setIds([]),
+      remove: (id) => update(ids.filter((item) => item !== id)),
+      clear: () => update([]),
       full: ids.length >= MAX_COMPARE,
     }),
-    [ids, toggle],
+    [ids, toggle, update],
   );
 
   return <CompareContext.Provider value={value}>{children}</CompareContext.Provider>;

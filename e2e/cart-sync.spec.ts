@@ -42,3 +42,12 @@ test("an item added just before a reload is saved", async ({ page }) => {
   await page.reload();
   await expect.poll(() => cartCount(page), { timeout: 10_000 }).toBe(1);
 });
+
+test("a guest's item added just before a reload is kept", async ({ page }) => {
+  await page.goto("/products/cmwb6090", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /^Add to Cart$/ }).first().click();
+  await expect(page.getByRole("button", { name: /Added/ }).first()).toBeVisible();
+  await page.reload({ waitUntil: "networkidle" });
+  await page.goto("/cart", { waitUntil: "networkidle" });
+  await expect(page.locator("main")).toContainText(/Classic Magnetic Whiteboard 2×3/);
+});

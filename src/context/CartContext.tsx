@@ -14,6 +14,32 @@ import type { CartConfiguration, CartItem } from "@/lib/types";
 import { getProductById } from "@/data/catalogue";
 import { cartLineId } from "@/lib/auth/cart";
 
+export type CartEdit =
+  | { op: "add"; item: CartItem }
+  | { op: "set"; id: string; quantity: number }
+  | { op: "remove"; id: string }
+  | { op: "clear" };
+
+/** Applies recorded edits to a list of cart lines, the same way the cart itself applies them. */
+export function replayCartEdits(start: CartItem[], edits: CartEdit[]): CartItem[] {
+  let lines = start.map((line) => ({ ...line }));
+  for (const edit of edits) {
+    if (edit.op === "add") {
+      const existing = lines.find((line) => line.id === edit.item.id);
+      lines = existing
+        ? lines.map((line) => (line.id === edit.item.id ? { ...line, quantity: clampQty(line.quantity + edit.item.quantity) } : line))
+        : [...lines, { ...edit.item }];
+    } else if (edit.op === "set") {
+      lines = lines.map((line) => (line.id === edit.id ? { ...line, quantity: clampQty(edit.quantity) } : line)).filter((line) => line.quantity > 0);
+    } else if (edit.op === "remove") {
+      lines = lines.filter((line) => line.id !== edit.id);
+    } else {
+      lines = [];
+    }
+  }
+  return lines;
+}
+
 interface CartContextValue {
   items: CartItem[];
   itemCount: number;
@@ -29,6 +55,13 @@ interface CartContextValue {
   removeItem: (id: string) => void;
   clearCart: () => void;
   replaceItems: (next: CartItem[]) => void;
+  /**
+   * The customer's own changes (add, quantity, remove, clear) since the page loaded, in order.
+   * Loading from browser storage and replaceItems() aren't recorded. AuthContext replays the
+   * changes made while the saved account was loading, so they aren't lost when it arrives.
+   */
+  editCount: () => number;
+  editsSince: (mark: number) => CartEdit[];
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -77,6 +110,9 @@ function readGuestCart(): CartItem[] {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const hydrated = useRef(false);
+  const edits = useRef<CartEdit[]>([]);
+  const editCount = useCallback(() => edits.current.length, []);
+  const editsSince = useCallback((mark: number) => edits.current.slice(mark), []);
 
   // Guest cart persistence (signed-in carts are also saved server-side by AuthContext).
   useEffect(() => {
@@ -125,6 +161,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       const id = buildId(productId, config);
       const price = unitPrice ?? product.price;
+      if (clampQty(quantity) >= 1) {
+        edits.current.push({ op: "add", item: { id, productId, quantity: clampQty(quantity), configuration: config, unitPrice: price } });
+      }
 
       setItems((prev) => {
         const existing = prev.find((item) => item.id === id);
@@ -151,6 +190,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
+    edits.current.push({ op: "set", id, quantity });
     setItems((prev) =>
       prev
         .map((item) =>
@@ -161,10 +201,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const removeItem = useCallback((id: string) => {
+    edits.current.push({ op: "remove", id });
     setItems((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const clearCart = useCallback(() => {
+    edits.current.push({ op: "clear" });
+    setItems([]);
+  }, []);
   const replaceItems = useCallback((next: CartItem[]) => setItems(next), []);
 
   const value = useMemo<CartContextValue>(() => {
@@ -183,8 +227,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       clearCart,
       replaceItems,
+      editCount,
+      editsSince,
     };
-  }, [items, addItem, addSetup, updateQuantity, removeItem, clearCart, replaceItems]);
+  }, [items, addItem, addSetup, updateQuantity, removeItem, clearCart, replaceItems, editCount, editsSince]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

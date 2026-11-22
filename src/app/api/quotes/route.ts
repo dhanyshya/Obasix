@@ -11,6 +11,7 @@ import {
 } from "@/lib/quotes/schema";
 import { fileExtensions as extensions, sniffType } from "@/lib/files";
 import { saveFile } from "@/lib/storage/files";
+import { grantQuoteAccess } from "@/lib/quotes/access";
 import { sendEmail, staffAlertEmails } from "@/lib/email/send";
 import { quoteReceivedEmail, staffNewQuoteEmail } from "@/lib/email/templates";
 import { allowQuoteAttempt, saveDemoQuote, type StoredQuote } from "@/lib/quotes/demo-store";
@@ -228,6 +229,8 @@ export async function POST(request: Request) {
   } catch {
     // Attribution is best effort; the quote is already saved.
   }
+  // This browser may now open the quote on the confirmation page.
+  await grantQuoteAccess(saved.reference);
   // A retry with the same idempotency key returns the earlier quote: only email the first time.
   const isNew = saved.reference === quote.reference;
   let notified = false;

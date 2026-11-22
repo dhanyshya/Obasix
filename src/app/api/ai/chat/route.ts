@@ -1,4 +1,5 @@
 import { catalogueAssist } from "@/lib/ai/catalogueAssist";
+import { sameOrigin } from "@/lib/auth/session";
 import { clientAddress } from "@/lib/rateLimit";
 import {
   OBASIX_AI_SYSTEM_PROMPT,
@@ -78,6 +79,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Only this site's pages may use the assistant; other sites can't spend its AI budget.
+  if (!sameOrigin(request)) return Response.json({ ok: false, message: "The request was rejected." }, { status: 403 });
   const config = getAiProviderConfig();
 
   let body: unknown;

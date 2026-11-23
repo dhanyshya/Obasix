@@ -38,6 +38,11 @@ jobs:
       - name: End-to-end tests (desktop, tablet, mobile)
         run: npx playwright test
 
+      # Payments, email and AI against a local stand-in for Razorpay, Resend and Claude.
+      # Runs after the main suite: Next.js allows one dev server per project folder.
+      - name: Integration tests (Razorpay, Resend, Claude stand-in)
+        run: npm run test:e2e:integrations
+
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -46,12 +51,22 @@ jobs:
           path: playwright-report/
           retention-days: 14
 
+      - name: Upload integration report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-integrations
+          path: playwright-report-integrations/
+          retention-days: 14
+
       - name: Upload failure traces and videos
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: test-results/
+          path: |
+            test-results/
+            test-results-integrations/
           retention-days: 14
 
   # Firefox and WebKit, one job each, on clean runners. Same suite as above minus the

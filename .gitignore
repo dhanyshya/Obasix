@@ -46,6 +46,8 @@ next-env.d.ts
 e2e/.tmp/
 test-results/
 playwright-report/
+test-results-integrations/
+playwright-report-integrations/
 
 # design tool scratch output
 .impeccable/review/

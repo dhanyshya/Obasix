@@ -44,13 +44,13 @@ function waitForHydration(page: Page) {
     return response;
   };
 }
-/** Served in place of remote product images (see offlineImages): the site's own logo, a real PNG. */
+/** Served in place of remote images (see offlineImages): the site's own logo, a real PNG. */
 const placeholderPng = readFileSync(path.join(process.cwd(), "public/assets/obasix-logo-official.png"));
 
 /**
- * Product photos come from Shopify's CDN through Next's image optimiser. When the CDN is
- * briefly unreachable from CI, the optimiser answers 500 and a test fails for reasons outside
- * this app, so tests get a placeholder for remote images instead. Local images still load.
+ * Some imagery (e.g. Unsplash photos) is remote and goes through Next's image optimiser. When
+ * that host is briefly unreachable from CI, the optimiser answers 500 and a test fails for
+ * reasons outside this app, so tests get a placeholder for remote images. Local images load.
  */
 async function offlineImages(context: BrowserContext) {
   await context.route(/\/_next\/image\?.*url=https?%3A/, (route) => route.fulfill({ status: 200, contentType: "image/png", body: placeholderPng }));

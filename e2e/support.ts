@@ -18,24 +18,36 @@ const randomIp = () => `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.
 export const uid = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 /**
- * The dev server's hot-reload socket (`/_next/hmr` with Turbopack, `/_next/webpack-hmr` with
- * webpack). Turbopack's dev server sends WebKit a full reload every few seconds (dev only;
- * production has no hot reload), resetting forms mid-test. Tests never edit source files, so the
- * socket is answered locally and left silent in every browser.
+ * Navigations wait until React has hydrated the page (the app sets `<html data-hydrated>`), so
+ * clicks and typing are handled by the app. Before that, a click on a submit button is a plain
+ * browser form submission that reloads the page, and the slower browsers often get there first.
  */
-const hotReload = /\/_next\/(webpack-)?hmr/;
-async function silenceHotReload(context: BrowserContext) {
-  await context.routeWebSocket(hotReload, () => {});
+async function hydrated(page: Page) {
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
+}
+function waitForHydration(page: Page) {
+  const goto = page.goto.bind(page);
+  const reload = page.reload.bind(page);
+  page.goto = async (...args) => {
+    const response = await goto(...args);
+    await hydrated(page);
+    return response;
+  };
+  page.reload = async (...args) => {
+    const response = await reload(...args);
+    await hydrated(page);
+    return response;
+  };
+}
+function hydrationAware(context: BrowserContext) {
+  context.on("page", waitForHydration);
 }
 
-export const test = base.extend<{ silencedHotReload: void }>({
-  silencedHotReload: [
-    async ({ context }, provide) => {
-      await silenceHotReload(context);
-      await provide();
-    },
-    { auto: true },
-  ],
+export const test = base.extend({
+  context: async ({ context }, provide) => {
+    hydrationAware(context);
+    await provide(context);
+  },
   // The fixture callback is named `provide` (Playwright calls it `use`) so the React hooks lint rule doesn't mistake it for a hook.
   extraHTTPHeaders: async ({}, provide) => {
     await provide({ "x-forwarded-for": randomIp() });
@@ -46,7 +58,7 @@ export { expect };
 /** A fresh browser context with its own client address, for a second person in the same test. */
 export async function newVisitor(browser: Browser, baseURL: string): Promise<{ context: BrowserContext; page: Page }> {
   const context = await browser.newContext({ baseURL, extraHTTPHeaders: { "x-forwarded-for": randomIp() } });
-  await silenceHotReload(context);
+  hydrationAware(context);
   return { context, page: await context.newPage() };
 }
 

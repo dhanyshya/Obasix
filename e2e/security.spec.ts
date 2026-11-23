@@ -50,3 +50,22 @@ test("the staff portal opens on Orders", async ({ page }) => {
   await expect(page).toHaveURL(/\/admin\/orders$/);
   await expect(page.getByRole("heading", { level: 1, name: "Orders" })).toBeVisible();
 });
+
+test("a form submitted before the page is interactive doesn't reload and lose what was typed", async ({ browser, baseURL }) => {
+  // A plain context (no hydration wait) with the app's JavaScript held back, as on a slow phone.
+  const context = await browser.newContext({ baseURL });
+  await context.route("**/_next/static/chunks/**", (route) => route.abort());
+  const page = await context.newPage();
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
+  let reloaded = false;
+  page.on("framenavigated", (frame) => {
+    if (frame === page.mainFrame()) reloaded = true;
+  });
+  await page.getByLabel("Email").fill("early@example.test");
+  await page.locator('main form button[type="submit"]').click();
+  await page.waitForTimeout(1500);
+  expect(reloaded).toBe(false);
+  expect(page.url()).toMatch(/\/login$/);
+  await expect(page.getByLabel("Email")).toHaveValue("early@example.test");
+  await context.close();
+});

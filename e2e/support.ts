@@ -17,7 +17,40 @@ export const PASSWORD = "Correct-horse-2027";
 const randomIp = () => `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`;
 export const uid = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
+/**
+ * Navigations wait until React has hydrated the page (the app sets `<html data-hydrated>`), so
+ * clicks and typing are handled by the app. Before that, a click on a submit button is a plain
+ * browser form submission that reloads the page, and typing is reset when React takes over the
+ * field; the slower browsers often get there first.
+ */
+async function hydrated(page: Page) {
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
+  // Parts inside a Suspense boundary hydrate later and mark themselves until they have.
+  await expect(page.locator("[data-hydration-pending]")).toHaveCount(0);
+}
+function waitForHydration(page: Page) {
+  const goto = page.goto.bind(page);
+  const reload = page.reload.bind(page);
+  page.goto = async (...args) => {
+    const response = await goto(...args);
+    await hydrated(page);
+    return response;
+  };
+  page.reload = async (...args) => {
+    const response = await reload(...args);
+    await hydrated(page);
+    return response;
+  };
+}
+function hydrationAware(context: BrowserContext) {
+  context.on("page", waitForHydration);
+}
+
 export const test = base.extend({
+  context: async ({ context }, provide) => {
+    hydrationAware(context);
+    await provide(context);
+  },
   // The fixture callback is named `provide` (Playwright calls it `use`) so the React hooks lint rule doesn't mistake it for a hook.
   extraHTTPHeaders: async ({}, provide) => {
     await provide({ "x-forwarded-for": randomIp() });
@@ -28,6 +61,7 @@ export { expect };
 /** A fresh browser context with its own client address, for a second person in the same test. */
 export async function newVisitor(browser: Browser, baseURL: string): Promise<{ context: BrowserContext; page: Page }> {
   const context = await browser.newContext({ baseURL, extraHTTPHeaders: { "x-forwarded-for": randomIp() } });
+  hydrationAware(context);
   return { context, page: await context.newPage() };
 }
 

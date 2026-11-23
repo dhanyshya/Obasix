@@ -33,6 +33,7 @@ import {
   validateQuoteFields,
 } from "@/lib/quotes/schema";
 import type { QuoteRequest } from "@/lib/types";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import { quoteTheme } from "./quoteTheme";
 
 type QuoteInitial = Partial<QuoteRequest> & {
@@ -60,6 +61,7 @@ const fieldSx = {
 
 export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
   const router = useRouter();
+  const hydrated = useHydrated();
   const cart = useCart();
   const idempotencyKey = useRef(crypto.randomUUID());
   const requestedProduct = initial?.productId ? getProductById(initial.productId) : undefined;
@@ -210,6 +212,8 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
       component="form"
       onSubmit={onSubmit}
       noValidate
+      // Hydrates after the rest of the page (inside Suspense); tests wait for this to clear.
+      data-hydration-pending={hydrated ? undefined : ""}
       sx={{
         display: "grid",
         gap: { xs: 3.5, lg: 4.5 },
@@ -591,7 +595,7 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
               <Button
                 type="submit"
                 variant="contained"
-                disabled={submitting}
+                disabled={submitting || !hydrated}
                 startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : undefined}
                 sx={{
                   minWidth: 220,

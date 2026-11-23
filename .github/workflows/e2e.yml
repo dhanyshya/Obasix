@@ -49,6 +49,7 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 14
 
       - name: Upload integration report
         if: ${{ !cancelled() }}
@@ -57,14 +58,15 @@ jobs:
           name: playwright-report-integrations
           path: playwright-report-integrations/
           retention-days: 14
-          retention-days: 14
 
       - name: Upload failure traces and videos
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: test-results/
+          path: |
+            test-results/
+            test-results-integrations/
           retention-days: 14
 
   # Firefox and WebKit, one job each, on clean runners. Same suite as above minus the

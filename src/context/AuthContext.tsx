@@ -31,6 +31,34 @@ type AuthResult = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * A signed-in cart change not yet confirmed by the server. Written synchronously on every change,
+ * so it survives a reload even where the browser drops the unload-time save (WebKit does).
+ */
+const unsavedKey = "obasix_unsaved_account";
+type Unsaved = { userId: string; items: CartItem[]; ids: string[] };
+function readUnsaved(userId: string): Unsaved | null {
+  try {
+    const value = JSON.parse(localStorage.getItem(unsavedKey) ?? "null") as Unsaved | null;
+    return value?.userId === userId ? value : null;
+  } catch {
+    return null;
+  }
+}
+function rawUnsaved() {
+  try {
+    return localStorage.getItem(unsavedKey);
+  } catch {
+    return null;
+  }
+}
+function writeUnsaved(value: Unsaved | null) {
+  try {
+    if (value) localStorage.setItem(unsavedKey, JSON.stringify(value));
+    else localStorage.removeItem(unsavedKey);
+  } catch {}
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [ready, setReady] = useState(false);
@@ -64,7 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const account = (await fetch("/api/account").then((response) => response.json())) as { cart?: CartItem[]; wishlist?: string[] };
     if (generation.current !== current) return;
-    applyAccount(account.cart ?? [], account.wishlist ?? [], editMark);
+    // Changes from the last visit that never reached the server win over the saved copy (and are resent).
+    const unsaved = readUnsaved(session.user.id);
+    applyAccount(unsaved?.items ?? account.cart ?? [], unsaved?.ids ?? account.wishlist ?? [], editMark);
     setReady(true);
   };
 
@@ -87,20 +117,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       configuration: item.configuration,
     }));
     const ids = wishlist.ids;
+    const userId = user.id;
+    writeUnsaved({ userId, items: cart.items, ids });
+    const written = rawUnsaved();
     const send = (keepalive: boolean) => {
       pendingSave.current = null;
-      void fetch("/api/account?action=cart", {
+      const cartSaved = fetch("/api/account?action=cart", {
         method: "POST",
         keepalive,
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ lines }),
       });
-      void fetch("/api/account?action=wishlist-sync", {
+      const wishlistSaved = fetch("/api/account?action=wishlist-sync", {
         method: "POST",
         keepalive,
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ids }),
       });
+      // Forget the local copy once both saves land, unless a newer change has replaced it meanwhile.
+      void Promise.all([cartSaved, wishlistSaved])
+        .then((responses) => {
+          if (responses.every((r) => r.ok) && written !== null && rawUnsaved() === written) writeUnsaved(null);
+        })
+        .catch(() => {});
     };
     pendingSave.current = () => send(true);
     const timer = window.setTimeout(() => send(false), 400);
@@ -146,6 +185,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     generation.current += 1;
     canSave.current = false;
+    writeUnsaved(null);
     await fetch("/api/auth?action=logout", { method: "POST" });
     setUser(null);
   };

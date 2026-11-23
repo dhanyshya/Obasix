@@ -26,7 +26,10 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: `next dev -p ${port}`,
+        // Turbopack's dev server sends WebKit into a reload loop (every page reloads every few
+        // seconds, so forms reset mid-test). Production has no hot reload, so real Safari users are
+        // unaffected; the cross-browser runs use the webpack dev server, which doesn't loop.
+        command: `next dev${allBrowsers ? " --webpack" : ""} -p ${port}`,
         url: `${baseURL}/api/commerce/mode`,
         reuseExistingServer: true,
         timeout: 180_000,

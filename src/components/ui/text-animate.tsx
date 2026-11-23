@@ -75,12 +75,6 @@ const defaultContainerVariants = {
   },
 };
 
-const defaultItemVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1 },
-  exit: { opacity: 0 },
-};
-
 const defaultItemAnimationVariants: Record<
   AnimationVariant,
   { container: Variants; item: Variants }

@@ -17,7 +17,25 @@ export const PASSWORD = "Correct-horse-2027";
 const randomIp = () => `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`;
 export const uid = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
-export const test = base.extend({
+/**
+ * The dev server's hot-reload socket (`/_next/hmr` with Turbopack, `/_next/webpack-hmr` with
+ * webpack). Turbopack's dev server sends WebKit a full reload every few seconds (dev only;
+ * production has no hot reload), resetting forms mid-test. Tests never edit source files, so the
+ * socket is answered locally and left silent in every browser.
+ */
+const hotReload = /\/_next\/(webpack-)?hmr/;
+async function silenceHotReload(context: BrowserContext) {
+  await context.routeWebSocket(hotReload, () => {});
+}
+
+export const test = base.extend<{ silencedHotReload: void }>({
+  silencedHotReload: [
+    async ({ context }, provide) => {
+      await silenceHotReload(context);
+      await provide();
+    },
+    { auto: true },
+  ],
   // The fixture callback is named `provide` (Playwright calls it `use`) so the React hooks lint rule doesn't mistake it for a hook.
   extraHTTPHeaders: async ({}, provide) => {
     await provide({ "x-forwarded-for": randomIp() });
@@ -28,6 +46,7 @@ export { expect };
 /** A fresh browser context with its own client address, for a second person in the same test. */
 export async function newVisitor(browser: Browser, baseURL: string): Promise<{ context: BrowserContext; page: Page }> {
   const context = await browser.newContext({ baseURL, extraHTTPHeaders: { "x-forwarded-for": randomIp() } });
+  await silenceHotReload(context);
   return { context, page: await context.newPage() };
 }
 

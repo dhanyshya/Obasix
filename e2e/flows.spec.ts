@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./support";
 
 // Navigations wait for "networkidle" so clicks and typing land after React hydrates;
 // earlier clicks were sometimes dropped (flaky "compare", and WebKit form tests).

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { ConfirmationExperience } from "@/components/checkout/ConfirmationExperience";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ConfirmationPage() {
   return (
-    <Suspense
+    <HydratingSuspense
       fallback={
         <Container sx={{ py: 10 }}>
           <Typography color="text.secondary">Loading confirmation…</Typography>
@@ -18,6 +18,6 @@ export default function ConfirmationPage() {
       }
     >
       <ConfirmationExperience />
-    </Suspense>
+    </HydratingSuspense>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { PurchaseSteps } from "@/components/checkout/PurchaseSteps";
@@ -24,9 +24,9 @@ export default function TrackOrderPage() {
       <Box sx={{ maxWidth: 720, mx: "auto", px: { xs: 2, sm: 4 }, py: { xs: 4, md: 7 } }}>
         <PurchaseSteps current={3} />
         <Box sx={{ mt: 3, bgcolor: brand.white, borderTop: 0, p: { xs: 2.5, md: 4 } }}>
-          <Suspense fallback={<Typography variant="body2" color="text.secondary">Loading tracking…</Typography>}>
+          <HydratingSuspense fallback={<Typography variant="body2" color="text.secondary">Loading tracking…</Typography>}>
             <TrackOrder />
-          </Suspense>
+          </HydratingSuspense>
         </Box>
       </Box>
     </Box>

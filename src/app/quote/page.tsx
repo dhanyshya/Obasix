@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import { useSearchParams } from "next/navigation";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -47,7 +47,7 @@ function QuoteContent() {
 
 export default function QuotePage() {
   return (
-    <Suspense
+    <HydratingSuspense
       fallback={
         <Box sx={{ bgcolor: quoteTheme.ivory, py: 10 }}>
           <Container>
@@ -57,6 +57,6 @@ export default function QuotePage() {
       }
     >
       <QuoteContent />
-    </Suspense>
+    </HydratingSuspense>
   );
 }

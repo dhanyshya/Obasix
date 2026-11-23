@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { VisualizeStart } from "@/components/visualize/VisualizeStart";
@@ -11,7 +11,7 @@ export const metadata = {
 
 export default function VisualizeIndexPage() {
   return (
-    <Suspense
+    <HydratingSuspense
       fallback={
         <Box sx={{ minHeight: "50vh", display: "grid", placeItems: "center" }}>
           <CircularProgress size={28} />
@@ -19,6 +19,6 @@ export default function VisualizeIndexPage() {
       }
     >
       <VisualizeStart />
-    </Suspense>
+    </HydratingSuspense>
   );
 }

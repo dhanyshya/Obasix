@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import { useSearchParams } from "next/navigation";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -406,7 +407,7 @@ function NotCustomizableState({ product }: { product: Product }) {
 
 export default function CustomizePage() {
   return (
-    <Suspense
+    <HydratingSuspense
       fallback={
         <Box sx={{ width: "100%", maxWidth: 1280, mx: "auto", px: { xs: 2.5, md: 4 }, py: 10, display: "flex", alignItems: "center", gap: 1.5 }}>
           <CircularProgress size={20} />
@@ -415,6 +416,6 @@ export default function CustomizePage() {
       }
     >
       <CustomizeContent />
-    </Suspense>
+    </HydratingSuspense>
   );
 }

@@ -104,6 +104,8 @@ test.describe("commerce (demo mode)", () => {
     const other = await page.context().browser()!.newContext();
     const p2 = await other.newPage();
     await p2.goto("/orders/track", { waitUntil: "networkidle" });
+    // This context is made directly, so it doesn't get support.ts's hydration wait: wait here.
+    await p2.locator("html[data-hydrated]").waitFor({ state: "attached" });
     await p2.getByLabel("Order number").fill(orderId);
     await p2.getByLabel("Email or phone").fill("+91 98765 01234");
     await p2.getByRole("button", { name: "Track Order" }).click();

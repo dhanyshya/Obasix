@@ -120,7 +120,10 @@ test("partner: apply → staff approve → register project → staff quote marg
   await project.getByRole("button", { name: /manage/i }).click();
   await staff.page.getByLabel("Quoted value (₹)").fill("480000");
   await staff.page.getByLabel("Margin %").fill("10");
+  // Let the staff save land before the partner looks.
+  const quoteSaved = staff.page.waitForResponse((r) => r.url().endsWith("/api/admin/partners") && r.request().method() === "POST" && r.ok());
   await staff.page.getByRole("button", { name: /save quote|quote/i }).first().click();
+  await quoteSaved;
 
   await page.reload();
   await expect(page.locator("tr").filter({ hasText: client })).toContainText("10%");

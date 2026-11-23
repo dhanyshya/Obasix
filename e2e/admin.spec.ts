@@ -183,7 +183,9 @@ test.describe("storefront → staff → customer workflows", () => {
 
     // Staff stop tracking: the product shows no availability at all.
     await staff.page.reload();
+    const stopped = staff.page.waitForResponse((r) => r.url().endsWith("/api/admin/stock") && r.request().method() === "POST" && r.ok());
     await staff.page.getByRole("row", { name: /Superior Pin-up Green 2×3/ }).getByRole("button", { name: "Stop tracking" }).click();
+    await stopped;
     await page.reload();
     await expect(page.getByRole("status").filter({ hasText: /in stock|left|Made to order/ })).toHaveCount(0);
     await staff.context.close();

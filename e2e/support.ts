@@ -20,10 +20,13 @@ export const uid = () => `${Date.now().toString(36)}${Math.random().toString(36)
 /**
  * Navigations wait until React has hydrated the page (the app sets `<html data-hydrated>`), so
  * clicks and typing are handled by the app. Before that, a click on a submit button is a plain
- * browser form submission that reloads the page, and the slower browsers often get there first.
+ * browser form submission that reloads the page, and typing is reset when React takes over the
+ * field; the slower browsers often get there first.
  */
 async function hydrated(page: Page) {
   await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
+  // Parts inside a Suspense boundary hydrate later and mark themselves until they have.
+  await expect(page.locator("[data-hydration-pending]")).toHaveCount(0);
 }
 function waitForHydration(page: Page) {
   const goto = page.goto.bind(page);

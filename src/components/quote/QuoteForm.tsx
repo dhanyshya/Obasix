@@ -212,6 +212,8 @@ export function QuoteForm({ initial }: { initial?: QuoteInitial }) {
       component="form"
       onSubmit={onSubmit}
       noValidate
+      // Hydrates after the rest of the page (inside Suspense); tests wait for this to clear.
+      data-hydration-pending={hydrated ? undefined : ""}
       sx={{
         display: "grid",
         gap: { xs: 3.5, lg: 4.5 },

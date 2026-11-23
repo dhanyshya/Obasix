@@ -196,7 +196,8 @@ test.describe("accounts", () => {
     await link.click();
     await page.getByLabel(/password/i).first().fill("new-horse-battery-2");
     await page.locator('main form button[type="submit"]').click();
-    await expect(page.getByText(/updated|changed|sign in/i).first()).toBeVisible();
+    // A successful reset sends the customer to sign in. (Waiting for "sign in" text matched the header link at once.)
+    await expect(page).toHaveURL(/\/login$/);
 
     await page.goto("/login", { waitUntil: "networkidle" });
     await page.getByLabel("Email").fill(email);

@@ -33,6 +33,14 @@ export const metadata: Metadata = {
     "OBASIX designs boards and accessories for offices, classrooms, homes and commercial interiors. Explore, visualize and customize your setup.",
 };
 
+/**
+ * Until React has hydrated a form, its submit handler isn't attached, so a tap on Submit would be
+ * a plain browser submission: the page reloads and everything typed is lost. This cancels those
+ * early submissions. Forms with an explicit `method` (plain HTML forms such as a GET search) are
+ * left alone. `data-hydrated` and `data-hydration-pending` are set by the app (see AppProviders).
+ */
+const earlySubmitGuard = `document.addEventListener("submit",function(e){var f=e.target;if(!(f instanceof HTMLFormElement)||f.hasAttribute("method"))return;if(!document.documentElement.hasAttribute("data-hydrated")||f.closest("[data-hydration-pending]"))e.preventDefault();},true);`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -41,6 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full antialiased" suppressHydrationWarning>
+        <script dangerouslySetInnerHTML={{ __html: earlySubmitGuard }} />
         <AppProviders>
           <Box
             sx={{

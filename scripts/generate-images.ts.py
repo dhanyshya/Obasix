@@ -45,8 +45,8 @@ acc = {
 lines = [
     "/**",
     " * Centralized OBASIX imagery.",
-    " * Category and product URLs are official assets from the OBASIX Shopify CDN (obasix.com).",
-    " * Replace entries with local /public assets when offline files are provided.",
+    " * Category and product photos are official OBASIX assets, served by this app from public/assets/products.",
+    " * Add new photos to public/assets/products and reference them as /assets/products/<file>.",
     " */",
     "",
     "export const images = {",

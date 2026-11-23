@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PageMasthead } from "@/components/layout/PageMasthead";
@@ -19,7 +19,7 @@ export default function SignageDesignPage() {
         crumbs={[{ href: "/signage", label: "Nameplates & Signage" }, { label: "Design your sign" }]}
         compact
       />
-      <Suspense
+      <HydratingSuspense
         fallback={
           <Box sx={{ display: "grid", placeItems: "center", py: 10 }}>
             <CircularProgress size={22} aria-label="Loading sign studio" />
@@ -27,7 +27,7 @@ export default function SignageDesignPage() {
         }
       >
         <SignageStudio />
-      </Suspense>
+      </HydratingSuspense>
     </Box>
   );
 }

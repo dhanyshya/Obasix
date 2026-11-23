@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { ProductShowroom } from "@/components/product/ProductShowroom";
@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function ProductsPage() {
   return (
-    <Suspense
+    <HydratingSuspense
       fallback={
         <Container sx={{ py: 10 }}>
           <Typography color="text.secondary">Loading catalogue...</Typography>
@@ -18,6 +18,6 @@ export default function ProductsPage() {
       }
     >
       <ProductShowroom />
-    </Suspense>
+    </HydratingSuspense>
   );
 }

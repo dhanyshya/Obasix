@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Container from "@mui/material/Container";
 import { LoginForm } from "@/components/auth/LoginForm";
 
@@ -7,8 +7,8 @@ export const metadata: Metadata = { title: "Sign in" };
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<Container sx={{ py: 8 }}>Loading sign in...</Container>}>
+    <HydratingSuspense fallback={<Container sx={{ py: 8 }}>Loading sign in...</Container>}>
       <LoginForm />
-    </Suspense>
+    </HydratingSuspense>
   );
 }

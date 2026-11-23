@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Suspense, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import { useSearchParams } from "next/navigation";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -112,7 +113,7 @@ function SmartSpaceContent() {
 
 export default function SmartSpacePage() {
   return (
-    <Suspense
+    <HydratingSuspense
       fallback={
         <Container sx={{ py: 10 }}>
           <Typography>Loading smart space...</Typography>
@@ -120,6 +121,6 @@ export default function SmartSpacePage() {
       }
     >
       <SmartSpaceContent />
-    </Suspense>
+    </HydratingSuspense>
   );
 }

@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PageMasthead } from "@/components/layout/PageMasthead";
@@ -21,7 +21,7 @@ export default function PlanningPage() {
         compact
       />
       <Box sx={{ ...pageMax, ...pagePad, pt: { xs: 4, md: 6 } }}>
-        <Suspense
+        <HydratingSuspense
           fallback={
             <Box sx={{ display: "grid", placeItems: "center", py: 10 }}>
               <CircularProgress size={22} aria-label="Loading planner designer" />
@@ -29,7 +29,7 @@ export default function PlanningPage() {
           }
         >
           <PlannerStudio />
-        </Suspense>
+        </HydratingSuspense>
       </Box>
     </Box>
   );

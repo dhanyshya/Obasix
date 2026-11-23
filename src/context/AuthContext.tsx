@@ -161,21 +161,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const submit = async (action: "login" | "register", payload: Record<string, unknown>): Promise<AuthResult> => {
     generation.current += 1;
-    const response = await fetch(`/api/auth?action=${action}`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        ...payload,
-        cart: cart.items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          configuration: item.configuration,
-        })),
-        wishlist: wishlist.ids,
-      }),
-    });
-    const result = (await response.json()) as AuthResult & { user?: SessionUser; cart?: CartItem[]; wishlist?: string[] };
-    if (!response.ok || !result.user) return result;
+    // A dropped connection or a non-JSON error page must not leave the form spinning.
+    const failed: AuthResult = { ok: false, message: "Something went wrong. Check your connection and try again." };
+    let response: Response;
+    let result: AuthResult & { user?: SessionUser; cart?: CartItem[]; wishlist?: string[] };
+    try {
+      response = await fetch(`/api/auth?action=${action}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          cart: cart.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            configuration: item.configuration,
+          })),
+          wishlist: wishlist.ids,
+        }),
+      });
+      result = (await response.json()) as typeof result;
+    } catch {
+      return failed;
+    }
+    if (!response.ok || !result.user) return result.message || result.errors ? result : failed;
     setUser(result.user);
     applyAccount(result.cart ?? [], result.wishlist ?? []);
     setReady(true);

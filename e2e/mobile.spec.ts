@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support";
 
 test("mobile bottom navigation reaches products, customize and cart", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });

@@ -6,7 +6,9 @@ import { expect, signUp, test } from "./support";
  * 2. an item added just before a reload was lost because the delayed save never went out.
  */
 async function cartCount(page: import("@playwright/test").Page) {
-  const response = await page.request.get("/api/account");
+  // A dropped connection to the dev server (ECONNRESET) counts as "not yet", so expect.poll retries.
+  const response = await page.request.get("/api/account").catch(() => null);
+  if (!response) return -1;
   const body = await response.json();
   return (body.cart ?? []).reduce((sum: number, line: { quantity: number }) => sum + line.quantity, 0);
 }

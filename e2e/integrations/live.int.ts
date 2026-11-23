@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { createHmac } from "node:crypto";
 import type { APIRequestContext, Page } from "@playwright/test";
 import { integrationSecrets } from "../../playwright.integrations.config";
@@ -141,10 +143,8 @@ test.describe("email (Resend)", () => {
 });
 
 test.describe("design help (Claude)", () => {
-  const photo = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-    "base64",
-  );
+  // A real PNG (the site logo): the route checks the file type, and Claude would read the image.
+  const photo = readFileSync(path.join(process.cwd(), "public/assets/obasix-logo-official.png"));
   const suggest = (page: Page) =>
     page.request.post("/api/ai/frame-colours", {
       headers: { origin: appOrigin() },

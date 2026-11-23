@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { test as base, expect, type Browser, type BrowserContext, type Page } from "@playwright/test";
 
 /**
@@ -42,13 +44,26 @@ function waitForHydration(page: Page) {
     return response;
   };
 }
-function hydrationAware(context: BrowserContext) {
+/** Served in place of remote product images (see offlineImages): the site's own logo, a real PNG. */
+const placeholderPng = readFileSync(path.join(process.cwd(), "public/assets/obasix-logo-official.png"));
+
+/**
+ * Product photos come from Shopify's CDN through Next's image optimiser. When the CDN is
+ * briefly unreachable from CI, the optimiser answers 500 and a test fails for reasons outside
+ * this app, so tests get a placeholder for remote images instead. Local images still load.
+ */
+async function offlineImages(context: BrowserContext) {
+  await context.route(/\/_next\/image\?.*url=https?%3A/, (route) => route.fulfill({ status: 200, contentType: "image/png", body: placeholderPng }));
+}
+
+async function hydrationAware(context: BrowserContext) {
   context.on("page", waitForHydration);
+  await offlineImages(context);
 }
 
 export const test = base.extend({
   context: async ({ context }, provide) => {
-    hydrationAware(context);
+    await hydrationAware(context);
     await provide(context);
   },
   // The fixture callback is named `provide` (Playwright calls it `use`) so the React hooks lint rule doesn't mistake it for a hook.
@@ -61,7 +76,7 @@ export { expect };
 /** A fresh browser context with its own client address, for a second person in the same test. */
 export async function newVisitor(browser: Browser, baseURL: string): Promise<{ context: BrowserContext; page: Page }> {
   const context = await browser.newContext({ baseURL, extraHTTPHeaders: { "x-forwarded-for": randomIp() } });
-  hydrationAware(context);
+  await hydrationAware(context);
   return { context, page: await context.newPage() };
 }
 

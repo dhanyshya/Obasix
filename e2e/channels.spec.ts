@@ -92,7 +92,11 @@ test("partner: apply → staff approve → register project → staff quote marg
   await page.getByLabel("State").fill("Maharashtra");
   await page.getByLabel("School or college").check();
   await page.getByLabel(/partner terms/).check();
+  const applied = page.waitForResponse((r) => r.url().endsWith("/api/partners") && r.request().method() === "POST");
   await page.getByRole("button", { name: "Apply to partner" }).click();
+  // If the application is refused, fail with the server's reason rather than a missing heading.
+  const reply = await applied;
+  expect(reply.ok(), `apply → ${reply.status()} ${await reply.text()}`).toBe(true);
   await expect(page.getByText(/under review|pending|received/i).first()).toBeVisible();
 
   const staff = await newVisitor(browser, baseURL!);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import Alert from "@mui/material/Alert";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -11,10 +11,8 @@ import Stack from "@mui/material/Stack";
 import { AuthCard, AuthPasswordField, authBackLinkSx, authSubmitButtonSx } from "@/components/auth/AuthFields";
 import NextLink from "@/components/Link";
 
-export function ResetPasswordForm() {
-  const searchParams = useSearchParams();
+export function ResetPasswordForm({ token = "" }: { token?: string }) {
   const router = useRouter();
-  const token = searchParams.get("token") ?? "";
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);

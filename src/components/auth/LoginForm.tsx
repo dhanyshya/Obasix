@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
@@ -11,11 +11,11 @@ import { AuthCard, AuthPasswordField, AuthTextField } from "@/components/auth/Au
 import NextLink from "@/components/Link";
 import { useAuth } from "@/context/AuthContext";
 
-export function LoginForm() {
+/** `nextPath` is the page's ?next= value, read on the server so the form is in the first HTML. */
+export function LoginForm({ nextPath }: { nextPath?: string }) {
   const { signIn } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const next = safeNext(searchParams.get("next"));
+  const next = safeNext(nextPath ?? null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

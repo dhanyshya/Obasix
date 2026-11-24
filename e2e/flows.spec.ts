@@ -195,6 +195,12 @@ test.describe("accounts", () => {
     await page.getByLabel("Email").fill(email);
     await page.locator('main form button[type="submit"]').click();
     const link = page.locator('a[href^="/reset-password?token="]');
+    if (process.env.E2E_SERVER === "production") {
+      // A production build never shows the link on the page; it only goes by email (see the integration suite).
+      await expect(page.getByText(/reset link was not sent|sent a link/i)).toBeVisible();
+      await expect(link).toHaveCount(0);
+      return;
+    }
     await expect(link).toBeVisible();
     await link.click();
     await page.getByLabel(/password/i).first().fill("new-horse-battery-2");

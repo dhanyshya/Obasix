@@ -61,6 +61,13 @@ test("a form submitted before the page is interactive doesn't reload and lose wh
   page.on("framenavigated", (frame) => {
     if (frame === page.mainFrame()) reloaded = true;
   });
+  // A production build prerenders /login with a loading placeholder, so there's no form to type
+  // into until the page is interactive, and nothing typed can be lost. The dev server renders the form.
+  if ((await page.getByLabel("Email").count()) === 0) {
+    await expect(page.getByText("Loading sign in...")).toBeVisible();
+    await context.close();
+    return;
+  }
   await page.getByLabel("Email").fill("early@example.test");
   await page.locator('main form button[type="submit"]').click();
   await page.waitForTimeout(1500);

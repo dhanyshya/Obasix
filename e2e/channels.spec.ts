@@ -162,7 +162,10 @@ test("company account: create → add a colleague → save the cart as a shared 
   await expect(page.getByText(email)).toBeVisible();
 
   await page.getByLabel("Save current cart as a list").fill("Branch standard");
+  // Wait for the list to be saved before the colleague looks for it.
+  const listSaved = page.waitForResponse((r) => r.url().endsWith("/api/company") && r.request().method() === "POST" && (r.request().postData() ?? "").includes("Branch standard"));
   await page.getByRole("button", { name: "Save list" }).click();
+  expect((await listSaved).ok()).toBe(true);
 
   // The colleague sees the shared list from their own account.
   await colleague.page.goto("/account/company", { waitUntil: "networkidle" });

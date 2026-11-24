@@ -39,6 +39,8 @@ export default defineConfig({
           OBASIX_ADMIN_EMAILS: "e2e-staff@example.test",
           // Tests send a per-test X-Forwarded-For so the shared rate limits don't trip across tests.
           TRUST_PROXY_HEADERS: "1",
+          // A production build refuses sign-in without AUTH_SECRET. A throwaway value for the test server only.
+          ...(production ? { AUTH_SECRET: "e2e-only-not-a-real-secret" } : {}),
         },
       },
   projects: [

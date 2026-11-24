@@ -1,77 +1,83 @@
-# OBASIX Industries — Premium Ecommerce UI
+# OBASIX Industries — Ecommerce Site
 
-Next-generation ecommerce experience for **OBASIX Industries** — whiteboards, notice boards, pin-up boards, combination boards, stands and accessories.
+Ecommerce site for **OBASIX Industries**: whiteboards, notice boards, pin-up boards, combination boards, signage, stands and accessories. It covers the shop, board and sign customisation, quotes, checkout, customer accounts, trade channels (distributors, partners, associates) and a staff admin.
 
-Inspired by the real catalogue at [obasix.com](https://www.obasix.com/).
+Based on the real catalogue at [obasix.com](https://www.obasix.com/).
 
-## Brand
+**Stack:** Next.js 16 (App Router), React 19, MUI 9, Tailwind 4, Postgres or SQLite, Vercel Blob, Razorpay, Resend, Claude.
 
-- Official logo: `public/obasix-logo.png`
-- Tokens: forest green (`#174F3A`), charcoal (`#202923`), pale green (`#F0F5EF`) in `src/theme/brandTokens.ts` and `src/app/globals.css`
+## Getting started
 
-## Run
+Requires **Node 24** (Node 22.13 or later is the minimum, for `node:sqlite`). CI runs on Node 24.
 
 ```bash
+npm install
+cp .env.example .env.local   # optional: every integration is off until its keys are set
 npm run dev
 ```
 
-Copy `.env.example` to `.env.local` and set AI keys when you want live chat answers (see below).
+With no settings, the site runs in **demo mode**: SQLite and local files under `.data/`, simulated payments (`OBASIX_COMMERCE_MODE=demo`), no emails and no AI suggestions.
 
-## Key routes
+## Configuration
 
-| Route | Purpose |
+Each integration switches on when its environment variables are set. [docs/going-live.md](docs/going-live.md) has the full production checklist.
+
+| Area | Variables |
 | --- | --- |
-| `/` | Homepage — Discover / Customize / Build |
-| `/products` | Showroom catalogue |
-| `/products/[id]` | Product detail |
-| `/customize` | Design Your Board customizer |
-| `/visualize` | Visualize Your Space |
-| `/smart-space` | Space setups + Build Your Setup |
-| `/cart` | Your OBASIX Setup |
-| `/quote` | Custom quote with file uploads |
-| `/orders/track` | Order tracking |
-| `/solutions` | Application solutions |
-| `/about` | About OBASIX |
-| `/compare` | Side-by-side product comparison |
-| `/api/ai/chat` | Server-side OBASIX AI chat (POST) |
+| Site & accounts | `NEXT_PUBLIC_SITE_URL`, `AUTH_SECRET` (required in production), `OBASIX_ADMIN_EMAILS` (staff allowed into `/admin`) |
+| Database | `DATABASE_URL` (Postgres, e.g. Neon). Without it, data is stored in local SQLite (`OBASIX_AUTH_DB`) |
+| File storage | `BLOB_READ_WRITE_TOKEN`: private Vercel Blob store for quote attachments and design proofs |
+| Payments | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` |
+| Email | `RESEND_API_KEY`, `EMAIL_FROM`, `OBASIX_STAFF_ALERT_EMAILS` (optional) |
+| AI design help | `ANTHROPIC_API_KEY`: frame-colour suggestions in the visualizer and alternative layouts in the sign studio |
+| AI chat assistant | `OBASIX_AI_API_KEY` (falls back to `OPENAI_API_KEY`), `OBASIX_AI_BASE_URL`, `OBASIX_AI_MODEL` |
+| Hosting | `TRUST_PROXY_HEADERS=1` only when self-hosting behind a proxy you control |
 
-## OBASIX AI Assistant
+API keys are only read on the server. Never prefix them with `NEXT_PUBLIC_`.
 
-The floating **Ask OBASIX AI** button is global (root layout). Chat calls **`POST /api/ai/chat`** on the server — API keys are never exposed to the browser.
+### Ask OBASIX AI (chat assistant)
 
-### Configuration
+The floating chat button appears on every page. It calls `POST /api/ai/chat`, which uses any OpenAI-compatible Chat Completions provider (the default is `https://api.openai.com/v1` with `gpt-4o-mini`). Answers are based on the catalogue in `src/data/catalogue.ts`, and the server checks each recommended product id before showing a product card.
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `OBASIX_AI_API_KEY` | Yes (for live AI) | API key for an OpenAI-compatible Chat Completions provider |
-| `OBASIX_AI_BASE_URL` | No | Defaults to `https://api.openai.com/v1` |
-| `OBASIX_AI_MODEL` | No | Defaults to `gpt-4o-mini` |
-| `OPENAI_API_KEY` | Fallback | Used if `OBASIX_AI_API_KEY` is unset |
+If no key is set, or the provider returns an auth or quota error, the chat shows a short message, a Retry button, suggestions from the catalogue and links to Products, Customize and Quote. It never makes up an answer. To check the configuration, call `GET /api/ai/chat` or `GET /api/ai/status`, or run `node scripts/diagnose-ai.mjs`.
 
-Without a key — or if the provider returns quota/auth errors — the assistant stays usable with a friendly message, Retry, catalogue-grounded suggestions, and links to Products / Customize / Quote. It does **not** invent fake AI answers or claim a live model reply succeeded.
+## Routes
 
-If OpenAI returns `insufficient_quota` / `credit_balance_exhausted`, add credits in the OpenAI billing dashboard or switch `OBASIX_AI_BASE_URL` / `OBASIX_AI_API_KEY` to another OpenAI-compatible provider.
+| Area | Routes |
+| --- | --- |
+| Shop | `/`, `/products`, `/products/[id]`, `/compare`, `/kits`, `/materials`, `/premium` |
+| Design tools | `/customize`, `/visualize`, `/smart-space`, `/planning`, `/signage`, `/signage/design` |
+| Buying | `/cart`, `/checkout`, `/quote`, `/orders/track` |
+| Company | `/about`, `/solutions`, `/projects`, `/oem` |
+| Trade channels | `/distributors`, `/partners`, `/associates` |
+| Accounts | `/login`, `/register`, `/forgot-password`, `/account/*` (orders, quotes, proofs, wishlist, company, channel dashboards) |
+| Staff | `/admin/*` (orders, quotes, proofs, stock, distributors, partners, associates) |
+| API | `/api/*`: route handlers for AI, auth, commerce, quotes, proofs, stock and the trade channels |
 
-Catalogue grounding uses `src/data/catalogue.ts`. Recommended product ids are validated server-side before cards are shown.
+## Project layout
 
-Check status: `GET /api/ai/chat`.
+- `src/app/`: pages and API route handlers
+- `src/components/`: UI, including the chat assistant in `src/components/ai/`
+- `src/data/`: catalogue (`catalogue.ts`) and image map (`images.ts`)
+- `src/lib/`: server logic: `db`, `auth`, `commerce` (Razorpay), `email` (Resend), `storage` (Blob or local files), `ai`, `quotes`, `proofs`, `stock`, and the trade channels
+- `src/theme/`: brand tokens and the MUI theme
 
-## Data architecture
+## Brand
 
-- Catalogue: `src/data/catalogue.ts` (real SKUs / series / prices from OBASIX catalogue)
-- Images: `src/data/images.ts` (centralized — replace with official CDN assets later)
-- AI: `src/app/api/ai/chat/route.ts` + `src/lib/ai/*` + floating UI in `src/components/ai/`
+- Logo: `public/obasix-logo.png`
+- Colours: forest green `#174F3A`, charcoal `#202923`, pale green `#F0F5EF`. They are defined in `src/theme/brandTokens.ts` and `src/app/globals.css`.
+- Design system: [DESIGN.md](DESIGN.md). Product overview: [PRODUCT.md](PRODUCT.md).
 
-## Experience
-
-**Discover → Ask OBASIX AI → Find product → Customize → Visualize → Accessories → Cart / Quote**
-
-## Testing
+## Scripts and testing
 
 ```bash
+npm run lint
 npm run typecheck
-npx playwright install chromium   # first time only
-npm run test:e2e                  # starts `next dev` on :3217 in demo mode with a throwaway DB
+npx playwright install chromium     # first time only
+npm run test:e2e                    # starts `next dev` on :3217 in demo mode with a throwaway database
+npm run test:e2e:production         # desktop suite against a production build
+npm run test:e2e:browsers           # all browsers
+npm run test:e2e:integrations       # integration suite (playwright.integrations.config.ts)
 ```
 
-See `docs/testing.md` for coverage and `PRODUCT.md` / `docs/` for the audit, feature inventory and roadmap.
+[docs/testing.md](docs/testing.md) describes test coverage. The `docs/` folder also holds the codebase audit, feature inventory, gap analysis and roadmap.

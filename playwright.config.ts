@@ -9,7 +9,9 @@ import { defineConfig, devices } from "@playwright/test";
  * UI mode:       npm run test:e2e:ui
  * Report:        npm run test:e2e:report     (HTML report from the last run)
  * All browsers:  npm run test:e2e:browsers   (adds Firefox and WebKit; run `npx playwright install firefox webkit` once)
+ * Production:    npm run test:e2e:production (builds the app and tests `next start` instead of the dev server)
  */
+const production = process.env.E2E_SERVER === "production";
 const allBrowsers = process.env.E2E_ALL_BROWSERS === "1";
 const port = Number(process.env.E2E_PORT ?? 3217);
 const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${port}`;
@@ -26,10 +28,10 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: `next dev -p ${port}`,
+        command: production ? `next build && next start -p ${port}` : `next dev -p ${port}`,
         url: `${baseURL}/api/commerce/mode`,
         reuseExistingServer: true,
-        timeout: 180_000,
+        timeout: production ? 600_000 : 180_000,
         env: {
           OBASIX_AUTH_DB: ".data/e2e-auth.sqlite",
           OBASIX_COMMERCE_MODE: "demo",

@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -10,7 +11,10 @@ export const metadata = {
   description: "Weekly and monthly planners, task boards, production dashboards and training boards, printed on a magnetic whiteboard to your layout.",
 };
 
-export default function PlanningPage() {
+export default async function PlanningPage() {
+  // Rendered per request so the part that reads the address bar (useSearchParams) is in the
+  // server HTML; prerendered, it was a loading placeholder until JavaScript arrived.
+  await connection();
   return (
     <Box sx={{ bgcolor: "#F2F3F0", pb: { xs: 10, md: 8 } }}>
       <PageMasthead

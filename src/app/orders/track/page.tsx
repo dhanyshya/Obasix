@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import type { Metadata } from "next";
 import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Box from "@mui/material/Box";
@@ -11,7 +12,10 @@ export const metadata: Metadata = {
   title: "Track order",
 };
 
-export default function TrackOrderPage() {
+export default async function TrackOrderPage() {
+  // Rendered per request so the part that reads the address bar (useSearchParams) is in the
+  // server HTML; prerendered, it was a loading placeholder until JavaScript arrived.
+  await connection();
   return (
     <Box sx={{ bgcolor: brand.ivory }}>
       <PageMasthead

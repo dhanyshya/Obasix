@@ -12,12 +12,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     qualities: [75, 90],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-    ],
+    // Every image is served from public/: no remote image hosts are allowed.
   },
 };
 

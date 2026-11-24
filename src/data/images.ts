@@ -9,7 +9,7 @@ export const images = {
   heroWorkspace: "/hero-workspace-photo.jpg",
   /** Full-bleed campaign hero — modern workspace with clear board presence */
   heroCampaign:
-    "https://images.unsplash.com/photo-1604328698692-f76ea9498e76?auto=format&fit=crop&w=2000&q=85",
+    "/assets/lifestyle/photo-1604328698692-f76ea9498e76.jpg",
   heroWhiteboard: "/assets/products/a_white_magnetic_white_board_with_a_light-weight_aluminium_frame.png",
   magneticWhiteboard: "/assets/products/1-3_5959cbd2-55f6-4ce6-9b46-e5859a78529d.png",
   magneticWhiteboardAlt: "/assets/products/magnetic_whiteboard_with_a_heavy_aluminium_frame.jpg",
@@ -39,25 +39,25 @@ export const images = {
 
   /** Wall / room templates for Visualize Your Wall */
   wallModernOffice:
-    "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1497366216548-37526070297c.jpg",
   wallExecutiveOffice:
-    "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1497366811353-6870744d04b2.jpg",
   wallMeetingRoom:
-    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1497366754035-f200968a6e72.jpg",
   wallClassroom:
-    "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1580582932707-520aed937b7b.jpg",
   wallHomeOffice:
-    "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1513694203232-719a280e022f.jpg",
   wallLivingRoom:
-    "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1618221195710-dd6b41faaea6.jpg",
   wallStartup:
-    "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1497366216548-37526070297c.jpg",
   wallTrainingRoom:
-    "https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1431540015161-0bf868a2d407.jpg",
   wallReception:
-    "https://images.unsplash.com/photo-1568992687947-868a62a9f521?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1568992687947-868a62a9f521.jpg",
   wallCommercial:
-    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
+    "/assets/lifestyle/photo-1486406146926-c627a92ad1ab.jpg",
 } as const;
 
 /** Dedicated wall scene map for Visualize Your Wall */

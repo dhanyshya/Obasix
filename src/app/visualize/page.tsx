@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -9,7 +10,10 @@ export const metadata = {
     "Choose an OBASIX board, upload a photo of your wall, and preview how it looks before you buy.",
 };
 
-export default function VisualizeIndexPage() {
+export default async function VisualizeIndexPage() {
+  // Rendered per request so the part that reads the address bar (useSearchParams) is in the
+  // server HTML; prerendered, it was a loading placeholder until JavaScript arrived.
+  await connection();
   return (
     <HydratingSuspense
       fallback={

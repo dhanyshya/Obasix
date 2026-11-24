@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { HydratingSuspense } from "@/components/HydratingSuspense";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -8,7 +9,10 @@ export const metadata = {
   description: "Explore OBASIX boards, stands and accessories for working spaces.",
 };
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  // Rendered per request so the part that reads the address bar (useSearchParams) is in the
+  // server HTML; prerendered, it was a loading placeholder until JavaScript arrived.
+  await connection();
   return (
     <HydratingSuspense
       fallback={

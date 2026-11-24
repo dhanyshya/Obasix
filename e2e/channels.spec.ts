@@ -1,4 +1,4 @@
-import { expect, newVisitor, placeDemoOrder, signInAsStaff, signUp, test, uid } from "./support";
+import { api, expect, newVisitor, placeDemoOrder, signInAsStaff, signUp, test, uid } from "./support";
 import type { Page } from "@playwright/test";
 
 /**
@@ -132,6 +132,16 @@ test("partner: apply → staff approve → register project → staff quote marg
   await page.reload();
   await expect(page.locator("tr").filter({ hasText: client })).toContainText("10%");
   await staff.context.close();
+
+  // The same registration sent twice at once (a double submit, or a POST the browser resends over
+  // a dropped connection) is registered once, and both copies get the same answer.
+  const resent = `E2E Resent School ${uid()}`;
+  const registration = { action: "register-project", clientName: resent, city: "Pune", sector: "School or college", scope: "12 classrooms: one magnetic board each", expectedValue: 500000, expectedDate: "2027-06-01" };
+  const [first, second] = await Promise.all([api(page, "/api/partners", registration), api(page, "/api/partners", registration)]);
+  expect([first.status, second.status], JSON.stringify([first.body, second.body])).toEqual([200, 200]);
+  expect(second.body.id).toBe(first.body.id);
+  await page.reload();
+  await expect(page.locator("tbody tr").filter({ hasText: resent })).toHaveCount(1);
 });
 
 test("company account: create → add a colleague → save the cart as a shared reorder list", async ({ page, browser, baseURL }) => {

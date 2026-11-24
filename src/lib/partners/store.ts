@@ -213,6 +213,9 @@ export async function applyAsPartner(input: {
   return (await findPartner(input.userId))!;
 }
 
+/** A repeat of a registration this soon after it is treated as the same request resent. */
+const resendWindowMs = 2 * 60 * 1000;
+
 export type RegisterResult = { ok: true; project: Project } | { ok: false; message: string };
 
 export async function registerProject(input: {
@@ -228,32 +231,45 @@ export async function registerProject(input: {
     return { ok: false, message: `Projects start at ₹${minimumProjectValue.toLocaleString("en-IN")}. Smaller orders can go through the website or the associate programme.` };
   }
   const key = clientKey(input.clientName, input.city);
-  const now = new Date();
-  const open = (await (await db()).get(`SELECT id, partner_user_id FROM partner_projects
-       WHERE client_key = ? AND status NOT IN ('Lost', 'Paid') AND protected_until > ? ORDER BY created_at LIMIT 1`, key, now.toISOString())) as { id: string; partner_user_id: string } | undefined;
-  if (open?.partner_user_id === input.partnerUserId) {
-    return { ok: false, message: `You already registered this client (${open.id}).` };
-  }
+  // Check and insert in one transaction, so two copies of the same request (a double submit, or
+  // a browser resending a POST over a dropped keep-alive connection) can't both pass the check.
+  const outcome = await (await db()).transaction(async (tx): Promise<{ id: string } | { message: string }> => {
+    // Postgres: lock this partner's row so their registrations run one at a time.
+    // (SQLite transactions already run one at a time.)
+    if (tx.engine === "postgres") await tx.get("SELECT user_id FROM partners WHERE user_id = ? FOR UPDATE", input.partnerUserId);
+    const now = new Date();
+    const open = (await tx.get(`SELECT id, partner_user_id, created_at FROM partner_projects
+         WHERE client_key = ? AND status NOT IN ('Lost', 'Paid') AND protected_until > ? ORDER BY created_at LIMIT 1`, key, now.toISOString())) as
+      | { id: string; partner_user_id: string; created_at: string }
+      | undefined;
+    if (open?.partner_user_id === input.partnerUserId) {
+      // The same registration arriving again within moments is a resend: answer as the first did.
+      if (now.getTime() - Date.parse(open.created_at) < resendWindowMs) return { id: open.id };
+      return { message: `You already registered this client (${open.id}).` };
+    }
 
-  const id = `PRJ-${randomBytes(3).toString("hex").toUpperCase()}`;
-  const protectedUntil = new Date(now.getTime() + projectProtectionDays * 86400000).toISOString();
-  (await (await db()).run(`INSERT INTO partner_projects (id, partner_user_id, client_name, client_key, city, sector, scope, expected_value, expected_date,
-         conflict_with, protected_until, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, id,
-      input.partnerUserId,
-      input.clientName,
-      key,
-      input.city,
-      input.sector,
-      input.scope,
-      input.expectedValue,
-      input.expectedDate,
-      // Registered by another partner first: kept, but flagged for staff. The earlier registration stands.
-      open?.id ?? "",
-      protectedUntil,
-      now.toISOString(),
-      now.toISOString(),));
-  return { ok: true, project: (await findProject(id))! };
+    const id = `PRJ-${randomBytes(3).toString("hex").toUpperCase()}`;
+    const protectedUntil = new Date(now.getTime() + projectProtectionDays * 86400000).toISOString();
+    await tx.run(`INSERT INTO partner_projects (id, partner_user_id, client_name, client_key, city, sector, scope, expected_value, expected_date,
+           conflict_with, protected_until, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, id,
+        input.partnerUserId,
+        input.clientName,
+        key,
+        input.city,
+        input.sector,
+        input.scope,
+        input.expectedValue,
+        input.expectedDate,
+        // Registered by another partner first: kept, but flagged for staff. The earlier registration stands.
+        open?.id ?? "",
+        protectedUntil,
+        now.toISOString(),
+        now.toISOString());
+    return { id };
+  });
+  if ("message" in outcome) return { ok: false, message: outcome.message };
+  return { ok: true, project: (await findProject(outcome.id))! };
 }
 
 export async function findProject(id: string) {

@@ -361,7 +361,7 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 | Status | **Complete** |
 | How | `src/lib/fastApiServer.ts` `readFromFastApi(path)`: inside a server component, GETs FastAPI with the visitor's cookie, client IP and the proxy secret. It returns `undefined` when the area is still on Next.js, so each page keeps its direct read as the fallback and the switch stays reversible per area |
 | New endpoint | `GET /api/proofs`: the signed-in customer's proof threads, newest first, only for quotes linked to the account or sent from its email |
-| Unchanged on purpose | `layout.tsx` only reads the session cookie (same cookie and table as FastAPI's auth). The company page's "recent orders" list keeps its direct read: FastAPI has no customer order-list endpoint yet; it moves with MIG-012 |
+| Unchanged on purpose | `layout.tsx` only reads the session cookie (same cookie and table as FastAPI's auth). The company page's "recent orders" first kept its direct read; since MIG-012a it reads `GET /api/commerce/orders` too |
 | Rollback | Remove the area from `OBASIX_API_ROUTES`; the page falls back to its direct read |
 
 **Tests**
@@ -394,6 +394,22 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 | Objective | Delete the site's own handlers for every area FastAPI now serves (`src/app/api/*` for the 21 areas), the old `/admin` pages and `src/components/admin/*`, the direct-read fallbacks added in MIG-010, and the store code only they use |
 | Status | **Not started: gated.** It removes the rollback path for every earlier migration, so it waits for evidence from production |
 | Gate (all required) | 1. Production has run with all 21 areas in `OBASIX_API_ROUTES`, `OBASIX_SCHEMA_OWNER=alembic` and `OBASIX_ADMIN_APP_URL` set for at least two weeks, including a month-end. 2. No rollback was used in that time. 3. FastAPI's 5xx rate and p95 latency are no worse than the site's before the switch (Sentry / request logs). 4. A sign-off from the person who owns operations |
-| Also needed first | A customer order-list endpoint in FastAPI, for the company page's "recent orders" (it still reads directly, see MIG-010). `/api/ai/sign-layouts` stays in Next.js by design (its rules also run in the browser) |
+| Also needed first | Done in MIG-012a: the customer order list. `/api/ai/sign-layouts` stays in Next.js by design (its rules also run in the browser) |
 | Steps when the gate passes | Delete in one PR per area group (auth+account, admin, quotes+proofs, commerce, channels, AI), each running the regression suite with that group's code gone. Then make `OBASIX_API_URL` required in production builds, drop `servedByFastApi` fallbacks, and move the site's suites that exercised the portal (`e2e/admin.spec.ts`) onto the admin app |
 | Rollback | Revert the PR; config switches still exist until the last step |
+
+## MIG-012a: Customer order list on FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | The last direct read on the account pages (company page, "recent orders") goes through FastAPI |
+| Status | **Complete** |
+| Endpoint | `GET /api/commerce/orders` with no `id`: the signed-in account's newest 50 orders (same query as the site's `listDemoOrdersForUser`); 401 when signed out. It answers in every commerce mode, because the history is the account's own data and the company page reorders from it. With `?id=` the behaviour is unchanged. The path is already in the `commerce` area, so no forwarding change |
+| Rollback | Remove `commerce` from `OBASIX_API_ROUTES`; the page falls back to its direct read |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): signed out → 401; own orders newest first; still listed when checkout is unconfigured while `?id=` keeps its 503; another account sees none | 131/131 |
+| Migration E2E: a demo order placed through FastAPI is listed by `GET /api/commerce/orders` and shown on `/account/company` | migration-010 and 006: 6/6 Chromium |

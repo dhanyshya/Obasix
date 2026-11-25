@@ -412,4 +412,4 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 | Suite | Result |
 |---|---|
 | API (pytest): signed out → 401; own orders newest first; still listed when checkout is unconfigured while `?id=` keeps its 503; another account sees none | 131/131 |
-| Migration E2E: a demo order placed through FastAPI is listed by `GET /api/commerce/orders` and shown on `/account/company` | migration-010 and 006: 6/6 Chromium |
+| Migration E2E: a demo order placed through FastAPI is listed by `GET /api/commerce/orders` and shown on `/account/company` | migration-010 and 006: 6/6 Chromium. Whole migration suite (MIG-001 to 012a), three browsers: 138/138 |

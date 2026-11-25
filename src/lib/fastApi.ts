@@ -41,6 +41,8 @@ export const apiAreas: Record<string, string[]> = {
   partners: ["/api/partners", "/api/partners/me"],
   "admin-partners": ["/api/admin/partners", "/api/admin/projects"],
   company: ["/api/company"],
+  // MIG-008. /api/ai/sign-layouts stays here, next to the signage rules the design studio also runs in the browser.
+  ai: ["/api/ai/status", "/api/ai/chat", "/api/ai/frame-colours"],
 };
 
 export type FastApiConfig = { target: string; secret: string; paths: Set<string>; prefixes: string[] } | null;
@@ -76,4 +78,24 @@ export function fastApiConfig(env: Record<string, string | undefined> = process.
     throw new Error("OBASIX_API_ROUTES includes quotes: set AUTH_SECRET, the same value on the site and the API.");
   }
   return { target, secret, paths, prefixes };
+}
+
+/**
+ * MIG-011: where the React admin app lives. When set, the site's /admin pages redirect there.
+ * It must be an absolute http(s) URL, and needs the FastAPI admin areas on (the app talks only to FastAPI).
+ */
+export function adminAppUrl(env: Record<string, string | undefined> = process.env): string | null {
+  const raw = env.OBASIX_ADMIN_APP_URL?.trim();
+  if (!raw) return null;
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new Error(`OBASIX_ADMIN_APP_URL must be an absolute URL, got "${raw}".`);
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("OBASIX_ADMIN_APP_URL must be http or https.");
+  if (!(env.OBASIX_API_ROUTES ?? "").split(",").map((a) => a.trim()).includes("admin-core")) {
+    throw new Error("OBASIX_ADMIN_APP_URL needs the admin-core area in OBASIX_API_ROUTES: the admin app talks only to FastAPI.");
+  }
+  return url.origin + url.pathname.replace(/\/$/, "");
 }

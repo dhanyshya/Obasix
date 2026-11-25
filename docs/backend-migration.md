@@ -49,8 +49,9 @@ Quote attachments and design proofs live in a private Vercel Blob store in produ
 | Variable | Where | Purpose |
 |---|---|---|
 | `OBASIX_API_URL` | site | FastAPI base URL. Leave unset to keep everything in Next.js |
-| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`, `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs`, `commerce`, `stock`, `admin-orders`, `associates`, `admin-associates`, `distributors`, `admin-distributors`, `partners`, `admin-partners`, `company`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
+| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`, `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs`, `commerce`, `stock`, `admin-orders`, `associates`, `admin-associates`, `distributors`, `admin-distributors`, `partners`, `admin-partners`, `company`, `ai`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | site and API | The same values on both once `commerce` is on (the webhook URL stays the site's) |
+| `ANTHROPIC_API_KEY`; `OBASIX_AI_API_KEY`, `OBASIX_AI_BASE_URL`, `OBASIX_AI_MODEL` | API (and the site for sign layouts) | Claude for design help; the chat's OpenAI-compatible provider |
 | `BLOB_READ_WRITE_TOKEN` | site and API | The same private Blob store (production) |
 | `OBASIX_FILES_DIR` | API | The site's `.data` folder when there's no Blob token |
 | `AUTH_SECRET` | site and API | Required on both, with the same value, once `quotes` or `quote-submit` is on: it signs the cookie that lets a browser read the quote it sent. The build fails without it |
@@ -73,8 +74,11 @@ The build fails if `OBASIX_API_URL` is set without `DATABASE_URL` or a valid sec
 | MIG-005b | Files, quote submission, proofs | `POST /api/quotes`, `/api/admin/quotes/{ref}/file`, `/api/proofs`, `/api/proofs/{id}/file`, `/api/admin/proofs`; admin app Proofs page | Done, off by default; see tracking |
 | MIG-006 | Commerce | `/api/commerce/{mode,orders,payment,payment/webhook,track}`, `/api/stock`, `/api/admin/orders`; admin app Orders page | Done, off by default; see tracking |
 | MIG-007 | Trade channels | Associates, distributors, partners, company accounts (customer and staff endpoints); admin app pages | Done, off by default; see tracking |
-| MIG-008 | AI | chat, frame colours, sign layouts | Planned |
-| MIG-009 | Schema ownership | Next.js stops creating tables; Alembic owns every change; SQLite dropped | Planned |
+| MIG-008 | AI | `/api/ai/status`, `/api/ai/chat`, `/api/ai/frame-colours` on FastAPI; `/api/ai/sign-layouts` stays in Next.js by design | Done, off by default; see tracking |
+| MIG-009 | Schema ownership | Alembic owns the schema (`OBASIX_SCHEMA_OWNER=alembic`: the site issues no DDL); `scripts/check-schema.sh` proves parity in CI | Done; see tracking |
+| MIG-010 | Account pages via FastAPI | Associate, company, distributor, partner and proofs account pages render from FastAPI instead of the database | Planned |
+| MIG-011 | Retire the Next.js staff portal | `/admin` pages hand over to the React admin app | Planned |
+| MIG-012 | Remove migrated route handlers | Delete `src/app/api/*` handlers for areas proven in production | After a production run |
 
 ## Running it
 

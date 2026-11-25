@@ -13,6 +13,7 @@ dependencies = [
   "httpx>=0.28",
   "sentry-sdk[fastapi]>=2.40",
   "python-multipart>=0.0.20",
+  "anthropic>=1.0",
 ]
 
 [dependency-groups]

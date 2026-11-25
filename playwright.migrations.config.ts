@@ -77,7 +77,11 @@ export default defineConfig({
       env: {
         DATABASE_URL: databaseUrl,
         OBASIX_API_URL: `http://127.0.0.1:${apiPort}`,
-        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company",
+        // MIG-009: the site issues no DDL; FastAPI's `alembic upgrade head` (run first) made every table.
+        OBASIX_SCHEMA_OWNER: "alembic",
+        // MIG-011: the site's /admin pages redirect to the React admin app.
+        OBASIX_ADMIN_APP_URL: "http://localhost:4173",
+        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company,ai",
         OBASIX_API_PROXY_SECRET: secret,
         OBASIX_COMMERCE_MODE: "demo",
         OBASIX_ADMIN_EMAILS: STAFF_EMAILS,

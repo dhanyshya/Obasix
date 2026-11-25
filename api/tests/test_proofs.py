@@ -200,3 +200,20 @@ async def test_staff_list_filters_and_upload_audit():
         actions = await (await conn.execute("SELECT action, detail FROM audit_log ORDER BY id")).fetchall()
     assert [a["action"] for a in actions] == ["proof.upload"] * 3
     assert actions[1]["detail"]["version"] == 2
+
+
+async def test_customer_lists_only_their_own_threads(client):
+    await save_quote()
+    await save_quote("OBX-QUOTE-DEMO-PRF002", email="other@example.com")
+    async with signed_in("boss@example.com") as boss:
+        await upload(boss)
+        await upload(boss, note="Second version")
+        await upload(boss, reference="OBX-QUOTE-DEMO-PRF002")
+    assert (await client.get("/api/proofs")).status_code == 401
+    async with signed_in("buyer@example.com") as buyer:
+        threads = (await buyer.get("/api/proofs")).json()["threads"]
+    assert [t["reference"] for t in threads] == [REF]
+    assert [p["version"] for p in threads[0]["proofs"]] == [2, 1]
+    assert threads[0]["proofs"][0]["status"] == "pending"
+    async with signed_in("stranger@example.com") as stranger:
+        assert (await stranger.get("/api/proofs")).json()["threads"] == []

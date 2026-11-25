@@ -413,3 +413,12 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 |---|---|
 | API (pytest): signed out → 401; own orders newest first; still listed when checkout is unconfigured while `?id=` keeps its 503; another account sees none | 131/131 |
 | Migration E2E: a demo order placed through FastAPI is listed by `GET /api/commerce/orders` and shown on `/account/company` | migration-010 and 006: 6/6 Chromium. Whole migration suite (MIG-001 to 012a), three browsers: 138/138 |
+
+**Regression script with the admin redirect on (`scripts/regression-fastapi.sh`)**
+
+The script now starts the site as production will run it, with `OBASIX_ADMIN_APP_URL` set (`ADMIN_APP_URL=off` restores the old behaviour). The site's tests that drive the old `/admin` pages are tagged `@portal`, and the script runs two passes:
+
+| Pass | Site setting | Tests | Result |
+|---|---|---|---|
+| 1 | `OBASIX_ADMIN_APP_URL=http://localhost:4173` | Everything except `@portal`, plus a new check that `/admin/orders` answers 308 to the admin app | 22/22 |
+| 2 | unset (the MIG-011 rollback) | Only `@portal`: the old portal still works for a deployment that hasn't set the URL | 9/9 |

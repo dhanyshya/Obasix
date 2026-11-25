@@ -44,11 +44,20 @@ test("the AI assistant refuses requests from other sites", async ({ page }) => {
   expect(own.status).not.toBe(403);
 });
 
-test("the staff portal opens on Orders", async ({ page }) => {
+test("the staff portal opens on Orders", { tag: "@portal" }, async ({ page }) => {
   await signInAsStaff(page);
   await page.goto("/admin", { waitUntil: "networkidle" });
   await expect(page).toHaveURL(/\/admin\/orders$/);
   await expect(page.getByRole("heading", { level: 1, name: "Orders" })).toBeVisible();
+});
+
+// MIG-011: with OBASIX_ADMIN_APP_URL set (E2E_ADMIN_APP_URL tells the suite), /admin redirects to the admin app.
+test("the old staff portal redirects to the admin app", async ({ request }) => {
+  const adminApp = process.env.E2E_ADMIN_APP_URL;
+  test.skip(!adminApp, "Only when the site is started with OBASIX_ADMIN_APP_URL.");
+  const response = await request.get("/admin/orders", { maxRedirects: 0 });
+  expect(response.status()).toBe(308);
+  expect(response.headers().location).toBe(`${adminApp!.replace(/\/$/, "")}/orders`);
 });
 
 test("a form submitted before the page is interactive doesn't reload and lose what was typed", async ({ browser, baseURL }) => {

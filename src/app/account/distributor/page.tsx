@@ -8,6 +8,7 @@ import { TradeOrderForm, type TradeProduct } from "@/components/distributors/Tra
 import { signType } from "@/components/home/directory/sign";
 import { getAllProducts, getProductCategoryLabel } from "@/data/catalogue";
 import { readSession } from "@/lib/auth/session";
+import { readFromFastApi } from "@/lib/fastApiServer";
 import { financialQuarter, minimumTradeOrder, tierById } from "@/lib/distributors/program";
 import { creditUsed, findDistributor, listTradeOrders, quarterPurchases, tradePrice, type TradeOrderStatus } from "@/lib/distributors/store";
 import { formatPrice } from "@/lib/format";
@@ -23,12 +24,36 @@ const statusColour: Record<TradeOrderStatus, string> = {
   Cancelled: brand.muted,
 };
 
+type Account = {
+  distributor: NonNullable<Awaited<ReturnType<typeof findDistributor>>>;
+  orders: Awaited<ReturnType<typeof listTradeOrders>>;
+  creditUsed: number;
+  quarter: string;
+  quarterPurchases: number;
+};
+
+// Through FastAPI once the distributors area is switched on; otherwise straight from the database.
+async function readAccount(userId: string): Promise<Account | null> {
+  const remote = await readFromFastApi<Account>("/api/distributors/me");
+  if (remote !== undefined) return remote;
+  const distributor = await findDistributor(userId);
+  if (!distributor) return null;
+  return {
+    distributor,
+    orders: await listTradeOrders(userId),
+    creditUsed: await creditUsed(userId),
+    quarter: financialQuarter(new Date()).label,
+    quarterPurchases: await quarterPurchases(userId),
+  };
+}
+
 const heading = { fontSize: { xs: 34, md: 46 } } as const;
 
 export default async function AccountDistributorPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
-  const distributor = await findDistributor(session.user.id);
+  const account = await readAccount(session.user.id);
+  const distributor = account?.distributor;
 
   if (!distributor || distributor.status === "rejected") {
     return (
@@ -69,12 +94,10 @@ export default async function AccountDistributorPage() {
   }
 
   const tier = tierById(distributor.tier);
-  const used = await creditUsed(session.user.id);
+  const { orders, creditUsed: used, quarterPurchases: purchases } = account!;
   const available = Math.max(distributor.creditLimit - used, 0);
-  const purchases = await quarterPurchases(session.user.id);
-  const quarter = financialQuarter(new Date());
+  const quarter = { label: account!.quarter };
   const progress = distributor.quarterlyTarget > 0 ? Math.min(purchases / distributor.quarterlyTarget, 1) : 0;
-  const orders = await listTradeOrders(session.user.id);
 
   const products: TradeProduct[] = getAllProducts()
     .filter((p) => p.price > 0)

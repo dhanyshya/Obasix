@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { clientAddress } from "@/lib/clientAddress";
-import { fastApiConfig } from "@/lib/fastApi";
+import { fastApiConfig, servedByFastApi } from "@/lib/fastApi";
 
 const fastApi = fastApiConfig();
 
@@ -11,7 +11,7 @@ const fastApi = fastApiConfig();
  */
 export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  if (!fastApi?.paths.has(path)) return NextResponse.next();
+  if (!fastApi || !servedByFastApi(fastApi, path)) return NextResponse.next();
   const headers = new Headers(request.headers);
   headers.set("x-obasix-client-ip", clientAddress(request));
   headers.set("x-obasix-proxy-secret", fastApi.secret);

@@ -6,6 +6,8 @@ cd "$(dirname "$0")/.."
 
 export DATABASE_URL="${DATABASE_URL:-postgresql://obasix:obasix-local-only@localhost:54329/obasix}"
 export OBASIX_API_PROXY_SECRET="${OBASIX_API_PROXY_SECRET:-$(openssl rand -hex 24)}"
+# The site and the API must share it: it signs the quote cookie (MIG-005).
+export AUTH_SECRET="${AUTH_SECRET:-$(openssl rand -hex 24)}"
 SITE_PORT="${PORT:-3000}"
 API_PORT="${API_PORT:-8000}"
 
@@ -21,6 +23,6 @@ trap cleanup EXIT INT TERM
 until curl -sf "http://127.0.0.1:${API_PORT}/health" >/dev/null; do sleep 1; done
 echo "FastAPI ready on :${API_PORT} (docs: http://127.0.0.1:${API_PORT}/docs)"
 
-OBASIX_API_URL="http://127.0.0.1:${API_PORT}" OBASIX_API_ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock}" \
+OBASIX_API_URL="http://127.0.0.1:${API_PORT}" OBASIX_API_ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock,quotes,admin-quotes}" \
   npx next dev -p "$SITE_PORT" &
 wait

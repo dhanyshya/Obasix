@@ -24,11 +24,13 @@ class Permission(StrEnum):
     STOCK_WRITE = "stock:write"
     AUDIT_READ = "audit:read"
     STAFF_MANAGE = "staff:manage"
+    QUOTES_READ = "quotes:read"
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
     "admin": frozenset(Permission),
-    "staff": frozenset({Permission.STOCK_READ, Permission.STOCK_WRITE}),
+    # Staff prepare quotes and proofs, so they may read quote requests (names, emails, phones).
+    "staff": frozenset({Permission.STOCK_READ, Permission.STOCK_WRITE, Permission.QUOTES_READ}),
 }
 ROLES = tuple(ROLE_PERMISSIONS)
 

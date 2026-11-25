@@ -161,3 +161,40 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 4. A WebKit-only check expected Tab to reach links; Safari's default Tab key skips them. Kept for Chromium and Firefox.
 
 **Approaches tried and dropped** (kept for the record): wrapping the context updates in `startTransition` (still 1 duplicate in 5); also waiting for `DOMContentLoaded` (3 in 8); waiting for the swap itself (no duplicates, but on CI's WebKit dev server the swap came seconds late, the update then reset a field the stock test had just typed into, and customers on slow devices could lose typing the same way). Cleaning up the leftover keeps the original timing.
+
+## MIG-005: Reading saved quotes on FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | Serve the customer's quote lookup and a new staff quote list from FastAPI, and add Quotes to the admin app |
+| Status | **Complete (behind a switch).** Off until `OBASIX_API_ROUTES` includes `quotes` and `admin-quotes` |
+| Scope decision | Quotes and proofs were split. Quote submission (with its file), the staff attachment download and proofs all need file storage, which FastAPI can't reach yet (private Vercel Blob, no Python SDK). Decided with the product owner: move the Postgres-only reads now; files and the rest are MIG-005b, after a storage decision (docs/backend-migration.md, "Files") |
+| Endpoints | Same as the site: `GET /api/quotes/{reference}` (signed `obasix_quotes` cookie, matching account email, or linked account; one 404 for "missing" and "not yours"; 60 lookups per 10 min per visitor). New: `GET /api/admin/quotes` (search across reference, name, company, email and phone; board type; with or without a file; date range; order; pages), permission `quotes:read` (admin and staff) |
+| Stays in Next.js | `POST /api/quotes`, `GET /api/admin/quotes/{reference}/file` |
+| Database changes | Alembic `0004`: `quote_requests` with `IF NOT EXISTS` (already created by the site); read-only here |
+| Site changes | `src/lib/fastApi.ts`: entries ending in `/` are prefixes (`/api/quotes/` covers `/api/quotes/<ref>` but not `POST /api/quotes`); `quotes` and `admin-quotes` areas; the build fails if `quotes` is on without `AUTH_SECRET` |
+| Rollback | Remove `quotes` and `admin-quotes` from `OBASIX_API_ROUTES` |
+
+**Behaviour changes (intended)**
+
+- `AUTH_SECRET` must be the same on the site and the API once `quotes` is on. Without it, the site signs quote cookies with a random per-process key that FastAPI can't verify, so FastAPI trusts no quote cookie.
+- The staff role gains `quotes:read`: staff prepare quotes and proofs. Quote requests contain customer names, emails and phones.
+
+**Tests**
+
+| Suite | Cases | Result |
+|---|---|---|
+| API (pytest) | 10 new: non-demo and unknown references; "not yours" gives the same 404; signed cookie accepted, forged ignored, cookie ignored without `AUTH_SECRET`; matching and linked accounts; lookup rate limit; cookie signature identical to the site's (Node `crypto`); staff list access by role; search, board type, file filter, date range incl. time zones, order, pages, literal `%` | 46/46 |
+| Admin app (Vitest) | Quotes list, filters and order sent to the API, details dialog, date-range check; staff nav includes Quotes | 25/25 |
+| Migration E2E | Guest submits on the site (Next.js, no request id) → confirmation page reads it from FastAPI → reload works → other browser and forged cookie get 404; signed-in customer reads it from a second browser after signing in, with no contact details in the customer view; customer gets 404 from the staff list; admin app search, file filter, details | 26/26 Chromium (MIG-001 to 005, twice); 78/78 Chromium, Firefox and WebKit |
+| Regression, all six areas on FastAPI (production build, Postgres) | `flows` (incl. quote submission and confirmation), `security` (incl. "a saved quote is readable by its sender only"), `cart-sync`, `admin`, `channels` | 30/30 |
+
+**Issues found and fixed**
+
+1. JSON `null` attachments: `->'attachment'` is a jsonb `null`, not SQL `NULL`, so "without a file" matched nothing. Now `jsonb_typeof(...) = 'object'`.
+2. Date filters compared Python's `+00:00` ISO format with the site's `...000Z` as text. Now converted to the stored format.
+3. The MIG-003 audit check compared database time with the test machine's clock. It now filters by audit id.
+
+**Watch**
+
+- The MIG-002 password-change test failed once in the first full run (the "current password is incorrect" message never appeared), then passed alone and in two full runs. Not reproduced; if it recurs, the trace will be in the CI report.

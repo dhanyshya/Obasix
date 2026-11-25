@@ -4,6 +4,9 @@
  * Each area listed in OBASIX_API_ROUTES is served by OBASIX_API_URL instead of
  * the route handlers in src/app/api. src/proxy.ts does the forwarding. With
  * OBASIX_API_URL unset, everything stays in Next.js.
+ *
+ * An entry is an exact path, or a prefix when it ends in "/": "/api/quotes/" covers
+ * /api/quotes/<reference> but not /api/quotes itself.
  */
 export const apiAreas: Record<string, string[]> = {
   auth: ["/api/auth"],
@@ -11,9 +14,19 @@ export const apiAreas: Record<string, string[]> = {
   // Staff roles, the audit log and "who am I": endpoints that only exist on FastAPI.
   "admin-core": ["/api/admin/me", "/api/admin/audit", "/api/admin/staff"],
   "admin-stock": ["/api/admin/stock"],
+  // Reading a saved quote. Submitting one (POST /api/quotes, with its file) stays in Next.js.
+  quotes: ["/api/quotes/"],
+  // The staff quote list (FastAPI only). The attachment download, /api/admin/quotes/<ref>/file, stays.
+  "admin-quotes": ["/api/admin/quotes"],
 };
 
-export type FastApiConfig = { target: string; secret: string; paths: Set<string> } | null;
+export type FastApiConfig = { target: string; secret: string; paths: Set<string>; prefixes: string[] } | null;
+
+/** True when `path` belongs to one of the configured areas. */
+export function servedByFastApi(config: FastApiConfig, path: string) {
+  if (!config) return false;
+  return config.paths.has(path) || config.prefixes.some((prefix) => path.startsWith(prefix) && path.length > prefix.length);
+}
 
 /** Reads and checks the settings. Throws on a mistake, so a bad deploy fails at build time. */
 export function fastApiConfig(env: Record<string, string | undefined> = process.env): FastApiConfig {
@@ -28,10 +41,16 @@ export function fastApiConfig(env: Record<string, string | undefined> = process.
     throw new Error("OBASIX_API_URL needs OBASIX_API_PROXY_SECRET (32+ characters), the same value the API has.");
   }
   const paths = new Set<string>();
-  for (const area of (env.OBASIX_API_ROUTES ?? "").split(",").map((a) => a.trim()).filter(Boolean)) {
+  const prefixes: string[] = [];
+  const areas = (env.OBASIX_API_ROUTES ?? "").split(",").map((a) => a.trim()).filter(Boolean);
+  for (const area of areas) {
     const sources = apiAreas[area];
     if (!sources) throw new Error(`OBASIX_API_ROUTES: unknown area "${area}". Known: ${Object.keys(apiAreas).join(", ")}`);
-    sources.forEach((path) => paths.add(path));
+    sources.forEach((path) => (path.endsWith("/") ? prefixes.push(path) : paths.add(path)));
   }
-  return { target, secret, paths };
+  if (areas.includes("quotes") && !env.AUTH_SECRET) {
+    // Quote cookies are signed with AUTH_SECRET; without it the site uses a random per-process key.
+    throw new Error("OBASIX_API_ROUTES includes quotes: set AUTH_SECRET, the same value on the site and the API.");
+  }
+  return { target, secret, paths, prefixes };
 }

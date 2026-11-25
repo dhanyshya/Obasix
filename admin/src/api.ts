@@ -53,7 +53,7 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
 
 // ---------- Types returned by FastAPI ----------
 
-export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage";
+export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage" | "quotes:read";
 export type Me = { email: string; name: string; role: "admin" | "staff"; source: "config" | "granted"; permissions: Permission[] };
 export type StockState = "in-stock" | "low" | "made-to-order" | "untracked";
 export type StockRow = { productId: string; name: string; sku: string; onHand: number | null; state: StockState; updatedBy: string | null; updatedAt: string | null };
@@ -71,3 +71,22 @@ export type AuditEntry = {
   ip: string;
 };
 export type StaffMember = { email: string; role: "admin" | "staff"; source: "config" | "granted"; grantedBy?: string | null; grantedAt?: string | null };
+export type QuoteLine = { productId: string; name: string; sku: string; quantity: number; catalogueUnitPrice: number; detail: string };
+export type QuoteSummary = {
+  reference: string;
+  createdAt: string;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  location: string;
+  boardType: string;
+  product: string;
+  dimensions: string;
+  quantity: number;
+  configurationSummary: string;
+  notes: string;
+  lines: QuoteLine[];
+  catalogueListSubtotal: number;
+  attachment: { name: string; type: string; size: number } | null;
+};

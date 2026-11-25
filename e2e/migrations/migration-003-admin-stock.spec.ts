@@ -31,10 +31,12 @@ async function signInAdmin(request: APIRequestContext, origin: string) {
 
 const stockRow = async () =>
   (await query<{ on_hand: number; updated_by: string }>("SELECT on_hand, updated_by FROM product_stock WHERE product_id = $1", [PRODUCT.id]))[0];
-const auditFor = (requestStart: Date) =>
+/** Audit rows written after `afterId` (ids only grow; no clocks involved). */
+const lastAuditId = async () => Number((await query<{ id: string | null }>("SELECT MAX(id) AS id FROM audit_log"))[0].id ?? 0);
+const auditFor = (afterId: number) =>
   query<{ action: string; actor_email: string; actor_role: string; detail: { before: number | null; after: number | null } }>(
-    "SELECT action, actor_email, actor_role, detail FROM audit_log WHERE target_id = $1 AND at >= $2 ORDER BY id",
-    [PRODUCT.id, requestStart],
+    "SELECT action, actor_email, actor_role, detail FROM audit_log WHERE target_id = $1 AND id > $2 ORDER BY id",
+    [PRODUCT.id, afterId],
   );
 
 test.beforeAll(async () => {
@@ -48,7 +50,7 @@ test.afterAll(async () => {
 });
 
 test("staff set stock on the staff page → FastAPI saves and audits it → customers see it", async ({ browser, baseURL, page }) => {
-  const started = new Date(Date.now() - 1000);
+  const started = await lastAuditId();
   const staff = await visitor(browser, baseURL!);
   await signInAdmin(staff.context.request, baseURL!);
   await open(staff.page, "/admin/stock");
@@ -127,7 +129,7 @@ test("roles: an admin grants 'staff' → stock allowed, audit and staff manageme
   });
   expect(granted.status()).toBe(200);
   const me = await (await clerk.context.request.get("/api/admin/me")).json();
-  expect(me).toMatchObject({ email: clerkEmail, role: "staff", source: "granted", permissions: ["stock:read", "stock:write"] });
+  expect(me).toMatchObject({ email: clerkEmail, role: "staff", source: "granted", permissions: ["quotes:read", "stock:read", "stock:write"] });
 
   const list = await (await clerk.context.request.get(`/api/admin/stock?q=${encodeURIComponent("Pin-up Green 2")}`)).json();
   expect(list.items).toEqual([expect.objectContaining({ productId: PRODUCT.id, state: "untracked", onHand: null })]);

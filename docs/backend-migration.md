@@ -26,8 +26,8 @@ The site's proxy sends the visitor's IP to FastAPI in `x-obasix-client-ip`, alon
 
 | Role | Permissions |
 |---|---|
-| `admin` | `stock:read`, `stock:write`, `audit:read`, `staff:manage` |
-| `staff` | `stock:read`, `stock:write` |
+| `admin` | `stock:read`, `stock:write`, `audit:read`, `staff:manage`, `quotes:read` |
+| `staff` | `stock:read`, `stock:write`, `quotes:read` |
 
 Each later admin migration adds its own permissions (for example `orders:write`) and decides which roles get them.
 
@@ -36,12 +36,21 @@ Each later admin migration adds its own permissions (for example `orders:write`)
 - Signed-out visitors and customers get `404 Not found.` from every admin endpoint. Staff without the permission an endpoint needs get `403`.
 - Until the React admin app (MIG-004) exists, the `/admin` pages in Next.js still admit only `OBASIX_ADMIN_EMAILS`. Someone granted `staff` in the table can use the admin API, but can't open those pages yet.
 
+## Files (open decision, MIG-005b)
+
+Quote attachments and design proofs are stored in a private Vercel Blob store in production (`.data/` on disk otherwise). Vercel has no Python SDK, so FastAPI can't yet write or read them. MIG-005 therefore moved only the quote reads that live in Postgres. Before MIG-005b, choose one:
+
+1. Re-implement the private Blob protocol in Python. Must be verified against a real store with a test token.
+2. Move both apps to S3-compatible storage (R2 or S3), with official SDKs on both sides and a one-off copy of existing files.
+3. A shared directory (`OBASIX_FILES_DIR`), for a single-server or Docker deployment only.
+
 ## Configuration
 
 | Variable | Where | Purpose |
 |---|---|---|
 | `OBASIX_API_URL` | site | FastAPI base URL. Leave unset to keep everything in Next.js |
-| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`) |
+| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
+| `AUTH_SECRET` | site and API | Required on both, with the same value, once `quotes` is on: it signs the cookie that lets a browser read the quote it sent. The build fails without it |
 | `OBASIX_API_PROXY_SECRET` | site and API | Same random value on both sides, 32+ characters |
 | `DATABASE_URL` | site and API | The same Postgres database |
 | `ALLOWED_ORIGINS` | API | Browser origins allowed to make changes (the site, later the admin) |
@@ -57,7 +66,8 @@ The build fails if `OBASIX_API_URL` is set without `DATABASE_URL` or a valid sec
 | MIG-002 | Account data | `/api/account` (profile, password, addresses, wishlist, saved configs, cart; lists orders read-only) | Done, off by default; see tracking |
 | MIG-003 | Admin foundation + stock | Roles (`admin`, `staff`) and permissions, append-only audit log, `/api/admin/{me,audit,staff}`, `/api/admin/stock` | Done, off by default; see tracking |
 | MIG-004 | Admin app | New React app (`admin/`, Vite) on MIG-003; the `/admin` pages in Next.js are retired | Planned |
-| MIG-005 | Quotes and proofs | `/api/quotes*`, `/api/proofs*`, `/api/admin/{quotes,proofs}`, file storage | Planned |
+| MIG-005 | Reading quotes | `GET /api/quotes/{reference}`, staff list `GET /api/admin/quotes`, admin app Quotes page | Done, off by default; see tracking |
+| MIG-005b | Files, quote submission, proofs | File storage decision first (see below), then `POST /api/quotes`, quote attachment download, `/api/proofs*`, `/api/admin/proofs` | Planned |
 | MIG-006 | Commerce (incl. `/api/admin/orders`) | orders, payment, Razorpay webhook, tracking, stock | Planned; highest risk, money moves |
 | MIG-007 | Trade channels | distributors, partners, associates, and their `/api/admin/*` routes; fix DEF-001 first | Planned |
 | MIG-008 | AI | chat, frame colours, sign layouts | Planned |

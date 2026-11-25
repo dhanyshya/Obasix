@@ -17,8 +17,10 @@ const adminApp = `http://localhost:${adminPort}`;
 const apiPort = 8218;
 const site = process.env.E2E_BASE_URL ?? `http://localhost:${sitePort}`;
 const secret = randomBytes(24).toString("hex");
+// Shared by the site and the API: it signs sessions and the quote cookie (MIG-005).
+const authSecret = randomBytes(24).toString("hex");
 // The MIG-003 and MIG-004 suites' admins; their accounts are removed after each run.
-const STAFF_EMAILS = "e2e-staff@example.test,mig003+admin@example.test,mig004+admin@example.test";
+const STAFF_EMAILS = "e2e-staff@example.test,mig003+admin@example.test,mig004+admin@example.test,mig005+admin@example.test";
 const allBrowsers = process.env.E2E_ALL_BROWSERS === "1";
 // A production build by default: `next dev` can fall into an endless "HMR hash mismatch"
 // reload on freshly compiled pages, which stalls browser tests. E2E_SERVER=dev to use it anyway.
@@ -50,6 +52,7 @@ export default defineConfig({
       env: {
         DATABASE_URL: databaseUrl,
         APP_ENV: "development",
+        AUTH_SECRET: authSecret,
         // No .pyc files in the project while Next.js watches it.
         PYTHONDONTWRITEBYTECODE: "1",
         // The site, and the admin app (MIG-004), which reaches FastAPI through its own proxy.
@@ -71,14 +74,14 @@ export default defineConfig({
       env: {
         DATABASE_URL: databaseUrl,
         OBASIX_API_URL: `http://127.0.0.1:${apiPort}`,
-        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock",
+        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes",
         OBASIX_API_PROXY_SECRET: secret,
         OBASIX_COMMERCE_MODE: "demo",
         OBASIX_ADMIN_EMAILS: STAFF_EMAILS,
         TRUST_PROXY_HEADERS: "1",
         NEXT_PUBLIC_SITE_URL: site,
-        // A production build refuses sign-in without it. A throwaway value for the test server only.
-        AUTH_SECRET: "migration-e2e-only-not-a-real-secret",
+        // A production build refuses sign-in without it. A throwaway value for the test servers only.
+        AUTH_SECRET: authSecret,
       },
     },
     {

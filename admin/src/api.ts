@@ -79,7 +79,7 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
 
 // ---------- Types returned by FastAPI ----------
 
-export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage" | "quotes:read" | "proofs:read" | "proofs:write";
+export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage" | "quotes:read" | "proofs:read" | "proofs:write" | "orders:read" | "orders:write";
 export type Me = { email: string; name: string; role: "admin" | "staff"; source: "config" | "granted"; permissions: Permission[] };
 export type StockState = "in-stock" | "low" | "made-to-order" | "untracked";
 export type StockRow = { productId: string; name: string; sku: string; onHand: number | null; state: StockState; updatedBy: string | null; updatedAt: string | null };
@@ -131,4 +131,24 @@ export type Proof = {
   decidedAt: string | null;
   decidedBy: string | null;
   customerComment: string;
+};
+export type OrderItem = { productId: string; name: string; quantity: number; unitPrice: number; lineTotal: number };
+export type StaffOrder = {
+  id: string;
+  method: "upi" | "card" | "cod" | "online";
+  email: string;
+  phone: string;
+  customerName: string;
+  items: OrderItem[];
+  subtotal: number;
+  status: string;
+  shippingAddress: { line: string; city: string; state: string; postal: string; country: string };
+  createdAt: string;
+  paymentStatus: "paid" | "pending";
+  courier?: string;
+  trackingNumber?: string;
+  staffNote: string;
+  updatedBy: string | null;
+  providerPaymentId: string | null;
+  nextStatus: string | null;
 };

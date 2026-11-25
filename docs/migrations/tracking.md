@@ -236,3 +236,41 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 1. `request.form()` returns Starlette's `UploadFile`, not FastAPI's subclass, so files were ignored. Fixed in both endpoints.
 2. A multipart part limit just above 2 MB turned "file too large" into "could not be read". Limits are now above the validation sizes (8 MB quotes, 12 MB proofs), so the site's messages come through.
 3. The first version of the regression script ran `alembic` without `DATABASE_URL`, so FastAPI never started, and the script carried on after its readiness wait anyway (15 false failures). It now fails unless both servers are healthy.
+
+## MIG-006: Commerce on FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | Checkout (demo and live Razorpay), payment confirmation, tracking, public stock and staff order handling on FastAPI; Orders in the admin app |
+| Status | **Complete (behind a switch).** Areas `commerce`, `stock`, `admin-orders` |
+| Endpoints | Same as the site: `GET /api/commerce/mode`, `POST/GET /api/commerce/orders`, `POST /api/commerce/payment`, `POST /api/commerce/payment/webhook`, `POST /api/commerce/track`, `GET /api/stock`, `POST /api/admin/orders`. New: `GET /api/admin/orders` (search, status, payment, live/demo, dates, pages) |
+| Database changes | None (`demo_orders`, `product_stock`, `associate_commissions` have baselines in 0002, 0003, 0005) |
+| Permissions | `orders:read`, `orders:write` (admin and staff) |
+| Audit | `order.advance` (before/after, courier and tracking number on dispatch), `order.cancel` (with the note) |
+| Rollback | Remove the three areas from `OBASIX_API_ROUTES` |
+
+**Shared writes until MIG-007**
+
+- A paid order credits the referring associate (`associate_commissions`), with the site's rules (not your own order, not your own email, active associates only).
+
+**Behaviour changes (intended)**
+
+- Two identical checkouts at the same moment (same idempotency key) make one order; on the site both could pass the "already exists?" check.
+- Staff order changes lock the order row instead of failing with "the order changed meanwhile".
+- An account reads one of its orders by owner, not by "is it among my latest 50".
+
+**Parity bugs found and fixed before release**
+
+1. Python's `round()` rounds halves to even, and JavaScript's `Math.round` rounds them up. The 5% commission on ₹3,650 (182.5) would have been ₹182 instead of the site's ₹183. Now `js.round_half_up`; the Razorpay amount uses it too.
+2. The same trap in rupee formatting: `Intl.NumberFormat` rounds halves away from zero (₹1,824.5 → ₹1,825). Fixed and checked against Node for 11 amounts, including Indian grouping (₹1,00,000) and a negative half.
+3. The shared JSON body reader treated `{}` as unreadable; JavaScript treats it as a real body. It now matches `!body` exactly (MIG-001 onward).
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): 24 commerce cases (modes, demo pricing and idempotency incl. simultaneous duplicates, every checkout message, commission rules, live checkout against a Razorpay stand-in, Razorpay down, forged and genuine callback, unsigned and genuine webhook, paid exactly once (emails, stock and commission once), tracking by email or phone, same 404 for wrong contact, rate limit, own orders only, public stock, staff advance/dispatch/cancel with audit, list filters, rupees and signatures vs Node) | 97/97 |
+| Admin app (Vitest): dispatch needs courier and tracking; cancel needs a reason; unpaid can't advance; filters | 31/31 |
+| Migration E2E: demo checkout on the site → FastAPI prices and saves it → tracked → staff move it to Processing and Dispatched in the admin app (audited) → the customer's tracking shows it; cancel with a reason; wrong contact and strangers get nothing | 30/30 Chromium; 90/90 three browsers |
+| The site's own live-payment and email suite, unchanged, with commerce on FastAPI (`playwright.integrations-fastapi.config.ts`, new): Razorpay order, forged signature refused, genuine confirmed once, webhook-only payment, unsigned webhook refused, Razorpay down, reset email. FastAPI's request log confirms it served each call | 6/6 |
+| Regression with all 13 areas on FastAPI | 30/30 |

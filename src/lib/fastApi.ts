@@ -23,6 +23,16 @@ export const apiAreas: Record<string, string[]> = {
   "admin-quote-files": ["/api/admin/quotes/"],
   proofs: ["/api/proofs", "/api/proofs/"],
   "admin-proofs": ["/api/admin/proofs"],
+  // MIG-006. The Razorpay webhook is forwarded with its raw body, so its signature still checks out.
+  commerce: [
+    "/api/commerce/mode",
+    "/api/commerce/orders",
+    "/api/commerce/payment",
+    "/api/commerce/payment/webhook",
+    "/api/commerce/track",
+  ],
+  stock: ["/api/stock"],
+  "admin-orders": ["/api/admin/orders"],
 };
 
 export type FastApiConfig = { target: string; secret: string; paths: Set<string>; prefixes: string[] } | null;

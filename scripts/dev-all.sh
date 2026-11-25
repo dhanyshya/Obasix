@@ -23,6 +23,6 @@ trap cleanup EXIT INT TERM
 until curl -sf "http://127.0.0.1:${API_PORT}/health" >/dev/null; do sleep 1; done
 echo "FastAPI ready on :${API_PORT} (docs: http://127.0.0.1:${API_PORT}/docs)"
 
-OBASIX_API_URL="http://127.0.0.1:${API_PORT}" OBASIX_API_ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs}" \
+OBASIX_API_URL="http://127.0.0.1:${API_PORT}" OBASIX_API_ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders}" \
   npx next dev -p "$SITE_PORT" &
 wait

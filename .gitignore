@@ -58,3 +58,5 @@ playwright-report-integrations/
 /playwright-report-migrations
 /test-results-migrations
 /test-results-api
+/playwright-report-integrations-fastapi
+/test-results-integrations-fastapi

@@ -27,6 +27,8 @@ class Permission(StrEnum):
     QUOTES_READ = "quotes:read"
     PROOFS_READ = "proofs:read"
     PROOFS_WRITE = "proofs:write"
+    ORDERS_READ = "orders:read"
+    ORDERS_WRITE = "orders:write"
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
@@ -39,6 +41,8 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.QUOTES_READ,
             Permission.PROOFS_READ,
             Permission.PROOFS_WRITE,
+            Permission.ORDERS_READ,
+            Permission.ORDERS_WRITE,
         }
     ),
 }

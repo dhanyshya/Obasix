@@ -10,6 +10,7 @@ import { SignIn } from "./pages/SignIn";
 // Each section loads when first opened, so sign-in stays small.
 const Overview = lazy(() => import("./pages/Overview").then((m) => ({ default: m.Overview })));
 const Stock = lazy(() => import("./pages/Stock").then((m) => ({ default: m.Stock })));
+const Orders = lazy(() => import("./pages/Orders").then((m) => ({ default: m.Orders })));
 const Quotes = lazy(() => import("./pages/Quotes").then((m) => ({ default: m.Quotes })));
 const Proofs = lazy(() => import("./pages/Proofs").then((m) => ({ default: m.Proofs })));
 const Audit = lazy(() => import("./pages/Audit").then((m) => ({ default: m.Audit })));
@@ -59,6 +60,7 @@ export const routes: RouteObject[] = [
     errorElement: <RouteError />,
     children: [
       { index: true, element: <Loading><Overview /></Loading> },
+      { path: "orders", element: <RequirePermission needs="orders:read"><Loading><Orders /></Loading></RequirePermission> },
       { path: "stock", element: <RequirePermission needs="stock:read"><Loading><Stock /></Loading></RequirePermission> },
       { path: "quotes", element: <RequirePermission needs="quotes:read"><Loading><Quotes /></Loading></RequirePermission> },
       { path: "proofs", element: <RequirePermission needs="proofs:read"><Loading><Proofs /></Loading></RequirePermission> },

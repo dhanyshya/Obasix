@@ -30,8 +30,8 @@ export function stubApi(handler: Handler) {
   return calls;
 }
 
-export const admin = { email: "boss@example.com", name: "Boss", role: "admin", source: "config", permissions: ["audit:read", "proofs:read", "proofs:write", "quotes:read", "staff:manage", "stock:read", "stock:write"] };
-export const clerk = { email: "clerk@example.com", name: "Clerk", role: "staff", source: "granted", permissions: ["proofs:read", "proofs:write", "quotes:read", "stock:read", "stock:write"] };
+export const admin = { email: "boss@example.com", name: "Boss", role: "admin", source: "config", permissions: ["audit:read", "orders:read", "orders:write", "proofs:read", "proofs:write", "quotes:read", "staff:manage", "stock:read", "stock:write"] };
+export const clerk = { email: "clerk@example.com", name: "Clerk", role: "staff", source: "granted", permissions: ["orders:read", "orders:write", "proofs:read", "proofs:write", "quotes:read", "stock:read", "stock:write"] };
 
 function Providers({ children }: { children: ReactElement }) {
   return (

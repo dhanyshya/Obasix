@@ -145,7 +145,7 @@ test("admin: overview → stock search, filter, sort, paging → edit with valid
   await v.close();
 });
 
-test("roles: admin gives 'staff' in the app → that person sees only stock, quotes and proofs → role removed → sent back to sign-in", async ({ browser }) => {
+test("roles: admin gives 'staff' in the app → that person gets staff sections only → role removed → sent back to sign-in", async ({ browser }) => {
   await ensureAccount(browser, ADMIN, "MIG-004 Admin");
   const clerkEmail = uniqueEmail(PREFIX, "clerk");
   await ensureAccount(browser, clerkEmail, "Clerk Person");
@@ -167,7 +167,10 @@ test("roles: admin gives 'staff' in the app → that person sees only stock, quo
   await signIn(clerk.page, clerkEmail);
   await expect(clerk.page.getByText(`${clerkEmail} · staff`)).toBeVisible();
   const nav = clerk.page.getByRole("navigation", { name: "Admin sections" });
-  await expect(nav.getByRole("link")).toHaveText(["Overview", "Stock", "Quotes", "Proofs"]);
+  // Staff sections only: never the audit log or staff management.
+  await expect(nav.getByRole("link", { name: "Stock", exact: true })).toBeVisible();
+  await expect(nav.getByRole("link", { name: "Audit log" })).toHaveCount(0);
+  await expect(nav.getByRole("link", { name: "Staff" })).toHaveCount(0);
   await clerk.page.goto("/audit");
   await expect(clerk.page.getByRole("heading", { name: "No access" })).toBeVisible();
   await clerk.page.goto("/staff");

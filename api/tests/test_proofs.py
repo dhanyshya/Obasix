@@ -27,7 +27,12 @@ def setup(monkeypatch, tmp_path):
 
 
 async def save_quote(reference=REF, email="buyer@example.com"):
-    quote = {"reference": reference, "idempotencyKey": f"k-{reference}", "createdAt": "2026-11-20T10:00:00.000Z", "email": email}
+    quote = {
+        "reference": reference,
+        "idempotencyKey": f"k-{reference}",
+        "createdAt": "2026-11-20T10:00:00.000Z",
+        "email": email,
+    }
     async with db.connection() as conn:
         await conn.execute(
             "INSERT INTO quote_requests (reference, idempotency_key, email, created_at, payload) VALUES (%s, %s, %s, %s, %s)",
@@ -36,19 +41,29 @@ async def save_quote(reference=REF, email="buyer@example.com"):
 
 
 async def upload(client, reference=REF, data=PNG, note="Check the logo colour"):
-    return await client.post("/api/admin/proofs", data={"quoteReference": reference, "note": note}, files={"file": ("logo.png", data, "image/png")})
+    return await client.post(
+        "/api/admin/proofs",
+        data={"quoteReference": reference, "note": note},
+        files={"file": ("logo.png", data, "image/png")},
+    )
 
 
 async def proofs():
     async with db.connection() as conn:
-        return await (await conn.execute("SELECT id, version, status, uploaded_by, stored_as FROM design_proofs ORDER BY version")).fetchall()
+        return await (
+            await conn.execute("SELECT id, version, status, uploaded_by, stored_as FROM design_proofs ORDER BY version")
+        ).fetchall()
 
 
 async def test_upload_rules(setup):
     await save_quote()
     async with signed_in("boss@example.com") as boss:
-        assert (await boss.post("/api/admin/proofs", data={"note": "x"})).json()["message"] == "Enter the quote reference."
-        assert (await boss.post("/api/admin/proofs", data={"quoteReference": REF})).json()["message"] == "Choose the proof file."
+        assert (await boss.post("/api/admin/proofs", data={"note": "x"})).json()[
+            "message"
+        ] == "Enter the quote reference."
+        assert (await boss.post("/api/admin/proofs", data={"quoteReference": REF})).json()[
+            "message"
+        ] == "Choose the proof file."
         too_big = await upload(boss, data=b"%PDF" + b"0" * (5 * 1024 * 1024))
         assert too_big.json()["message"] == "The proof must be 5 MB or smaller."
         assert (await upload(boss, data=b"GIF89a")).json()["message"] == "Upload the proof as a PNG, JPEG, WebP or PDF."
@@ -69,11 +84,17 @@ async def test_versions_supersede_and_an_approval_closes_the_thread(tmp_path):
         async with signed_in("buyer@example.com") as buyer:
             no_confirm = await buyer.post("/api/proofs", json={"proofId": rows[1]["id"], "decision": "approved"})
             assert no_confirm.json()["message"] == "Confirm you've checked the wording, sizes and colours."
-            old = await buyer.post("/api/proofs", json={"proofId": rows[0]["id"], "decision": "approved", "confirm": True})
+            old = await buyer.post(
+                "/api/proofs", json={"proofId": rows[0]["id"], "decision": "approved", "confirm": True}
+            )
             assert old.status_code == 409
-            ok = await buyer.post("/api/proofs", json={"proofId": rows[1]["id"], "decision": "approved", "confirm": True})
+            ok = await buyer.post(
+                "/api/proofs", json={"proofId": rows[1]["id"], "decision": "approved", "confirm": True}
+            )
             assert ok.json() == {"ok": True}
-            twice = await buyer.post("/api/proofs", json={"proofId": rows[1]["id"], "decision": "changes", "comment": "Too late now"})
+            twice = await buyer.post(
+                "/api/proofs", json={"proofId": rows[1]["id"], "decision": "changes", "comment": "Too late now"}
+            )
             assert twice.status_code == 409
         closed = await upload(boss)
         assert closed.status_code == 409 and "already approved" in closed.json()["message"]
@@ -85,19 +106,31 @@ async def test_customer_decisions_and_who_may_decide(setup):
         await upload(boss)
     [proof] = await proofs()
     async with signed_in("stranger@example.com") as stranger:
-        assert (await stranger.post("/api/proofs", json={"proofId": proof["id"], "decision": "changes", "comment": "Hello there"})).json() == {
+        assert (
+            await stranger.post(
+                "/api/proofs", json={"proofId": proof["id"], "decision": "changes", "comment": "Hello there"}
+            )
+        ).json() == {
             "ok": False,
             "message": "That proof wasn't found.",
         }
-        assert (await stranger.post("/api/proofs", json={"decision": "maybe"})).json()["message"] == "Choose approve or request changes."
+        assert (await stranger.post("/api/proofs", json={"decision": "maybe"})).json()[
+            "message"
+        ] == "Choose approve or request changes."
     async with signed_in("buyer@example.com") as buyer:
         short = await buyer.post("/api/proofs", json={"proofId": proof["id"], "decision": "changes", "comment": "no"})
         assert short.json()["message"] == "Tell us what to change."
-        ok = await buyer.post("/api/proofs", json={"proofId": proof["id"], "decision": "changes", "comment": "Logo should be larger"})
+        ok = await buyer.post(
+            "/api/proofs", json={"proofId": proof["id"], "decision": "changes", "comment": "Logo should be larger"}
+        )
         assert ok.json() == {"ok": True}
     async with db.connection() as conn:
         row = await (await conn.execute("SELECT status, decided_by, customer_comment FROM design_proofs")).fetchone()
-    assert dict(row) == {"status": "changes", "decided_by": "buyer@example.com", "customer_comment": "Logo should be larger"}
+    assert dict(row) == {
+        "status": "changes",
+        "decided_by": "buyer@example.com",
+        "customer_comment": "Logo should be larger",
+    }
     assert setup[-1][1] == f"Changes requested: {REF} v1"
 
 
@@ -119,10 +152,18 @@ async def test_proof_files_for_staff_and_the_owning_customer_only(client):
 
 
 async def test_quote_attachment_download_is_staff_only_and_audited(tmp_path):
-    quote = {"reference": REF, "idempotencyKey": "k", "createdAt": "2026-11-20T10:00:00.000Z", "email": "b@example.com",
-             "attachment": {"name": "plan.pdf", "type": "application/pdf", "size": 8, "storedAs": f"{REF}.pdf"}}
+    quote = {
+        "reference": REF,
+        "idempotencyKey": "k",
+        "createdAt": "2026-11-20T10:00:00.000Z",
+        "email": "b@example.com",
+        "attachment": {"name": "plan.pdf", "type": "application/pdf", "size": 8, "storedAs": f"{REF}.pdf"},
+    }
     async with db.connection() as conn:
-        await conn.execute("INSERT INTO quote_requests VALUES (%s, 'k', 'b@example.com', %s, %s)", (REF, quote["createdAt"], json.dumps(quote)))
+        await conn.execute(
+            "INSERT INTO quote_requests VALUES (%s, 'k', 'b@example.com', %s, %s)",
+            (REF, quote["createdAt"], json.dumps(quote)),
+        )
     (tmp_path / "quote-files").mkdir()
     (tmp_path / "quote-files" / f"{REF}.pdf").write_bytes(b"%PDF-abc")
     async with signed_in("customer@example.com") as customer:
@@ -147,7 +188,10 @@ async def test_staff_list_filters_and_upload_audit():
         everything = (await boss.get("/api/admin/proofs")).json()
         assert everything["total"] == 3
         pending = (await boss.get("/api/admin/proofs", params={"status": "pending"})).json()
-        assert sorted((p["quoteReference"], p["version"]) for p in pending["items"]) == [(REF, 2), ("OBX-QUOTE-DEMO-PRF002", 1)]
+        assert sorted((p["quoteReference"], p["version"]) for p in pending["items"]) == [
+            (REF, 2),
+            ("OBX-QUOTE-DEMO-PRF002", 1),
+        ]
         one = (await boss.get("/api/admin/proofs", params={"quoteReference": REF.lower()})).json()
         assert [p["version"] for p in one["items"]] == [2, 1]
     async with signed_in("customer@example.com") as customer:

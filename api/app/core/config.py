@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     razorpay_key_id: str = Field("", alias="RAZORPAY_KEY_ID")
     razorpay_key_secret: str = Field("", alias="RAZORPAY_KEY_SECRET")
     razorpay_webhook_secret: str = Field("", alias="RAZORPAY_WEBHOOK_SECRET")
+    razorpay_api_base: str = Field("https://api.razorpay.com", alias="RAZORPAY_API_BASE")  # tests only
 
     # Files (quote attachments, proofs): Vercel Blob when the token is set, else this folder.
     blob_token: str = Field("", alias="BLOB_READ_WRITE_TOKEN")

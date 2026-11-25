@@ -11,6 +11,7 @@ import { useAuth } from "../auth";
 
 const sections: { to: string; label: string; needs: Permission }[] = [
   { to: "/", label: "Overview", needs: "stock:read" },
+  { to: "/orders", label: "Orders", needs: "orders:read" },
   { to: "/stock", label: "Stock", needs: "stock:read" },
   { to: "/quotes", label: "Quotes", needs: "quotes:read" },
   { to: "/proofs", label: "Proofs", needs: "proofs:read" },

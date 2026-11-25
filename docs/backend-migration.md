@@ -49,7 +49,8 @@ Quote attachments and design proofs live in a private Vercel Blob store in produ
 | Variable | Where | Purpose |
 |---|---|---|
 | `OBASIX_API_URL` | site | FastAPI base URL. Leave unset to keep everything in Next.js |
-| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`, `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
+| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`, `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs`, `commerce`, `stock`, `admin-orders`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | site and API | The same values on both once `commerce` is on (the webhook URL stays the site's) |
 | `BLOB_READ_WRITE_TOKEN` | site and API | The same private Blob store (production) |
 | `OBASIX_FILES_DIR` | API | The site's `.data` folder when there's no Blob token |
 | `AUTH_SECRET` | site and API | Required on both, with the same value, once `quotes` or `quote-submit` is on: it signs the cookie that lets a browser read the quote it sent. The build fails without it |
@@ -70,7 +71,7 @@ The build fails if `OBASIX_API_URL` is set without `DATABASE_URL` or a valid sec
 | MIG-004 | Admin app | New React app (`admin/`, Vite) on MIG-003; the `/admin` pages in Next.js are retired | Planned |
 | MIG-005 | Reading quotes | `GET /api/quotes/{reference}`, staff list `GET /api/admin/quotes`, admin app Quotes page | Done, off by default; see tracking |
 | MIG-005b | Files, quote submission, proofs | `POST /api/quotes`, `/api/admin/quotes/{ref}/file`, `/api/proofs`, `/api/proofs/{id}/file`, `/api/admin/proofs`; admin app Proofs page | Done, off by default; see tracking |
-| MIG-006 | Commerce (incl. `/api/admin/orders`) | orders, payment, Razorpay webhook, tracking, stock | Planned; highest risk, money moves |
+| MIG-006 | Commerce | `/api/commerce/{mode,orders,payment,payment/webhook,track}`, `/api/stock`, `/api/admin/orders`; admin app Orders page | Done, off by default; see tracking |
 | MIG-007 | Trade channels | distributors, partners, associates, and their `/api/admin/*` routes; fix DEF-001 first | Planned |
 | MIG-008 | AI | chat, frame colours, sign layouts | Planned |
 | MIG-009 | Schema ownership | Next.js stops creating tables; Alembic owns every change; SQLite dropped | Planned |
@@ -84,6 +85,7 @@ npm run test:e2e:migrations
 npm run test:all          # every gate, in order
 npm run build:all         # site production build + admin app + API container image
 npm run test:e2e:regression-fastapi   # the site's own suites with every migrated area on FastAPI
+npm run test:e2e:integrations-fastapi # live payments, email and AI (stand-ins) with every migrated area on FastAPI
 ```
 
 FastAPI docs: http://127.0.0.1:8000/docs (turned off when `APP_ENV=production`).

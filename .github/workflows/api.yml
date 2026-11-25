@@ -97,6 +97,9 @@ jobs:
       # Starts FastAPI (after migrations) and Next.js, waits for both, then runs headless.
       - name: Micro-migration E2E
         run: npm run test:e2e:migrations
+      # Live Razorpay payments, Resend email and Claude against local stand-ins, with commerce on FastAPI.
+      - name: Integration suite against FastAPI
+        run: npm run test:e2e:integrations-fastapi
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -104,4 +107,5 @@ jobs:
           path: |
             playwright-report-migrations/
             test-results-migrations/
+            playwright-report-integrations-fastapi/
           retention-days: 14

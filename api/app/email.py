@@ -2,12 +2,14 @@
 
 import html
 import logging
+from typing import Any
 from urllib.parse import quote
 
 import httpx
 
 from app.catalogue import company
 from app.core.config import get_settings
+from app.core.money import format_inr
 
 log = logging.getLogger(__name__)
 
@@ -115,6 +117,58 @@ def staff_proof_decision_email(
     )
     subject = f"Proof approved: {reference} v{version}" if approved else f"Changes requested: {reference} v{version}"
     return {"subject": subject, "html": page, "text": text}
+
+
+def _items(order: dict[str, Any]) -> list[str]:
+    return [f"{i['quantity']} × {i['name']} — {format_inr(i['lineTotal'])}" for i in order["items"]]
+
+
+def _address(order: dict[str, Any]) -> str:
+    a = order.get("shippingAddress") or {}
+    return ", ".join(p for p in [a.get("line"), a.get("city"), a.get("state"), a.get("postal")] if p)
+
+
+def order_confirmation_email(order: dict[str, Any]) -> dict[str, str]:
+    site = get_settings().site_url
+    page, text = _layout(
+        f"Thank you, {order.get('customerName', '')}. Your order is confirmed.",
+        [
+            f"Order {order['id']} · paid {format_inr(order['subtotal'])}",
+            *_items(order),
+            f"Delivering to: {_address(order)}",
+            "We'll email you the courier and tracking number when it's dispatched.",
+        ],
+        ("Track your order", f"{site}/orders/track"),
+    )
+    return {"subject": f"Order {order['id']} confirmed", "html": page, "text": text, "reply_to": company()["email"]}
+
+
+def order_dispatched_email(order: dict[str, Any]) -> dict[str, str]:
+    site = get_settings().site_url
+    page, text = _layout(
+        f"Your order {order['id']} has been dispatched.",
+        [
+            f"Courier: {order.get('courier') or '—'}",
+            f"Tracking number: {order.get('trackingNumber') or '—'}",
+            *_items(order),
+        ],
+        ("Track your order", f"{site}/orders/track"),
+    )
+    return {"subject": f"Order {order['id']} is on its way", "html": page, "text": text, "reply_to": company()["email"]}
+
+
+def staff_new_order_email(order: dict[str, Any]) -> dict[str, str]:
+    site = get_settings().site_url
+    page, text = _layout(
+        f"New paid order {order['id']}",
+        [
+            f"{order.get('customerName', '')} · {order['email']} · {order['phone']}",
+            *_items(order),
+            f"Ship to: {_address(order)}",
+        ],
+        ("Open orders", f"{site}/admin/orders"),
+    )
+    return {"subject": f"New paid order {order['id']} · {format_inr(order['subtotal'])}", "html": page, "text": text}
 
 
 def staff_alert_emails() -> list[str]:

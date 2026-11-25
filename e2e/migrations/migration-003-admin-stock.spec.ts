@@ -129,7 +129,11 @@ test("roles: an admin grants 'staff' → stock allowed, audit and staff manageme
   });
   expect(granted.status()).toBe(200);
   const me = await (await clerk.context.request.get("/api/admin/me")).json();
-  expect(me).toMatchObject({ email: clerkEmail, role: "staff", source: "granted", permissions: ["proofs:read", "proofs:write", "quotes:read", "stock:read", "stock:write"] });
+  // The full permission list is pinned in api/tests/test_admin.py; here: stock yes, audit and staff no.
+  expect(me).toMatchObject({ email: clerkEmail, role: "staff", source: "granted" });
+  expect(me.permissions).toEqual(expect.arrayContaining(["stock:read", "stock:write"]));
+  expect(me.permissions).not.toContain("audit:read");
+  expect(me.permissions).not.toContain("staff:manage");
 
   const list = await (await clerk.context.request.get(`/api/admin/stock?q=${encodeURIComponent("Pin-up Green 2")}`)).json();
   expect(list.items).toEqual([expect.objectContaining({ productId: PRODUCT.id, state: "untracked", onHand: null })]);

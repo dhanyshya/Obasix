@@ -1,0 +1,115 @@
+name: FastAPI and migrations
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env: { POSTGRES_USER: obasix, POSTGRES_PASSWORD: ci-only, POSTGRES_DB: obasix_test }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U obasix" --health-interval 2s --health-retries 30
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      # The parity tests run the site's TypeScript to compare results.
+      - run: npm ci
+        working-directory: .
+      - name: Shared data is current
+        working-directory: .
+        run: node scripts/export-shared-data.mjs && git diff --exit-code api/app/data
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Migrations apply, and apply again with no change
+        env: { DATABASE_URL: "postgresql://obasix:ci-only@localhost:5432/obasix_test" }
+        run: uv run alembic upgrade head && uv run alembic upgrade head
+      - name: Alembic creates everything the site creates
+        working-directory: .
+        env: { SCHEMA_CHECK_URL: "postgresql://obasix:ci-only@localhost:5432" }
+        run: scripts/check-schema.sh
+      - name: Unit and integration tests
+        env: { TEST_DATABASE_URL: "postgresql://obasix:ci-only@localhost:5432/obasix_test" }
+        run: uv run pytest --junitxml=junit.xml
+      - name: Dependency vulnerabilities (Python)
+        run: uvx pip-audit --strict -r <(uv export --frozen --no-dev --no-hashes --no-emit-project)
+      - name: Container builds
+        run: docker build -t obasix-api .
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with: { name: api-junit, path: api/junit.xml, retention-days: 14 }
+
+  admin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm, cache-dependency-path: admin/package-lock.json }
+      - run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Unit and component tests
+        run: npm test
+      - name: Production build
+        run: npx vite build
+      - name: Dependency vulnerabilities (high and critical)
+        run: npm audit --omit=dev --audit-level=high
+
+  migrations-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env: { POSTGRES_USER: obasix, POSTGRES_PASSWORD: ci-only, POSTGRES_DB: obasix }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U obasix" --health-interval 2s --health-retries 30
+    env:
+      MIGRATION_DATABASE_URL: postgresql://obasix:ci-only@localhost:5432/obasix
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      # The admin app (MIG-004) is built and served by the migration suite.
+      - run: npm ci --prefix admin
+      - name: Dependency vulnerabilities (npm, high and critical)
+        run: npm audit --omit=dev --audit-level=high
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+        working-directory: api
+      - run: npx playwright install --with-deps chromium
+      # Starts FastAPI (after migrations) and Next.js, waits for both, then runs headless.
+      - name: Micro-migration E2E
+        run: npm run test:e2e:migrations
+      # Live Razorpay payments, Resend email and Claude against local stand-ins, with commerce on FastAPI.
+      - name: Integration suite against FastAPI
+        run: npm run test:e2e:integrations-fastapi
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: migrations-report
+          path: |
+            playwright-report-migrations/
+            test-results-migrations/
+            playwright-report-integrations-fastapi/
+          retention-days: 14

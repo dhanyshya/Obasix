@@ -1,0 +1,21 @@
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 2000;
+  padding: 8px 12px;
+  background: #fff;
+  color: #164e3b;
+  font-weight: 600;
+}
+.skip-link:focus {
+  left: 8px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

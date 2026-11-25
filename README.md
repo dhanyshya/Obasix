@@ -61,6 +61,7 @@ If no key is set, or the provider returns an auth or quota error, the chat shows
 - `src/data/`: catalogue (`catalogue.ts`) and image map (`images.ts`)
 - `src/lib/`: server logic: `db`, `auth`, `commerce` (Razorpay), `email` (Resend), `storage` (Blob or local files), `ai`, `quotes`, `proofs`, `stock`, and the trade channels
 - `src/theme/`: brand tokens and the MUI theme
+- `api/`: FastAPI service that is taking over the backend one area at a time (see below)
 
 ## Brand
 
@@ -78,6 +79,21 @@ npm run test:e2e                    # starts `next dev` on :3217 in demo mode wi
 npm run test:e2e:production         # desktop suite against a production build
 npm run test:e2e:browsers           # all browsers
 npm run test:e2e:integrations       # integration suite (playwright.integrations.config.ts)
+```
+
+## FastAPI backend (migration in progress)
+
+The backend is moving from the Next.js route handlers to a FastAPI service in `api/`, one area at a time. A separate React admin app will follow. The plan is in [docs/backend-migration.md](docs/backend-migration.md) and the status of each step in [docs/migrations/tracking.md](docs/migrations/tracking.md). Nothing changes unless `OBASIX_API_URL` is set.
+
+Needs Docker, [uv](https://docs.astral.sh/uv/) and Python 3.13+.
+
+```bash
+npm run dev:all               # Postgres + migrations + FastAPI :8000 + site :3000, migrated areas served by FastAPI
+npm test                      # FastAPI lint, unit and integration tests
+npm run test:e2e:migrations   # micro-migration E2E, headless (E2E_ALL_BROWSERS=1 for Firefox and WebKit)
+npm run test:all              # every gate in order: lint, types, API tests, migration E2E, regression E2E
+npm run build:all             # site production build + API container image
+npm run api:export-data       # after changing src/data: refresh the catalogue copy the API reads
 ```
 
 [docs/testing.md](docs/testing.md) describes test coverage. The `docs/` folder also holds the codebase audit, feature inventory, gap analysis and roadmap.

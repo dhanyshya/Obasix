@@ -12,11 +12,16 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CompareProvider } from "@/context/CompareContext";
 import { CompareTray } from "@/components/compare/CompareTray";
+import { watchOrphanedSegments } from "@/lib/streamOrphans";
 
-/** Marks the page as interactive (`<html data-hydrated>`) once React has hydrated it; end-to-end tests wait on it. */
+/**
+ * Marks the page as interactive (`<html data-hydrated>`) once React has hydrated it; end-to-end tests
+ * wait on it. Also clears streamed copies of the page that React will never swap in (see streamOrphans).
+ */
 function HydrationMarker() {
   useEffect(() => {
     document.documentElement.dataset.hydrated = "1";
+    return watchOrphanedSegments();
   }, []);
   return null;
 }

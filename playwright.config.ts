@@ -44,13 +44,13 @@ export default defineConfig({
         },
       },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } }, testIgnore: /mobile\.spec/ },
+    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } }, testIgnore: [/mobile\.spec/, /migrations\//] },
     { name: "tablet", use: { ...devices["Desktop Chrome"], viewport: { width: 820, height: 1180 }, hasTouch: true }, testMatch: /layout\.spec/ },
     { name: "mobile", use: { ...devices["Pixel 7"] }, testMatch: /layout\.spec|mobile\.spec/ },
     ...(allBrowsers
       ? [
-          { name: "firefox", use: { ...devices["Desktop Firefox"] }, testIgnore: /mobile\.spec/ },
-          { name: "webkit", use: { ...devices["Desktop Safari"] }, testIgnore: /mobile\.spec/ },
+          { name: "firefox", use: { ...devices["Desktop Firefox"] }, testIgnore: [/mobile\.spec/, /migrations\//] },
+          { name: "webkit", use: { ...devices["Desktop Safari"] }, testIgnore: [/mobile\.spec/, /migrations\//] },
         ]
       : []),
   ],

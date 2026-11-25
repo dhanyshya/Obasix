@@ -1,0 +1,329 @@
+[
+  {
+    "id": "cmwb6090",
+    "slug": "classic-magnetic-whiteboard-2x3",
+    "name": "Classic Magnetic Whiteboard 2×3",
+    "sku": "CMWB6090",
+    "price": 1825,
+    "frame": "aluminium-light",
+    "sizes": [
+      "2x3"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "cmwb90120",
+    "slug": "classic-magnetic-whiteboard-3x4",
+    "name": "Classic Magnetic Whiteboard 3×4",
+    "sku": "CMWB90120",
+    "price": 3114,
+    "frame": "aluminium-light",
+    "sizes": [
+      "3x4"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "cmwb4560",
+    "slug": "classic-magnetic-whiteboard-1-5x2",
+    "name": "Classic Magnetic Whiteboard 1.5×2",
+    "sku": "CMWB4560",
+    "price": 890,
+    "frame": "aluminium-light",
+    "sizes": [
+      "1.5x2"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "cmwb3060",
+    "slug": "classic-magnetic-whiteboard-1x2",
+    "name": "Classic Magnetic Whiteboard 1×2",
+    "sku": "CMWB3060",
+    "price": 710,
+    "frame": "aluminium-light",
+    "sizes": [
+      "1x2"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "smwbpcb90120",
+    "slug": "superior-magnetic-whiteboard-3x4-black",
+    "name": "Superior Magnetic Whiteboard 3×4",
+    "sku": "SMWBPCB90120",
+    "price": 4330,
+    "frame": "aluminium-heavy-black",
+    "sizes": [
+      "3x4"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "smwb6090",
+    "slug": "superior-magnetic-whiteboard-2x3-natural",
+    "name": "Superior Magnetic 2×3 Natural",
+    "sku": "SMWB6090",
+    "price": 4278,
+    "frame": "aluminium-natural",
+    "sizes": [
+      "2x3"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "pwmwb90120",
+    "slug": "pine-magnetic-whiteboard-3x4",
+    "name": "Pine Frame Magnetic Whiteboard 3×4",
+    "sku": "PWMWB90120",
+    "price": 4110,
+    "frame": "pine-wood",
+    "sizes": [
+      "3x4"
+    ],
+    "colours": [
+      "white",
+      "pine"
+    ]
+  },
+  {
+    "id": "pwmwb6090",
+    "slug": "pine-magnetic-whiteboard-2x3",
+    "name": "Pine Frame Magnetic Whiteboard 2×3",
+    "sku": "PWMWB6090",
+    "price": 2404,
+    "frame": "pine-wood",
+    "sizes": [
+      "2x3"
+    ],
+    "colours": [
+      "white",
+      "pine"
+    ]
+  },
+  {
+    "id": "swbpcb4560",
+    "slug": "superior-non-magnetic-1-5x2",
+    "name": "Superior Non-Magnetic 1.5×2",
+    "sku": "SWBPCB4560",
+    "price": 1989,
+    "frame": "aluminium-heavy-black",
+    "sizes": [
+      "1.5x2"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "swbpcw3060",
+    "slug": "superior-non-magnetic-1x2-white",
+    "name": "Superior Non-Magnetic 1×2 White",
+    "sku": "SWBPCW3060",
+    "price": 1413,
+    "frame": "aluminium-heavy-white",
+    "sizes": [
+      "1x2"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "scuv90120",
+    "slug": "ceramic-steel-whiteboard-3x4",
+    "name": "Ceramic Steel Whiteboard 3×4",
+    "sku": "SCUV90120",
+    "price": 7677,
+    "frame": "aluminium-natural",
+    "sizes": [
+      "3x4"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "mobile-3x4",
+    "slug": "double-sided-mobile-magnetic-3x4",
+    "name": "Mobile Double-Sided Magnetic 3×4",
+    "sku": "MWB-DS-3X4",
+    "price": 10989,
+    "frame": "powder-coated-black",
+    "sizes": [
+      "3x4"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "spbmgpcb3060",
+    "slug": "superior-pinup-mid-grey-1x2",
+    "name": "Superior Pin-up Mid Grey 1×2",
+    "sku": "SPBMGPCB3060",
+    "price": 1285,
+    "frame": "aluminium-heavy-black",
+    "sizes": [
+      "1x2"
+    ],
+    "colours": [
+      "mid-grey"
+    ]
+  },
+  {
+    "id": "spbpcbg6090",
+    "slug": "superior-pinup-green-2x3",
+    "name": "Superior Pin-up Green 2×3",
+    "sku": "SPBPCBG6090",
+    "price": 2450,
+    "frame": "aluminium-heavy-black",
+    "sizes": [
+      "2x3"
+    ],
+    "colours": [
+      "green"
+    ]
+  },
+  {
+    "id": "cpbb3060",
+    "slug": "classic-pinup-blue-1x2",
+    "name": "Classic Pin-up Blue 1×2",
+    "sku": "CPBB3060",
+    "price": 980,
+    "frame": "aluminium-light",
+    "sizes": [
+      "1x2"
+    ],
+    "colours": [
+      "turquoise"
+    ]
+  },
+  {
+    "id": "wbcb-02",
+    "slug": "kids-whiteboard-chalkboard-easle",
+    "name": "Kids Whiteboard + Chalkboard Easel",
+    "sku": "WBCB-02",
+    "price": 3518,
+    "frame": "pine-wood",
+    "sizes": [
+      "2x3"
+    ],
+    "colours": [
+      "white",
+      "blackboard"
+    ]
+  },
+  {
+    "id": "cwbds6090",
+    "slug": "classic-dual-side-2x3",
+    "name": "Classic Dual-Side Whiteboard 2×3",
+    "sku": "CWBDS6090",
+    "price": 1345,
+    "frame": "aluminium-light",
+    "sizes": [
+      "2x3"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "magnets-40mm",
+    "slug": "magnets-40mm-pack-10",
+    "name": "40 mm Magnetic Buttons (10 pcs)",
+    "sku": "MAG-40-10",
+    "price": 239,
+    "frame": "aluminium-light",
+    "sizes": [],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "magnets-30mm",
+    "slug": "magnets-30mm-pack-10",
+    "name": "30 mm Magnetic Buttons (10 pcs)",
+    "sku": "MAG-30-10",
+    "price": 239,
+    "frame": "aluminium-light",
+    "sizes": [],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "marker-holder-white",
+    "slug": "marker-duster-holder-white",
+    "name": "Marker & Duster Holder White",
+    "sku": "MH-WHT",
+    "price": 859,
+    "frame": "aluminium-light",
+    "sizes": [],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "marker-holder-black",
+    "slug": "marker-duster-holder-black",
+    "name": "Marker & Duster Holder Black",
+    "sku": "MH-BLK",
+    "price": 859,
+    "frame": "aluminium-heavy-black",
+    "sizes": [],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "whiteboard-stand",
+    "slug": "superior-4x6-with-stand",
+    "name": "4×6 Magnetic Board + Stand",
+    "sku": "SMWBWS120180",
+    "price": 13503,
+    "frame": "aluminium-natural",
+    "sizes": [
+      "4x6"
+    ],
+    "colours": [
+      "white"
+    ]
+  },
+  {
+    "id": "easel-5ft",
+    "slug": "artist-wooden-easel-5ft",
+    "name": "Wooden Easel Stand 5 ft",
+    "sku": "EASEL-5FT",
+    "price": 1199,
+    "frame": "pine-wood",
+    "sizes": [],
+    "colours": [
+      "pine"
+    ]
+  },
+  {
+    "id": "foot-rest",
+    "slug": "foot-rest-natural-pine",
+    "name": "Pine Under-Desk Foot Rest",
+    "sku": "FR-PINE",
+    "price": 1810,
+    "frame": "pine-wood",
+    "sizes": [],
+    "colours": [
+      "pine"
+    ]
+  }
+]

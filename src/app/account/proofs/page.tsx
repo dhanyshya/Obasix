@@ -6,6 +6,7 @@ import Link from "@/components/Link";
 import { signType } from "@/components/home/directory/sign";
 import { ProofDecision } from "@/components/proofs/ProofDecision";
 import { readSession } from "@/lib/auth/session";
+import { readFromFastApi } from "@/lib/fastApiServer";
 import { listProofsForQuote, quoteReferencesForCustomer, type Proof } from "@/lib/proofs/store";
 import { brandTokens as brand } from "@/theme/brandTokens";
 
@@ -20,13 +21,22 @@ const statusText: Record<Proof["status"], string> = {
 
 const date = (iso: string) => new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
+type Thread = { reference: string; proofs: Awaited<ReturnType<typeof listProofsForQuote>> };
+
+// Through FastAPI once the proofs area is switched on; otherwise straight from the database.
+async function readThreads(userId: string, email: string): Promise<Thread[]> {
+  const remote = await readFromFastApi<{ threads: Thread[] }>("/api/proofs");
+  if (remote !== undefined) return remote?.threads ?? [];
+  const references = [...(await quoteReferencesForCustomer(userId, email))];
+  return (await Promise.all(references.map(async (reference) => ({ reference, proofs: await listProofsForQuote(reference) }))))
+    .filter((thread) => thread.proofs.length > 0)
+    .sort((a, b) => b.proofs[0].createdAt.localeCompare(a.proofs[0].createdAt));
+}
+
 export default async function AccountProofsPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
-  const references = [...(await quoteReferencesForCustomer(session.user.id, session.user.email))];
-  const threads = (await Promise.all(references.map(async (reference) => ({ reference, proofs: await listProofsForQuote(reference) }))))
-    .filter((thread) => thread.proofs.length > 0)
-    .sort((a, b) => b.proofs[0].createdAt.localeCompare(a.proofs[0].createdAt));
+  const threads = await readThreads(session.user.id, session.user.email);
 
   return (
     <Box>

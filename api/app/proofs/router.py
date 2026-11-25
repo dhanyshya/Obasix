@@ -170,6 +170,25 @@ async def staff_list(
 # ---------- Customer ----------
 
 
+@router.get("/api/proofs", summary="The signed-in customer's proof threads, most recent first")
+async def customer_threads(request: Request) -> JSONResponse:
+    user = await read_session(request)
+    if not user:
+        return fail(401, "Sign in to review your proofs.")
+    async with connection() as conn:
+        rows = await (await conn.execute("SELECT * FROM design_proofs ORDER BY version DESC")).fetchall()
+    by_quote: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        by_quote.setdefault(row["quote_reference"], []).append(_proof(row))
+    threads = [
+        {"reference": reference, "proofs": proofs}
+        for reference, proofs in by_quote.items()
+        if await customer_can_see(reference, user)
+    ]
+    threads.sort(key=lambda t: t["proofs"][0]["createdAt"], reverse=True)
+    return JSONResponse({"ok": True, "threads": threads})
+
+
 @router.post("/api/proofs", summary="The customer approves a proof or asks for changes")
 async def decide(request: Request) -> JSONResponse:
     if not trusted_origin(request):

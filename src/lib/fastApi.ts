@@ -23,6 +23,26 @@ export const apiAreas: Record<string, string[]> = {
   "admin-quote-files": ["/api/admin/quotes/"],
   proofs: ["/api/proofs", "/api/proofs/"],
   "admin-proofs": ["/api/admin/proofs"],
+  // MIG-006. The Razorpay webhook is forwarded with its raw body, so its signature still checks out.
+  commerce: [
+    "/api/commerce/mode",
+    "/api/commerce/orders",
+    "/api/commerce/payment",
+    "/api/commerce/payment/webhook",
+    "/api/commerce/track",
+  ],
+  stock: ["/api/stock"],
+  "admin-orders": ["/api/admin/orders"],
+  // MIG-007: trade channels.
+  associates: ["/api/associates", "/api/associates/ref", "/api/associates/me"],
+  "admin-associates": ["/api/admin/associates", "/api/admin/commissions"],
+  distributors: ["/api/distributors", "/api/distributors/me", "/api/distributors/orders"],
+  "admin-distributors": ["/api/admin/distributors", "/api/admin/trade-orders"],
+  partners: ["/api/partners", "/api/partners/me"],
+  "admin-partners": ["/api/admin/partners", "/api/admin/projects"],
+  company: ["/api/company"],
+  // MIG-008. /api/ai/sign-layouts stays here, next to the signage rules the design studio also runs in the browser.
+  ai: ["/api/ai/status", "/api/ai/chat", "/api/ai/frame-colours"],
 };
 
 export type FastApiConfig = { target: string; secret: string; paths: Set<string>; prefixes: string[] } | null;
@@ -58,4 +78,24 @@ export function fastApiConfig(env: Record<string, string | undefined> = process.
     throw new Error("OBASIX_API_ROUTES includes quotes: set AUTH_SECRET, the same value on the site and the API.");
   }
   return { target, secret, paths, prefixes };
+}
+
+/**
+ * MIG-011: where the React admin app lives. When set, the site's /admin pages redirect there.
+ * It must be an absolute http(s) URL, and needs the FastAPI admin areas on (the app talks only to FastAPI).
+ */
+export function adminAppUrl(env: Record<string, string | undefined> = process.env): string | null {
+  const raw = env.OBASIX_ADMIN_APP_URL?.trim();
+  if (!raw) return null;
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new Error(`OBASIX_ADMIN_APP_URL must be an absolute URL, got "${raw}".`);
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("OBASIX_ADMIN_APP_URL must be http or https.");
+  if (!(env.OBASIX_API_ROUTES ?? "").split(",").map((a) => a.trim()).includes("admin-core")) {
+    throw new Error("OBASIX_ADMIN_APP_URL needs the admin-core area in OBASIX_API_ROUTES: the admin app talks only to FastAPI.");
+  }
+  return url.origin + url.pathname.replace(/\/$/, "");
 }

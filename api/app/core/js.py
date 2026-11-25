@@ -75,3 +75,8 @@ def truthy(value: Any) -> bool:
     if isinstance(value, dict | list):
         return True
     return bool(value)
+
+
+def round_half_up(value: float) -> int:
+    """Math.round: halves go up (2.5 → 3, -2.5 → -2). Python's round() goes to the even number."""
+    return math.floor(value + 0.5)

@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     razorpay_key_id: str = Field("", alias="RAZORPAY_KEY_ID")
     razorpay_key_secret: str = Field("", alias="RAZORPAY_KEY_SECRET")
     razorpay_webhook_secret: str = Field("", alias="RAZORPAY_WEBHOOK_SECRET")
+    razorpay_api_base: str = Field("https://api.razorpay.com", alias="RAZORPAY_API_BASE")  # tests only
 
     # Files (quote attachments, proofs): Vercel Blob when the token is set, else this folder.
     blob_token: str = Field("", alias="BLOB_READ_WRITE_TOKEN")
@@ -50,6 +51,13 @@ class Settings(BaseSettings):
     quote_api_url: str = Field("", alias="QUOTE_API_URL")
     quote_api_token: str = Field("", alias="QUOTE_API_TOKEN")
     staff_alert_emails: Annotated[list[str], NoDecode] = Field(default_factory=list, alias="OBASIX_STAFF_ALERT_EMAILS")
+
+    # AI (MIG-008). The chat uses an OpenAI-compatible provider, as on the site; design help uses Claude.
+    obasix_ai_api_key: str = Field("", alias="OBASIX_AI_API_KEY")
+    openai_api_key: str = Field("", alias="OPENAI_API_KEY")
+    obasix_ai_base_url: str = Field("https://api.openai.com/v1", alias="OBASIX_AI_BASE_URL")
+    obasix_ai_model: str = Field("gpt-4o-mini", alias="OBASIX_AI_MODEL")
+    anthropic_api_key: str = Field("", alias="ANTHROPIC_API_KEY")  # the SDK reads it (and ANTHROPIC_BASE_URL) itself
 
     sentry_dsn: str = Field("", alias="SENTRY_DSN")
     log_level: str = Field("INFO", alias="LOG_LEVEL")

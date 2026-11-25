@@ -29,7 +29,13 @@ async def json_body(request: Request) -> dict[str, Any] | None:
         body = json.loads(await request.body())
     except ValueError:
         return None
-    if not body:
+    # JavaScript's `!body`: null, false, 0 and "" are unreadable; {} and [] are not.
+    if (
+        body is None
+        or body is False
+        or body == ""
+        or (isinstance(body, int | float) and not isinstance(body, bool) and body == 0)
+    ):
         return None
     return body if isinstance(body, dict) else {}
 

@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 import path from "path";
+import { fastApiConfig } from "./src/lib/fastApi";
+
+// Fails the build on a bad FastAPI migration setting; src/proxy.ts does the forwarding.
+fastApiConfig();
 
 const nextConfig: NextConfig = {
   devIndicators: false,

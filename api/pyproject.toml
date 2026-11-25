@@ -1,0 +1,36 @@
+[project]
+name = "obasix-api"
+version = "0.1.0"
+description = "OBASIX backend API (FastAPI)"
+requires-python = ">=3.13"
+dependencies = [
+  "fastapi>=0.120",
+  "uvicorn[standard]>=0.38",
+  "pydantic-settings>=2.11",
+  "psycopg[binary,pool]>=3.2",
+  "alembic>=1.17",
+  "sqlalchemy>=2.0",
+  "httpx>=0.28",
+  "sentry-sdk[fastapi]>=2.40",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.4", "pytest-asyncio>=1.2", "ruff>=0.14"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+# Fixed test passwords and subprocess calls to node are expected in tests.
+"tests/**" = ["S105", "S106", "S603", "S607"]

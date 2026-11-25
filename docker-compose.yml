@@ -1,0 +1,42 @@
+# Local services. `docker compose up -d db` for the database only;
+# `docker compose up` also builds and runs the FastAPI service.
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: obasix
+      POSTGRES_PASSWORD: obasix-local-only
+      POSTGRES_DB: obasix
+    ports: ["54329:5432"]
+    volumes: [pgdata:/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U obasix -d obasix"]
+      interval: 2s
+      retries: 30
+
+  migrate:
+    build: ./api
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql://obasix:obasix-local-only@db:5432/obasix
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql://obasix:obasix-local-only@db:5432/obasix
+      APP_ENV: development
+      ALLOWED_ORIGINS: http://localhost:3000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      OBASIX_API_PROXY_SECRET: ${OBASIX_API_PROXY_SECRET:-local-development-proxy-secret-0000}
+    ports: ["8000:8000"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 3s
+      retries: 20
+
+volumes:
+  pgdata:

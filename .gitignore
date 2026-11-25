@@ -53,3 +53,8 @@ playwright-report-integrations/
 .impeccable/review/
 .impeccable/hook.cache.json
 .playwright-mcp/
+
+# FastAPI and migration test output
+/playwright-report-migrations
+/test-results-migrations
+/test-results-api

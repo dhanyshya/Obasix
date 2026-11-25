@@ -79,7 +79,9 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
 
 // ---------- Types returned by FastAPI ----------
 
-export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage" | "quotes:read" | "proofs:read" | "proofs:write" | "orders:read" | "orders:write";
+export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage" | "quotes:read" | "proofs:read" | "proofs:write" | "orders:read" | "orders:write"
+  | "associates:read" | "associates:write" | "distributors:read" | "distributors:write" | "distributors:approve"
+  | "partners:read" | "partners:write" | "partners:approve";
 export type Me = { email: string; name: string; role: "admin" | "staff"; source: "config" | "granted"; permissions: Permission[] };
 export type StockState = "in-stock" | "low" | "made-to-order" | "untracked";
 export type StockRow = { productId: string; name: string; sku: string; onHand: number | null; state: StockState; updatedBy: string | null; updatedAt: string | null };

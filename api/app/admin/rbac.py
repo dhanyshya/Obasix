@@ -29,6 +29,15 @@ class Permission(StrEnum):
     PROOFS_WRITE = "proofs:write"
     ORDERS_READ = "orders:read"
     ORDERS_WRITE = "orders:write"
+    # Payouts are money: admins only.
+    ASSOCIATES_READ = "associates:read"
+    ASSOCIATES_WRITE = "associates:write"
+    DISTRIBUTORS_READ = "distributors:read"
+    DISTRIBUTORS_WRITE = "distributors:write"  # trade orders: payments, dispatch, cancel
+    DISTRIBUTORS_APPROVE = "distributors:approve"  # tier, credit limit, territory: admins only
+    PARTNERS_READ = "partners:read"
+    PARTNERS_WRITE = "partners:write"  # advance a project, mark it lost
+    PARTNERS_APPROVE = "partners:approve"  # approve partners, quote margins, pay out: admins only
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
@@ -43,6 +52,10 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.PROOFS_WRITE,
             Permission.ORDERS_READ,
             Permission.ORDERS_WRITE,
+            Permission.DISTRIBUTORS_READ,
+            Permission.DISTRIBUTORS_WRITE,
+            Permission.PARTNERS_READ,
+            Permission.PARTNERS_WRITE,
         }
     ),
 }

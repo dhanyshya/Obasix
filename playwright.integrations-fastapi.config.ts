@@ -16,7 +16,7 @@ const standIn = "http://localhost:3219";
 const site = `http://localhost:${port}`;
 const databaseUrl = process.env.MIGRATION_DATABASE_URL ?? "postgresql://obasix:obasix-local-only@localhost:54329/obasix";
 const routes =
-  "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders";
+  "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company";
 const proxySecret = randomBytes(24).toString("hex");
 const authSecret = randomBytes(24).toString("hex");
 const shared = {

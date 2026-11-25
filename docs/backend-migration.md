@@ -26,8 +26,8 @@ The site's proxy sends the visitor's IP to FastAPI in `x-obasix-client-ip`, alon
 
 | Role | Permissions |
 |---|---|
-| `admin` | all of the above, plus `audit:read` and `staff:manage` |
-| `staff` | `stock:read`, `stock:write`, `quotes:read`, `proofs:read`, `proofs:write` |
+| `admin` | all of the above, plus `audit:read`, `staff:manage`, `associates:*`, `distributors:approve`, `partners:approve` (money and approvals) |
+| `staff` | `stock:*`, `quotes:read`, `proofs:*`, `orders:*`, `distributors:read`/`write` (trade orders), `partners:read`/`write` (advance, lost) |
 
 Each later admin migration adds its own permissions (for example `orders:write`) and decides which roles get them.
 
@@ -49,7 +49,7 @@ Quote attachments and design proofs live in a private Vercel Blob store in produ
 | Variable | Where | Purpose |
 |---|---|---|
 | `OBASIX_API_URL` | site | FastAPI base URL. Leave unset to keep everything in Next.js |
-| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`, `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs`, `commerce`, `stock`, `admin-orders`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
+| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`, `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs`, `commerce`, `stock`, `admin-orders`, `associates`, `admin-associates`, `distributors`, `admin-distributors`, `partners`, `admin-partners`, `company`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | site and API | The same values on both once `commerce` is on (the webhook URL stays the site's) |
 | `BLOB_READ_WRITE_TOKEN` | site and API | The same private Blob store (production) |
 | `OBASIX_FILES_DIR` | API | The site's `.data` folder when there's no Blob token |
@@ -72,7 +72,7 @@ The build fails if `OBASIX_API_URL` is set without `DATABASE_URL` or a valid sec
 | MIG-005 | Reading quotes | `GET /api/quotes/{reference}`, staff list `GET /api/admin/quotes`, admin app Quotes page | Done, off by default; see tracking |
 | MIG-005b | Files, quote submission, proofs | `POST /api/quotes`, `/api/admin/quotes/{ref}/file`, `/api/proofs`, `/api/proofs/{id}/file`, `/api/admin/proofs`; admin app Proofs page | Done, off by default; see tracking |
 | MIG-006 | Commerce | `/api/commerce/{mode,orders,payment,payment/webhook,track}`, `/api/stock`, `/api/admin/orders`; admin app Orders page | Done, off by default; see tracking |
-| MIG-007 | Trade channels | distributors, partners, associates, and their `/api/admin/*` routes; fix DEF-001 first | Planned |
+| MIG-007 | Trade channels | Associates, distributors, partners, company accounts (customer and staff endpoints); admin app pages | Done, off by default; see tracking |
 | MIG-008 | AI | chat, frame colours, sign layouts | Planned |
 | MIG-009 | Schema ownership | Next.js stops creating tables; Alembic owns every change; SQLite dropped | Planned |
 

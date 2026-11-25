@@ -15,6 +15,10 @@ from starlette.exceptions import HTTPException
 from app.account.router import router as account_router
 from app.admin.router import router as admin_router
 from app.auth.router import router as auth_router
+from app.channels.associates import router as associates_router
+from app.channels.company import router as company_router
+from app.channels.distributors import router as distributors_router
+from app.channels.partners import router as partners_router
 from app.commerce.router import router as commerce_router
 from app.core import db
 from app.core.config import get_settings
@@ -121,6 +125,10 @@ def create_app() -> FastAPI:
     app.include_router(quotes_router)
     app.include_router(proofs_router)
     app.include_router(commerce_router)
+    app.include_router(associates_router)
+    app.include_router(distributors_router)
+    app.include_router(partners_router)
+    app.include_router(company_router)
     return app
 
 

@@ -33,6 +33,14 @@ export const apiAreas: Record<string, string[]> = {
   ],
   stock: ["/api/stock"],
   "admin-orders": ["/api/admin/orders"],
+  // MIG-007: trade channels.
+  associates: ["/api/associates", "/api/associates/ref", "/api/associates/me"],
+  "admin-associates": ["/api/admin/associates", "/api/admin/commissions"],
+  distributors: ["/api/distributors", "/api/distributors/me", "/api/distributors/orders"],
+  "admin-distributors": ["/api/admin/distributors", "/api/admin/trade-orders"],
+  partners: ["/api/partners", "/api/partners/me"],
+  "admin-partners": ["/api/admin/partners", "/api/admin/projects"],
+  company: ["/api/company"],
 };
 
 export type FastApiConfig = { target: string; secret: string; paths: Set<string>; prefixes: string[] } | null;

@@ -21,6 +21,8 @@ async def signed_in(email: str) -> AsyncIterator[httpx.AsyncClient]:
         response = await client.post(
             "/api/auth?action=register", json={"name": "Person", "email": email, "password": PASSWORD}
         )
+        if response.status_code == 409:  # already registered in this test: sign in instead
+            response = await client.post("/api/auth?action=login", json={"email": email, "password": PASSWORD})
         assert response.status_code == 200, response.text
         yield client
 
@@ -82,6 +84,14 @@ async def test_config_admin_has_every_permission(boss):
         "proofs:write",
         "orders:read",
         "orders:write",
+        "associates:read",
+        "associates:write",
+        "distributors:read",
+        "distributors:write",
+        "distributors:approve",
+        "partners:read",
+        "partners:write",
+        "partners:approve",
     }
 
 
@@ -90,8 +100,12 @@ async def test_staff_role_can_work_stock_but_not_audit_or_staff(boss):
     async with signed_in("clerk@example.com") as clerk:
         me = (await clerk.get("/api/admin/me")).json()
         assert me["role"] == "staff" and me["permissions"] == [
+            "distributors:read",
+            "distributors:write",
             "orders:read",
             "orders:write",
+            "partners:read",
+            "partners:write",
             "proofs:read",
             "proofs:write",
             "quotes:read",

@@ -274,3 +274,35 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 | Migration E2E: demo checkout on the site → FastAPI prices and saves it → tracked → staff move it to Processing and Dispatched in the admin app (audited) → the customer's tracking shows it; cancel with a reason; wrong contact and strangers get nothing | 30/30 Chromium; 90/90 three browsers |
 | The site's own live-payment and email suite, unchanged, with commerce on FastAPI (`playwright.integrations-fastapi.config.ts`, new): Razorpay order, forged signature refused, genuine confirmed once, webhook-only payment, unsigned webhook refused, Razorpay down, reset email. FastAPI's request log confirms it served each call | 6/6 |
 | Regression with all 13 areas on FastAPI | 30/30 |
+
+## MIG-007: Trade channels on FastAPI (associates, distributors, partners, company accounts)
+
+| Field | Value |
+|---|---|
+| Objective | Move the four trade channels (customer and staff endpoints) and give staff admin app pages for them |
+| Status | **Complete (behind a switch).** Areas `associates`, `admin-associates`, `distributors`, `admin-distributors`, `partners`, `admin-partners`, `company` |
+| Steps | 007a associates, 007b distributors, 007c partners, 007d company accounts. Each was ported, unit and integration tested, and checked against the site's own channel journeys before the next |
+| Endpoints | Same as the site: `POST /api/associates`, `/api/associates/ref`, `/api/admin/associates`; `POST /api/distributors`, `/api/distributors/orders`, `/api/admin/distributors`; `POST /api/partners`, `/api/admin/partners`; `POST /api/company`. New reads: `GET /api/associates/me`, `/api/admin/associates`, `/api/admin/commissions`, `/api/distributors/me`, `/api/admin/distributors`, `/api/admin/trade-orders`, `/api/partners/me`, `/api/admin/partners`, `/api/admin/projects`, `/api/company` |
+| Database changes | Alembic `0006` (payout columns), `0007` distributors, `0008` partners, `0009` company: all `IF NOT EXISTS` matching what the site creates |
+| Permissions | Admin only: `associates:*` (payouts), `distributors:approve` (tier, credit, territory), `partners:approve` (approval, margins, payouts). Staff: `distributors:read`/`write` (trade orders), `partners:read`/`write` (advance, lost) |
+| Audit | `associate.pause`/`activate`, `commission.pay`/`void`, `distributor.decide`, `trade.record-payment`/`advance`/`cancel`, `partner.decide`, `project.quote`/`advance`/`lose`/`pay` |
+| Rollback | Remove the seven areas from `OBASIX_API_ROUTES` |
+
+**Behaviour changes (intended)**
+
+- Locks where the site had check-then-write races: joining the associate programme, applying as a distributor, trade orders (two at once could both fit the same available credit), project registration per client, company people changes (the last owner can't be removed twice over), reorder list limits, and order or project updates (row locks).
+- Approvals, margins and payouts are admin-only. On the site any allowlisted staff member could do them.
+- A partner's own project list says a project is "held" without naming the other partner's project.
+- **Site fix:** the partner margin message read "Set a margin between 0 and 30.000000000000004%." (`0.3 * 100` in JavaScript). Now "30%" on both sides.
+
+**Parity checked against the site's code** (Node runs the TypeScript): financial-quarter boundaries for six dates around year and quarter edges; trade prices (`Math.round(price × (1 − discount))` with JavaScript rounding); V8's acceptance of dates like 2027-02-30 for expected order dates.
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): associates 9, distributors 6, partners 4, company 3 (rules and messages, codes, referral window, commission states, payouts, approvals, credit and simultaneous orders, protection and conflicts, one payout per order, owners, reorder lists, role limits, audit, Node parity) | 120/120 |
+| Admin app (Vitest): bulk payout with a reference; full distributor decision; staff can't decide; partner quote | 34/34 |
+| Migration E2E (admin app): distributor approved → trade order → payment → dispatch (audited); partner approved → project → margin quoted (30% limit); referred order delivered → commission paid; strangers refused | 33/33 Chromium; 99/99 three browsers |
+| The site's own `channels.spec.ts` and `admin.spec.ts` with all channels on FastAPI | 9/9 |
+| Regression and integration suites with all 20 areas on FastAPI | 30/30, 6/6 |

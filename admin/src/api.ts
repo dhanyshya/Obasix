@@ -22,6 +22,32 @@ function newRequestId() {
   return crypto.randomUUID().replaceAll("-", "");
 }
 
+/** The full URL of an API path, for links (file downloads go straight to the browser). */
+export function apiUrl(path: string) {
+  return `${base}${path}`;
+}
+
+/** A multipart upload (files). Same error handling as api(). */
+export async function apiForm<T>(path: string, form: FormData): Promise<T> {
+  const requestId = newRequestId();
+  let response: Response;
+  try {
+    response = await fetch(new URL(`${base}${path}`, window.location.origin), {
+      method: "POST",
+      credentials: "include",
+      headers: { "x-request-id": requestId },
+      body: form,
+    });
+  } catch {
+    throw new ApiError(0, "We couldn't reach the server. Check your connection and try again.", requestId);
+  }
+  const data = (await response.json().catch(() => ({}))) as { ok?: boolean; message?: string };
+  if (!response.ok || data.ok === false) {
+    throw new ApiError(response.status, data.message || "The upload was refused.", response.headers.get("x-request-id") ?? requestId);
+  }
+  return data as T;
+}
+
 export async function api<T>(path: string, init: { method?: string; body?: unknown; query?: Record<string, string | number | undefined> } = {}): Promise<T> {
   const url = new URL(`${base}${path}`, window.location.origin);
   for (const [key, value] of Object.entries(init.query ?? {})) {
@@ -53,7 +79,7 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
 
 // ---------- Types returned by FastAPI ----------
 
-export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage" | "quotes:read";
+export type Permission = "stock:read" | "stock:write" | "audit:read" | "staff:manage" | "quotes:read" | "proofs:read" | "proofs:write";
 export type Me = { email: string; name: string; role: "admin" | "staff"; source: "config" | "granted"; permissions: Permission[] };
 export type StockState = "in-stock" | "low" | "made-to-order" | "untracked";
 export type StockRow = { productId: string; name: string; sku: string; onHand: number | null; state: StockState; updatedBy: string | null; updatedAt: string | null };
@@ -89,4 +115,20 @@ export type QuoteSummary = {
   lines: QuoteLine[];
   catalogueListSubtotal: number;
   attachment: { name: string; type: string; size: number } | null;
+};
+export type ProofStatus = "pending" | "approved" | "changes" | "superseded";
+export type Proof = {
+  id: string;
+  quoteReference: string;
+  version: number;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  staffNote: string;
+  uploadedBy: string;
+  createdAt: string;
+  status: ProofStatus;
+  decidedAt: string | null;
+  decidedBy: string | null;
+  customerComment: string;
 };

@@ -129,7 +129,7 @@ test("roles: an admin grants 'staff' → stock allowed, audit and staff manageme
   });
   expect(granted.status()).toBe(200);
   const me = await (await clerk.context.request.get("/api/admin/me")).json();
-  expect(me).toMatchObject({ email: clerkEmail, role: "staff", source: "granted", permissions: ["quotes:read", "stock:read", "stock:write"] });
+  expect(me).toMatchObject({ email: clerkEmail, role: "staff", source: "granted", permissions: ["proofs:read", "proofs:write", "quotes:read", "stock:read", "stock:write"] });
 
   const list = await (await clerk.context.request.get(`/api/admin/stock?q=${encodeURIComponent("Pin-up Green 2")}`)).json();
   expect(list.items).toEqual([expect.objectContaining({ productId: PRODUCT.id, state: "untracked", onHand: null })]);

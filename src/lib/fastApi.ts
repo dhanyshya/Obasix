@@ -16,8 +16,13 @@ export const apiAreas: Record<string, string[]> = {
   "admin-stock": ["/api/admin/stock"],
   // Reading a saved quote. Submitting one (POST /api/quotes, with its file) stays in Next.js.
   quotes: ["/api/quotes/"],
-  // The staff quote list (FastAPI only). The attachment download, /api/admin/quotes/<ref>/file, stays.
+  // The staff quote list (FastAPI only).
   "admin-quotes": ["/api/admin/quotes"],
+  // MIG-005b. Files go to the same store as the site's: Vercel Blob, or a shared OBASIX_FILES_DIR.
+  "quote-submit": ["/api/quotes"],
+  "admin-quote-files": ["/api/admin/quotes/"],
+  proofs: ["/api/proofs", "/api/proofs/"],
+  "admin-proofs": ["/api/admin/proofs"],
 };
 
 export type FastApiConfig = { target: string; secret: string; paths: Set<string>; prefixes: string[] } | null;
@@ -48,7 +53,7 @@ export function fastApiConfig(env: Record<string, string | undefined> = process.
     if (!sources) throw new Error(`OBASIX_API_ROUTES: unknown area "${area}". Known: ${Object.keys(apiAreas).join(", ")}`);
     sources.forEach((path) => (path.endsWith("/") ? prefixes.push(path) : paths.add(path)));
   }
-  if (areas.includes("quotes") && !env.AUTH_SECRET) {
+  if ((areas.includes("quotes") || areas.includes("quote-submit")) && !env.AUTH_SECRET) {
     // Quote cookies are signed with AUTH_SECRET; without it the site uses a random per-process key.
     throw new Error("OBASIX_API_ROUTES includes quotes: set AUTH_SECRET, the same value on the site and the API.");
   }

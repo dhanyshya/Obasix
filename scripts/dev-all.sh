@@ -17,12 +17,12 @@ docker compose up -d --wait db
 cleanup() { kill 0 2>/dev/null || true; }
 trap cleanup EXIT INT TERM
 
-(cd api && APP_ENV=development ALLOWED_ORIGINS="http://localhost:${SITE_PORT}" \
+(cd api && OBASIX_FILES_DIR="$PWD/../.data" APP_ENV=development ALLOWED_ORIGINS="http://localhost:${SITE_PORT}" \
   NEXT_PUBLIC_SITE_URL="http://localhost:${SITE_PORT}" uv run uvicorn app.main:app --reload --port "$API_PORT") &
 
 until curl -sf "http://127.0.0.1:${API_PORT}/health" >/dev/null; do sleep 1; done
 echo "FastAPI ready on :${API_PORT} (docs: http://127.0.0.1:${API_PORT}/docs)"
 
-OBASIX_API_URL="http://127.0.0.1:${API_PORT}" OBASIX_API_ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock,quotes,admin-quotes}" \
+OBASIX_API_URL="http://127.0.0.1:${API_PORT}" OBASIX_API_ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs}" \
   npx next dev -p "$SITE_PORT" &
 wait

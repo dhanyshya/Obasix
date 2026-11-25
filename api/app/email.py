@@ -2,6 +2,7 @@
 
 import html
 import logging
+from urllib.parse import quote
 
 import httpx
 
@@ -47,16 +48,101 @@ def password_reset_email(link: str) -> dict[str, str]:
     return {"subject": "Reset your OBASIX password", "html": page, "text": text}
 
 
-async def send_email(to: str, message: dict[str, str]) -> bool:
+def _summary_line(*parts: str) -> str:
+    return " · ".join(p for p in parts if p)
+
+
+def quote_received_email(reference: str, name: str, summary: str) -> dict[str, str]:
+    page, text = _layout(
+        f"Thank you, {name}. We've received your request.",
+        [
+            f"Reference: {reference}",
+            summary,
+            "Our team will reply with a price and lead time. For custom work we'll send a design proof for your "
+            "approval before anything is made.",
+        ],
+    )
+    return {
+        "subject": f"We've received your quote request {reference}",
+        "html": page,
+        "text": text,
+        "reply_to": company()["email"],
+    }
+
+
+def staff_new_quote_email(
+    reference: str, name: str, company_name: str, email: str, phone: str, summary: str
+) -> dict[str, str]:
+    site = get_settings().site_url
+    page, text = _layout(
+        f"New quote request {reference}",
+        [f"{name}{f' · {company_name}' if company_name else ''} · {email} · {phone}", summary],
+        ("Open quotes", f"{site}/admin/quotes?q={quote(reference, safe='')}"),
+    )
+    return {"subject": f"New quote request {reference}", "html": page, "text": text, "reply_to": email}
+
+
+def proof_ready_email(reference: str, version: int, note: str) -> dict[str, str]:
+    site = get_settings().site_url
+    page, text = _layout(
+        f"Proof version {version} is ready for your review",
+        [
+            f"Quote {reference}",
+            *([f"From our team: {note}"] if note else []),
+            "Check every word, size and colour. We make it exactly as the version you approve.",
+        ],
+        ("Review the proof", f"{site}/account/proofs"),
+    )
+    return {
+        "subject": f"Your design proof for {reference} is ready",
+        "html": page,
+        "text": text,
+        "reply_to": company()["email"],
+    }
+
+
+def staff_proof_decision_email(
+    reference: str, version: int, decision: str, comment: str, customer: str
+) -> dict[str, str]:
+    site = get_settings().site_url
+    approved = decision == "approved"
+    page, text = _layout(
+        f"{reference} version {version} is approved for production"
+        if approved
+        else f"{reference} version {version}: changes requested",
+        [f"By {customer}", *([f"“{comment}”"] if comment else [])],
+        ("Open proofs", f"{site}/admin/proofs"),
+    )
+    subject = f"Proof approved: {reference} v{version}" if approved else f"Changes requested: {reference} v{version}"
+    return {"subject": subject, "html": page, "text": text}
+
+
+def staff_alert_emails() -> list[str]:
     settings = get_settings()
-    if not settings.email_configured or not to:
+    return settings.staff_alert_emails or settings.admin_emails
+
+
+async def send_email(to: str | list[str], message: dict[str, str]) -> bool:
+    """Best effort, as on the site: never raises, so an email outage can't block a quote or a proof."""
+    settings = get_settings()
+    recipients = [r for r in ([to] if isinstance(to, str) else to) if r]
+    if not settings.email_configured or not recipients:
         return False
+    body = {
+        "from": settings.email_from,
+        "to": recipients,
+        "subject": message["subject"],
+        "html": message["html"],
+        "text": message["text"],
+    }
+    if message.get("reply_to"):
+        body["reply_to"] = message["reply_to"]
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             response = await client.post(
                 f"{settings.resend_api_base}/emails",
                 headers={"authorization": f"Bearer {settings.resend_api_key}"},
-                json={"from": settings.email_from, "to": [to], **message},
+                json=body,
             )
         if response.is_error:
             log.error('Email "%s" failed: %s', message["subject"], response.status_code)

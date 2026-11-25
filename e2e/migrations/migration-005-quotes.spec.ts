@@ -6,7 +6,7 @@ import { nextIp, open, PASSWORD, query, removeAccounts, signUp, uniqueEmail } fr
 
 /**
  * MIG-005: reading saved quotes on FastAPI (customer lookup and the staff list), and the
- * admin app's Quotes page. Submitting a quote, with its file, stays in Next.js.
+ * admin app's Quotes page. (Submitting moved later, in MIG-005b.)
  * See docs/migrations/tracking.md. mig005+admin@example.test is in OBASIX_ADMIN_EMAILS.
  */
 const PREFIX = "mig005";
@@ -47,7 +47,9 @@ async function submitQuote(page: Page, email: string, name: string) {
   await page.locator('main form button[type="submit"]').click();
   const post = await submitted;
   expect(post.status()).toBe(200);
-  expect(post.headers()["x-request-id"], "submitting stays in Next.js").toBeUndefined();
+  // Submitting moved to FastAPI in MIG-005b ("quote-submit"); this suite only needs it to work.
+  const submitOnFastApi = (process.env.OBASIX_API_ROUTES ?? "quote-submit").split(",").includes("quote-submit");
+  expect(Boolean(post.headers()["x-request-id"]), "submission served where the configured areas say").toBe(submitOnFastApi);
   const lookup = await lookedUp;
   expect(lookup.status()).toBe(200);
   expect(lookup.headers()["x-request-id"], "reading is served by FastAPI").toBeTruthy();

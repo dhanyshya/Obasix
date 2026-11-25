@@ -16,6 +16,7 @@ from app.core.db import connection
 from app.core.http import client_address, fail
 from app.core.ratelimit import allow_attempt
 from app.quotes.access import can_view
+from app.quotes.submit import submit
 
 router = APIRouter(tags=["quotes"])
 
@@ -34,6 +35,11 @@ async def find_quote(reference: str) -> dict[str, Any] | None:
             await conn.execute("SELECT payload FROM quote_requests WHERE reference = %s", (reference,))
         ).fetchone()
     return json.loads(row["payload"]) if row else None
+
+
+@router.post("/api/quotes", summary="Submit a quote request (multipart form, Idempotency-Key header)")
+async def submit_quote(request: Request) -> JSONResponse:
+    return await submit(request)
 
 
 @router.get("/api/quotes/{reference}", summary="A saved quote, for the person who sent it")

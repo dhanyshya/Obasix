@@ -198,3 +198,41 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 **Watch**
 
 - The MIG-002 password-change test failed once in the first full run (the "current password is incorrect" message never appeared), then passed alone and in two full runs. Not reproduced; if it recurs, the trace will be in the CI report.
+
+## MIG-005b: Files, quote submission and design proofs on FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | Move everything left in quotes and proofs: submitting a quote with its file, staff file downloads, and the proof workflow |
+| Status | **Complete (behind a switch).** Areas `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs` |
+| Storage decision | Taken without the product owner, as instructed to proceed. Port the private Vercel Blob protocol and prove it against the official SDK (see docs/backend-migration.md, "Files"); a shared `OBASIX_FILES_DIR` for local and single-server use. Reversible: the areas can be switched off, and storage is one module |
+| Endpoints | Same as the site: `POST /api/quotes`, `GET /api/admin/quotes/{ref}/file`, `POST /api/admin/proofs`, `POST /api/proofs`, `GET /api/proofs/{id}/file`. New: `GET /api/admin/proofs` (filter by quote and status, pages) |
+| Database changes | Alembic `0005`: `design_proofs` and the associate tables, `IF NOT EXISTS` (already created by the site) |
+| Permissions | `proofs:read`, `proofs:write` (admin and staff). Quote files need `quotes:read` |
+| Audit | `proof.upload`, `quote.file.download` |
+| Rollback | Remove the four areas from `OBASIX_API_ROUTES` |
+
+**Shared writes until later migrations**
+
+- Quote submission credits associates (`associate_quotes`), as the site does. The associate tables stay owned by the site until trade channels move (MIG-007).
+
+**Behaviour changes (intended)**
+
+- Proof uploads take a per-quote lock, so two uploads at once can't get the same version number.
+- Downloading a customer's quote file is written to the audit log.
+- Attribution failures are logged; the site ignored them silently.
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): storage incl. byte-for-byte parity with `@vercel/blob`; 21 quote-submission cases (every field rule, idempotency, rate limit, modes, account link, associate credit); proofs (rules, versions, approval closes the thread, decisions, who may see files, staff list, audit) | 73/73 |
+| Admin app (Vitest): Proofs page (list, file checks, confirm, multipart upload), quote download and proofs links | 28/28 |
+| Migration E2E: quote with a file submitted on the site → FastAPI → file in the shared store → downloaded from the site's staff portal and the admin app (audited) → stranger 404; proofs v1 from the admin app → customer requests changes on the site → v2 → approved → further uploads refused → stranger can't see or decide | 28/28 Chromium; 84/84 three browsers |
+| Regression with all ten areas on FastAPI (`scripts/regression-fastapi.sh`, new) | 30/30 |
+
+**Issues found and fixed**
+
+1. `request.form()` returns Starlette's `UploadFile`, not FastAPI's subclass, so files were ignored. Fixed in both endpoints.
+2. A multipart part limit just above 2 MB turned "file too large" into "could not be read". Limits are now above the validation sizes (8 MB quotes, 12 MB proofs), so the site's messages come through.
+3. The first version of the regression script ran `alembic` without `DATABASE_URL`, so FastAPI never started, and the script carried on after its readiness wait anyway (15 false failures). It now fails unless both servers are healthy.

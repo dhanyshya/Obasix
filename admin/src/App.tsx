@@ -11,6 +11,7 @@ import { SignIn } from "./pages/SignIn";
 const Overview = lazy(() => import("./pages/Overview").then((m) => ({ default: m.Overview })));
 const Stock = lazy(() => import("./pages/Stock").then((m) => ({ default: m.Stock })));
 const Quotes = lazy(() => import("./pages/Quotes").then((m) => ({ default: m.Quotes })));
+const Proofs = lazy(() => import("./pages/Proofs").then((m) => ({ default: m.Proofs })));
 const Audit = lazy(() => import("./pages/Audit").then((m) => ({ default: m.Audit })));
 const Staff = lazy(() => import("./pages/Staff").then((m) => ({ default: m.Staff })));
 
@@ -60,6 +61,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <Loading><Overview /></Loading> },
       { path: "stock", element: <RequirePermission needs="stock:read"><Loading><Stock /></Loading></RequirePermission> },
       { path: "quotes", element: <RequirePermission needs="quotes:read"><Loading><Quotes /></Loading></RequirePermission> },
+      { path: "proofs", element: <RequirePermission needs="proofs:read"><Loading><Proofs /></Loading></RequirePermission> },
       { path: "audit", element: <RequirePermission needs="audit:read"><Loading><Audit /></Loading></RequirePermission> },
       { path: "staff", element: <RequirePermission needs="staff:manage"><Loading><Staff /></Loading></RequirePermission> },
       { path: "*", element: <NotFound /> },

@@ -18,6 +18,7 @@ from app.auth.router import router as auth_router
 from app.core import db
 from app.core.config import get_settings
 from app.core.logging import configure_logging, request_id
+from app.proofs.router import router as proofs_router
 from app.quotes.router import router as quotes_router
 
 log = logging.getLogger("obasix.api")
@@ -117,6 +118,7 @@ def create_app() -> FastAPI:
     app.include_router(account_router)
     app.include_router(admin_router)
     app.include_router(quotes_router)
+    app.include_router(proofs_router)
     return app
 
 

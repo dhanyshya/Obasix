@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
 /**
@@ -20,7 +21,7 @@ const secret = randomBytes(24).toString("hex");
 // Shared by the site and the API: it signs sessions and the quote cookie (MIG-005).
 const authSecret = randomBytes(24).toString("hex");
 // The MIG-003 and MIG-004 suites' admins; their accounts are removed after each run.
-const STAFF_EMAILS = "e2e-staff@example.test,mig003+admin@example.test,mig004+admin@example.test,mig005+admin@example.test";
+const STAFF_EMAILS = "e2e-staff@example.test,mig003+admin@example.test,mig004+admin@example.test,mig005+admin@example.test,mig5b+admin@example.test";
 const allBrowsers = process.env.E2E_ALL_BROWSERS === "1";
 // A production build by default: `next dev` can fall into an endless "HMR hash mismatch"
 // reload on freshly compiled pages, which stalls browser tests. E2E_SERVER=dev to use it anyway.
@@ -53,6 +54,8 @@ export default defineConfig({
         DATABASE_URL: databaseUrl,
         APP_ENV: "development",
         AUTH_SECRET: authSecret,
+        // The site's own files folder: both sides read and write quote attachments and proofs there.
+        OBASIX_FILES_DIR: path.join(__dirname, ".data"),
         // No .pyc files in the project while Next.js watches it.
         PYTHONDONTWRITEBYTECODE: "1",
         // The site, and the admin app (MIG-004), which reaches FastAPI through its own proxy.
@@ -74,7 +77,7 @@ export default defineConfig({
       env: {
         DATABASE_URL: databaseUrl,
         OBASIX_API_URL: `http://127.0.0.1:${apiPort}`,
-        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes",
+        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs",
         OBASIX_API_PROXY_SECRET: secret,
         OBASIX_COMMERCE_MODE: "demo",
         OBASIX_ADMIN_EMAILS: STAFF_EMAILS,

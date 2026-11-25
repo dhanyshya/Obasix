@@ -61,7 +61,9 @@ describe("quotes page", () => {
     const dialog = await screen.findByRole("dialog", { name: "Quote OBX-QUOTE-DEMO-ABC123" });
     expect(within(dialog).getByText("meera@example.com")).toBeInTheDocument();
     expect(within(dialog).getByText(/2 × Classic Board \(CMWB6090\)/)).toBeInTheDocument();
-    expect(within(dialog).getByText(/plan.pdf \(117 KB\)/)).toBeInTheDocument();
+    const download = within(dialog).getByRole("link", { name: /Download plan.pdf \(117 KB\)/ });
+    expect(download).toHaveAttribute("href", "/api/admin/quotes/OBX-QUOTE-DEMO-ABC123/file");
+    expect(within(dialog).getByRole("link", { name: "Proofs for this quote" })).toHaveAttribute("href", "/proofs?quoteReference=OBX-QUOTE-DEMO-ABC123");
   });
 
   it("checks the date range before asking the API", async () => {

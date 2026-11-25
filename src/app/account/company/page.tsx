@@ -26,6 +26,13 @@ async function readOverview(email: string): Promise<Overview> {
   return { membership, members: await listMembers(membership.company.id), lists: await listReorderLists(membership.company.id) };
 }
 
+// Through FastAPI once the commerce area is switched on; otherwise straight from the database.
+async function readOrders(userId: string) {
+  const remote = await readFromFastApi<{ orders: Awaited<ReturnType<typeof listDemoOrdersForUser>> }>("/api/commerce/orders");
+  if (remote !== undefined) return remote?.orders ?? [];
+  return listDemoOrdersForUser(userId);
+}
+
 const heading = { fontSize: { xs: 34, md: 46 } } as const;
 
 export default async function AccountCompanyPage() {
@@ -36,7 +43,7 @@ export default async function AccountCompanyPage() {
   const { membership } = overview;
 
   // Past orders, priced at today's catalogue; retired products drop out.
-  const orders: PanelOrder[] = (await listDemoOrdersForUser(session.user.id))
+  const orders: PanelOrder[] = (await readOrders(session.user.id))
     .slice(0, 10)
     .map((order) => {
       const lines = order.items.flatMap((item) => {

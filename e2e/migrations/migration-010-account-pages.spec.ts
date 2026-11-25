@@ -24,6 +24,7 @@ test.afterAll(async () => {
     await query("DELETE FROM company_members WHERE company_id = ANY($1)", [companies]);
     await query("DELETE FROM companies WHERE id = ANY($1)", [companies]);
   }
+  await query("DELETE FROM demo_orders WHERE email LIKE $1", [`${PREFIX}+%`]);
   await query("DELETE FROM design_proofs WHERE quote_reference LIKE 'OBX-QUOTE-MIG010%'");
   await query("DELETE FROM quote_requests WHERE reference LIKE 'OBX-QUOTE-MIG010%'");
   await removeAccounts(PREFIX);
@@ -66,8 +67,16 @@ test("company page shows the company created through FastAPI", async ({ browser 
   const c = await account(browser, "buyer");
   const name = `Branches ${Date.now().toString(36)}`;
   expect((await c.post("/api/company", { action: "create", name, gstin: "", billingAddress: "Pune" })).ok()).toBe(true);
+  const placed = await c.context.request.post("/api/commerce/orders", {
+    data: { details: { name: "Company Buyer", email: c.email, phone: "+91 98765 43210", shipping: { line: "12 MG Road", city: "Pune", state: "MH", postal: "411001" } }, lines: [{ productId: "cmwb6090", quantity: 2 }], method: "upi" },
+    headers: { origin: SITE, "idempotency-key": `mig010-${Date.now()}` },
+  });
+  const orderId = (await placed.json()).order.id;
+  const listed = await (await c.context.request.get("/api/commerce/orders")).json();
+  expect(listed.orders.map((o: { id: string }) => o.id)).toEqual([orderId]);
   await open(c.page, "/account/company");
   await expect(c.page.getByRole("heading", { name })).toBeVisible();
+  await expect(c.page.getByText(orderId, { exact: true })).toBeVisible(); // recent orders, read through FastAPI
   await c.context.close();
 });
 

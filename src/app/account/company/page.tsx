@@ -4,11 +4,27 @@ import Typography from "@mui/material/Typography";
 import { CreateCompanyForm, MembersSection, RecentOrders, ReorderLists, type PanelOrder } from "@/components/company/CompanyPanel";
 import { getProductById } from "@/data/catalogue";
 import { readSession } from "@/lib/auth/session";
+import { readFromFastApi } from "@/lib/fastApiServer";
 import { listDemoOrdersForUser } from "@/lib/commerce/order-store";
 import { findMembership, listMembers, listReorderLists } from "@/lib/company/store";
 import { brandTokens as brand } from "@/theme/brandTokens";
 
 export const metadata: Metadata = { title: "Company" };
+
+type Overview = {
+  membership: Awaited<ReturnType<typeof findMembership>>;
+  members?: Awaited<ReturnType<typeof listMembers>>;
+  lists?: Awaited<ReturnType<typeof listReorderLists>>;
+};
+
+// Through FastAPI once the company area is switched on; otherwise straight from the database.
+async function readOverview(email: string): Promise<Overview> {
+  const remote = await readFromFastApi<Overview>("/api/company");
+  if (remote) return remote;
+  const membership = await findMembership(email);
+  if (!membership) return { membership: null };
+  return { membership, members: await listMembers(membership.company.id), lists: await listReorderLists(membership.company.id) };
+}
 
 const heading = { fontSize: { xs: 34, md: 46 } } as const;
 
@@ -16,7 +32,8 @@ export default async function AccountCompanyPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
   const me = session.user.email.toLowerCase();
-  const membership = await findMembership(me);
+  const overview = await readOverview(me);
+  const { membership } = overview;
 
   // Past orders, priced at today's catalogue; retired products drop out.
   const orders: PanelOrder[] = (await listDemoOrdersForUser(session.user.id))
@@ -52,8 +69,8 @@ export default async function AccountCompanyPage() {
 
   const { company, role } = membership;
   const isOwner = role === "owner";
-  const members = (await listMembers(company.id)).map((m) => ({ email: m.email, role: m.role }));
-  const lists = await listReorderLists(company.id);
+  const members = (overview.members ?? []).map((m) => ({ email: m.email, role: m.role }));
+  const lists = overview.lists ?? [];
 
   return (
     <Box sx={{ display: "grid", gap: { xs: 3, md: 4 } }}>

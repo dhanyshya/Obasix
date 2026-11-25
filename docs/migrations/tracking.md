@@ -352,3 +352,48 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 
 - "SQLite dropped" is replaced by "SQLite for local development only": dropping it would make Docker mandatory for every contributor and for the site's existing CI suite, with nothing gained in production.
 - Remaining direct database access from the site: 6 account pages and 12 staff-portal files. These are MIG-010 and MIG-011.
+
+## MIG-010: Account pages read through FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | The account pages (associate, distributor, partner, company, proofs) stop reading the database directly when their area is served by FastAPI |
+| Status | **Complete** |
+| How | `src/lib/fastApiServer.ts` `readFromFastApi(path)`: inside a server component, GETs FastAPI with the visitor's cookie, client IP and the proxy secret. It returns `undefined` when the area is still on Next.js, so each page keeps its direct read as the fallback and the switch stays reversible per area |
+| New endpoint | `GET /api/proofs`: the signed-in customer's proof threads, newest first, only for quotes linked to the account or sent from its email |
+| Unchanged on purpose | `layout.tsx` only reads the session cookie (same cookie and table as FastAPI's auth). The company page's "recent orders" list keeps its direct read: FastAPI has no customer order-list endpoint yet; it moves with MIG-012 |
+| Rollback | Remove the area from `OBASIX_API_ROUTES`; the page falls back to its direct read |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): new customer proof list (401 signed out; own threads only, newest version first; a stranger sees none) | 130/130 |
+| Migration E2E `migration-010-account-pages.spec.ts`: each page rendered for a real account shows what FastAPI holds; the proofs page and `GET /api/proofs` hide another customer's thread | 4/4 Chromium |
+
+## MIG-011: The site's staff portal gives way to the React admin app
+
+| Field | Value |
+|---|---|
+| Objective | Staff use one admin: the React app (`admin/`), which goes only through FastAPI (roles, audit log). The site's old `/admin` pages, which write to the database directly and keep no audit trail, are no longer reachable |
+| Status | **Complete** (switch). Deleting the old pages' code is part of MIG-012, so turning the switch off restores them |
+| How | New setting `OBASIX_ADMIN_APP_URL` on the site. When set, `src/proxy.ts` answers every `/admin` and `/admin/<section>` page with a permanent (308) redirect to the same section of the admin app. The build fails if the URL isn't absolute http(s), or if `admin-core` isn't in `OBASIX_API_ROUTES`, because the app talks only to FastAPI |
+| Why not delete now | The site's own suites (`e2e/admin.spec.ts`, `channels.spec.ts`, `security.spec.ts`) still run the portal in the deployment mode without FastAPI. Removing it before production runs on FastAPI would leave staff with no admin in that mode |
+| Rollback | Unset `OBASIX_ADMIN_APP_URL` |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| Migration E2E `migration-011-admin-portal.spec.ts`: `/admin`, `/admin/orders`, `/admin/stock`, `/admin/proofs` → 308 to the app's section; a visitor following it lands on the app's sign-in; `/api/admin/*` forwarding unchanged. `migration-003` now drives stock through the API (the screen is covered by `migration-004`) | 46/46 Chromium (whole migration suite, MIG-001 to 011) |
+
+## MIG-012: Remove the Next.js copies (gated on production)
+
+| Field | Value |
+|---|---|
+| Objective | Delete the site's own handlers for every area FastAPI now serves (`src/app/api/*` for the 21 areas), the old `/admin` pages and `src/components/admin/*`, the direct-read fallbacks added in MIG-010, and the store code only they use |
+| Status | **Not started: gated.** It removes the rollback path for every earlier migration, so it waits for evidence from production |
+| Gate (all required) | 1. Production has run with all 21 areas in `OBASIX_API_ROUTES`, `OBASIX_SCHEMA_OWNER=alembic` and `OBASIX_ADMIN_APP_URL` set for at least two weeks, including a month-end. 2. No rollback was used in that time. 3. FastAPI's 5xx rate and p95 latency are no worse than the site's before the switch (Sentry / request logs). 4. A sign-off from the person who owns operations |
+| Also needed first | A customer order-list endpoint in FastAPI, for the company page's "recent orders" (it still reads directly, see MIG-010). `/api/ai/sign-layouts` stays in Next.js by design (its rules also run in the browser) |
+| Steps when the gate passes | Delete in one PR per area group (auth+account, admin, quotes+proofs, commerce, channels, AI), each running the regression suite with that group's code gone. Then make `OBASIX_API_URL` required in production builds, drop `servedByFastApi` fallbacks, and move the site's suites that exercised the portal (`e2e/admin.spec.ts`) onto the admin app |
+| Rollback | Revert the PR; config switches still exist until the last step |

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { replayCartEdits, useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { afterStream } from "@/lib/afterStream";
 import type { CartItem } from "@/lib/types";
 
 export type SessionUser = {
@@ -79,27 +80,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     canSave.current = true;
   };
 
+  /** State changes after the session and account load wait for the page to finish streaming: see afterStream. */
   const refresh = async () => {
     const current = ++generation.current;
     const editMark = cart.editCount();
     const session = (await fetch("/api/auth").then((response) => response.json())) as { user: SessionUser | null };
     if (generation.current !== current) return;
-    setUser(session.user);
+    afterStream(() => setUser(session.user));
     if (!session.user) {
       canSave.current = false;
-      setReady(true);
+      afterStream(() => setReady(true));
       return;
     }
     const account = (await fetch("/api/account").then((response) => response.json())) as { cart?: CartItem[]; wishlist?: string[] };
     if (generation.current !== current) return;
     // Changes from the last visit that never reached the server win over the saved copy (and are resent).
     const unsaved = readUnsaved(session.user.id);
-    applyAccount(unsaved?.items ?? account.cart ?? [], unsaved?.ids ?? account.wishlist ?? [], editMark);
-    setReady(true);
+    afterStream(() => {
+      applyAccount(unsaved?.items ?? account.cart ?? [], unsaved?.ids ?? account.wishlist ?? [], editMark);
+      setReady(true);
+    });
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- refresh() only sets state after awaiting the session fetch
+     
     void refresh();
     // The saved account is loaded once. Later cart edits are saved separately.
     // eslint-disable-next-line react-hooks/exhaustive-deps

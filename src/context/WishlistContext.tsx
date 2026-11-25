@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { afterStream } from "@/lib/afterStream";
 
 interface WishlistContextValue {
   ids: string[];
@@ -28,8 +29,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const saved = JSON.parse(window.localStorage.getItem("obasix-wishlist-v1") ?? "[]") as unknown;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from browser storage
-      if (Array.isArray(saved) && saved.length) setIdsState((prev) => (prev.length ? prev : saved.map(String).slice(0, 40)));
+      // After the page has streamed in: see afterStream.
+      if (Array.isArray(saved) && saved.length) afterStream(() => setIdsState((prev) => (prev.length ? prev : saved.map(String).slice(0, 40))));
     } catch {
       // Storage unavailable.
     }

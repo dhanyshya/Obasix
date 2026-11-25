@@ -13,6 +13,7 @@ import {
 import type { CartConfiguration, CartItem } from "@/lib/types";
 import { getProductById } from "@/data/catalogue";
 import { cartLineId } from "@/lib/auth/cart";
+import { afterStream } from "@/lib/afterStream";
 
 export type CartEdit =
   | { op: "add"; item: CartItem }
@@ -126,8 +127,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Guest cart persistence (signed-in carts are also saved server-side by AuthContext).
   useEffect(() => {
     const saved = readGuestCart();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from browser storage
-    if (saved.length) setItems((prev) => (prev.length ? prev : saved));
+    // After the page has streamed in: see afterStream.
+    if (saved.length) afterStream(() => setItems((prev) => (prev.length ? prev : saved)));
   }, []);
 
   /**

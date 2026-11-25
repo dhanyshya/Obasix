@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { getProductById } from "@/data/catalogue";
+import { afterStream } from "@/lib/afterStream";
 
 export const MAX_COMPARE = 4;
 const KEY = "obasix-compare-v1";
@@ -25,8 +26,8 @@ export function CompareProvider({ children }: { children: ReactNode }) {
       const saved = JSON.parse(window.localStorage.getItem(KEY) ?? "[]") as unknown;
       if (Array.isArray(saved)) {
         const valid = saved.map(String).filter((id) => getProductById(id)).slice(0, MAX_COMPARE);
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from browser storage
-        if (valid.length) setIds(valid);
+        // After the page has streamed in: see afterStream.
+        if (valid.length) afterStream(() => setIds(valid));
       }
     } catch {
       // Storage unavailable; comparison still works for this page view.

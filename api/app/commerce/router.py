@@ -22,7 +22,7 @@ from app.core.http import client_address, fail, trusted_origin
 from app.core.ratelimit import allow_attempt
 from app.core.text import clean, json_body
 from app.email import order_dispatched_email, send_email
-from app.orders import to_order
+from app.orders import orders_for_user, to_order
 from app.quotes.router import iso_z
 
 router = APIRouter(tags=["commerce"])
@@ -142,8 +142,18 @@ async def place(request: Request) -> JSONResponse:
     return JSONResponse({"ok": True, "mode": "demo", "charged": False, "orderCreated": True, "order": result["order"]})
 
 
-@router.get("/api/commerce/orders", summary="An order placed by the signed-in account")
-async def own_order(request: Request, id: Annotated[str, Query()] = "") -> JSONResponse:  # noqa: A002
+@router.get(
+    "/api/commerce/orders",
+    summary="The signed-in account's orders (newest 50), or one of them with ?id=",
+)
+async def own_order(request: Request, id: Annotated[str | None, Query()] = None) -> JSONResponse:  # noqa: A002
+    if id is None:
+        # The account's own history (listDemoOrdersForUser), in every mode: the company page reorders from it.
+        user = await read_session(request)
+        if not user:
+            return fail(401, "Sign in to see your orders.")
+        async with connection() as conn:
+            return JSONResponse({"ok": True, "orders": await orders_for_user(conn, user["id"])})
     current = get_settings().commerce_mode
     if current == "unconfigured":
         return unavailable("tracking_unavailable", "No order service is connected.", 503)

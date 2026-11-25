@@ -8,6 +8,7 @@ import { PartnerApplyForm, ProjectRegisterForm } from "@/components/partners/Par
 import { readSession } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/format";
 import type { ProjectStatus } from "@/lib/partners/program";
+import { readFromFastApi } from "@/lib/fastApiServer";
 import { findPartner, listPartnerProjects, type Project } from "@/lib/partners/store";
 import { brandTokens as brand } from "@/theme/brandTokens";
 
@@ -35,10 +36,22 @@ function earningText(p: Project) {
   return amount;
 }
 
+type Account = { partner: NonNullable<Awaited<ReturnType<typeof findPartner>>>; projects: Project[] };
+
+// Through FastAPI once the partners area is switched on (another partner's name shows only as "held");
+// otherwise straight from the database.
+async function readAccount(userId: string): Promise<Account | null> {
+  const remote = await readFromFastApi<Account>("/api/partners/me");
+  if (remote !== undefined) return remote;
+  const partner = await findPartner(userId);
+  return partner ? { partner, projects: await listPartnerProjects(userId) } : null;
+}
+
 export default async function AccountPartnerPage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
-  const partner = await findPartner(session.user.id);
+  const account = await readAccount(session.user.id);
+  const partner = account?.partner;
 
   if (!partner || partner.status === "rejected") {
     return (
@@ -73,7 +86,7 @@ export default async function AccountPartnerPage() {
     );
   }
 
-  const projects = await listPartnerProjects(session.user.id);
+  const projects = account!.projects;
   const open = projects.filter((p) => ["Submitted", "Quoted"].includes(p.status));
   const won = projects.filter((p) => ["Won", "In production", "Delivered", "Paid"].includes(p.status));
   const stats = [

@@ -479,3 +479,20 @@ def test_rupees_and_signatures_match_node():
     assert [js.round_half_up(x) for x in (182.5, 2.5, -2.5, 0.49)] == [183, 3, -2, 0]
     assert sign("order_1", "pay_1") == node["p"]
     assert hmac.new(WEBHOOK_SECRET.encode(), b'{"x":1}', hashlib.sha256).hexdigest() == node["w"]
+
+
+async def test_order_list_is_the_signed_in_accounts_own_newest_first(client, demo, monkeypatch):
+    assert (await client.get("/api/commerce/orders")).status_code == 401
+    async with signed_in("lister@example.com") as buyer:
+        first = (await order(buyer, key="list-key-0001")).json()["order"]["id"]
+        second = (await order(buyer, key="list-key-0002", lines=[{"productId": "cmwb6090", "quantity": 1}])).json()[
+            "order"
+        ]["id"]
+        listed = (await buyer.get("/api/commerce/orders")).json()
+        assert listed["ok"] and [o["id"] for o in listed["orders"]][:2] == [second, first]
+        # The history stays readable when checkout itself isn't configured.
+        monkeypatch.setattr(get_settings(), "commerce_mode_flag", "live")
+        assert len((await buyer.get("/api/commerce/orders")).json()["orders"]) == 2
+        assert (await buyer.get("/api/commerce/orders?id=")).status_code == 503
+    async with signed_in("other-lister@example.com") as stranger:
+        assert (await stranger.get("/api/commerce/orders")).json()["orders"] == []

@@ -49,33 +49,27 @@ test.afterAll(async () => {
   await removeAccounts(PREFIX);
 });
 
-test("staff set stock on the staff page → FastAPI saves and audits it → customers see it", async ({ browser, baseURL, page }) => {
+test("staff set stock → FastAPI saves and audits it → customers see it", async ({ browser, baseURL, page }) => {
+  // The screen itself is the React admin app's (migration-004); since MIG-011 the site's /admin redirects there.
   const started = await lastAuditId();
   const staff = await visitor(browser, baseURL!);
   await signInAdmin(staff.context.request, baseURL!);
-  await open(staff.page, "/admin/stock");
+  const set = (onHand: number | null) =>
+    staff.context.request.post("/api/admin/stock", { data: { productId: PRODUCT.id, onHand }, headers: { origin: baseURL! } });
 
-  const row = staff.page.getByRole("row", { name: PRODUCT.name });
-  const saved = staff.page.waitForResponse((r) => r.url().endsWith("/api/admin/stock") && r.request().method() === "POST");
-  await row.getByRole("spinbutton").fill("5");
-  await row.getByRole("button", { name: "Save" }).click();
-  const response = await saved;
+  const response = await set(5);
+  expect(response.ok()).toBe(true);
   expect(response.headers()["x-request-id"]).toBeTruthy(); // answered by FastAPI
-  await expect(row.getByRole("status")).toHaveText("Saved");
-
   expect(await stockRow()).toEqual({ on_hand: 5, updated_by: ADMIN });
   await open(page, `/products/${PRODUCT.slug}`);
   await expect(page.getByRole("status").filter({ hasText: "Only 5 left in stock" })).toBeVisible();
 
   // A value the site refuses is refused with the same message, and isn't logged.
-  await row.getByRole("spinbutton").fill("100001");
-  await row.getByRole("button", { name: "Save" }).click();
-  await expect(row.getByRole("status")).toHaveText("Enter a whole number from 0 to 100,000.");
+  const refused = await set(100001);
+  expect(refused.status()).toBe(400);
+  expect((await refused.json()).message).toBe("Enter a whole number from 0 to 100,000.");
 
-  const stopped = staff.page.waitForResponse((r) => r.url().endsWith("/api/admin/stock") && r.request().method() === "POST" && r.ok());
-  await staff.page.reload();
-  await staff.page.getByRole("row", { name: PRODUCT.name }).getByRole("button", { name: "Stop tracking" }).click();
-  await stopped;
+  expect((await set(null)).ok()).toBe(true);
   expect(await stockRow()).toBeUndefined();
   await page.reload();
   await expect(page.getByRole("status").filter({ hasText: /in stock|left|Made to order/ })).toHaveCount(0);

@@ -29,7 +29,7 @@ const adminApis = [
   "/api/admin/partners",
 ];
 
-test.describe("staff portal access", () => {
+test.describe("staff portal access", { tag: "@portal" }, () => {
   // Visits every staff page as two different people: allow 3× the default time.
   test.slow();
 
@@ -71,7 +71,7 @@ test.describe("staff portal access", () => {
   });
 });
 
-test.describe("storefront → staff → customer workflows", () => {
+test.describe("storefront → staff → customer workflows", { tag: "@portal" }, () => {
   // Multi-step journeys across three sessions: allow 3× the default per-test time.
   test.slow();
 

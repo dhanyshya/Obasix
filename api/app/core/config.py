@@ -52,6 +52,13 @@ class Settings(BaseSettings):
     quote_api_token: str = Field("", alias="QUOTE_API_TOKEN")
     staff_alert_emails: Annotated[list[str], NoDecode] = Field(default_factory=list, alias="OBASIX_STAFF_ALERT_EMAILS")
 
+    # AI (MIG-008). The chat uses an OpenAI-compatible provider, as on the site; design help uses Claude.
+    obasix_ai_api_key: str = Field("", alias="OBASIX_AI_API_KEY")
+    openai_api_key: str = Field("", alias="OPENAI_API_KEY")
+    obasix_ai_base_url: str = Field("https://api.openai.com/v1", alias="OBASIX_AI_BASE_URL")
+    obasix_ai_model: str = Field("gpt-4o-mini", alias="OBASIX_AI_MODEL")
+    anthropic_api_key: str = Field("", alias="ANTHROPIC_API_KEY")  # the SDK reads it (and ANTHROPIC_BASE_URL) itself
+
     sentry_dsn: str = Field("", alias="SENTRY_DSN")
     log_level: str = Field("INFO", alias="LOG_LEVEL")
 

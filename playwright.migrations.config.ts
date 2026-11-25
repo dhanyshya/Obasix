@@ -21,7 +21,7 @@ const secret = randomBytes(24).toString("hex");
 // Shared by the site and the API: it signs sessions and the quote cookie (MIG-005).
 const authSecret = randomBytes(24).toString("hex");
 // The MIG-003 and MIG-004 suites' admins; their accounts are removed after each run.
-const STAFF_EMAILS = "e2e-staff@example.test,mig003+admin@example.test,mig004+admin@example.test,mig005+admin@example.test,mig5b+admin@example.test,mig006+admin@example.test";
+const STAFF_EMAILS = "e2e-staff@example.test,mig003+admin@example.test,mig004+admin@example.test,mig005+admin@example.test,mig5b+admin@example.test,mig006+admin@example.test,mig007+admin@example.test";
 const allBrowsers = process.env.E2E_ALL_BROWSERS === "1";
 // A production build by default: `next dev` can fall into an endless "HMR hash mismatch"
 // reload on freshly compiled pages, which stalls browser tests. E2E_SERVER=dev to use it anyway.
@@ -77,7 +77,11 @@ export default defineConfig({
       env: {
         DATABASE_URL: databaseUrl,
         OBASIX_API_URL: `http://127.0.0.1:${apiPort}`,
-        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders",
+        // MIG-009: the site issues no DDL; FastAPI's `alembic upgrade head` (run first) made every table.
+        OBASIX_SCHEMA_OWNER: "alembic",
+        // MIG-011: the site's /admin pages redirect to the React admin app.
+        OBASIX_ADMIN_APP_URL: "http://localhost:4173",
+        OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company,ai",
         OBASIX_API_PROXY_SECRET: secret,
         OBASIX_COMMERCE_MODE: "demo",
         OBASIX_ADMIN_EMAILS: STAFF_EMAILS,

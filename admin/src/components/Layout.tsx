@@ -15,6 +15,9 @@ const sections: { to: string; label: string; needs: Permission }[] = [
   { to: "/stock", label: "Stock", needs: "stock:read" },
   { to: "/quotes", label: "Quotes", needs: "quotes:read" },
   { to: "/proofs", label: "Proofs", needs: "proofs:read" },
+  { to: "/distributors", label: "Distributors", needs: "distributors:read" },
+  { to: "/partners", label: "Partners", needs: "partners:read" },
+  { to: "/associates", label: "Associates", needs: "associates:read" },
   { to: "/audit", label: "Audit log", needs: "audit:read" },
   { to: "/staff", label: "Staff", needs: "staff:manage" },
 ];

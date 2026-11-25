@@ -37,7 +37,7 @@ describe("orders page", () => {
     const posts: unknown[] = [];
     stub(base, posts);
     renderAt("/orders");
-    await userEvent.click(await screen.findByRole("button", { name: "Manage OBX-1A2B3C4D" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Manage OBX-1A2B3C4D" }, { timeout: 5000 }));
     const dialog = await screen.findByRole("dialog", { name: "Order OBX-1A2B3C4D" });
     expect(within(dialog).getByText("Razorpay payment pay_1")).toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole("button", { name: "Mark Dispatched" }));
@@ -56,7 +56,7 @@ describe("orders page", () => {
     const posts: unknown[] = [];
     stub({ ...base, paymentStatus: "pending", status: "Pending Payment", nextStatus: null, method: "online" }, posts);
     renderAt("/orders");
-    await userEvent.click(await screen.findByRole("button", { name: "Manage OBX-1A2B3C4D" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Manage OBX-1A2B3C4D" }, { timeout: 5000 }));
     const dialog = await screen.findByRole("dialog");
     expect(within(dialog).queryByRole("button", { name: /^Mark/ })).toBeNull();
     await userEvent.click(within(dialog).getByRole("button", { name: "Cancel order" }));

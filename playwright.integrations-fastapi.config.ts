@@ -16,7 +16,7 @@ const standIn = "http://localhost:3219";
 const site = `http://localhost:${port}`;
 const databaseUrl = process.env.MIGRATION_DATABASE_URL ?? "postgresql://obasix:obasix-local-only@localhost:54329/obasix";
 const routes =
-  "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders";
+  "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company,ai";
 const proxySecret = randomBytes(24).toString("hex");
 const authSecret = randomBytes(24).toString("hex");
 const shared = {
@@ -57,6 +57,9 @@ export default defineConfig({
         OBASIX_API_PROXY_SECRET: proxySecret,
         OBASIX_FILES_DIR: path.join(__dirname, ".data"),
         PYTHONDONTWRITEBYTECODE: "1",
+        // Design help (MIG-008) talks to the Claude stand-in.
+        ANTHROPIC_API_KEY: "sk-ant-standin",
+        ANTHROPIC_BASE_URL: standIn,
       },
     },
     {
@@ -68,6 +71,8 @@ export default defineConfig({
       env: {
         ...shared,
         OBASIX_API_URL: `http://127.0.0.1:${apiPort}`,
+        // MIG-009: the site issues no DDL; FastAPI's `alembic upgrade head` (run first) made every table.
+        OBASIX_SCHEMA_OWNER: "alembic",
         OBASIX_API_ROUTES: routes,
         OBASIX_API_PROXY_SECRET: proxySecret,
         TRUST_PROXY_HEADERS: "1",

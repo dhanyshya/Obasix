@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 DB="${MIGRATION_DATABASE_URL:-postgresql://obasix:obasix-local-only@localhost:54329/obasix}"
-ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company}"
+ROUTES="${OBASIX_API_ROUTES:-auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company,ai}"
 SECRET="$(openssl rand -hex 24)"; AUTH="$(openssl rand -hex 24)"; SITE=http://localhost:3218
 cleanup() { pkill -f "next start -p 3218" 2>/dev/null || true; pkill -f "uvicorn app.main:app --port 8218" 2>/dev/null || true; }
 trap cleanup EXIT

@@ -306,3 +306,25 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 | Migration E2E (admin app): distributor approved → trade order → payment → dispatch (audited); partner approved → project → margin quoted (30% limit); referred order delivered → commission paid; strangers refused | 33/33 Chromium; 99/99 three browsers |
 | The site's own `channels.spec.ts` and `admin.spec.ts` with all channels on FastAPI | 9/9 |
 | Regression and integration suites with all 20 areas on FastAPI | 30/30, 6/6 |
+
+## MIG-008: AI on FastAPI (chat assistant, design help)
+
+| Field | Value |
+|---|---|
+| Objective | Serve the chat assistant, frame-colour suggestions and the design-help status from FastAPI |
+| Status | **Complete (behind a switch).** Area `ai` |
+| Endpoints | Same as the site: `GET /api/ai/status`, `GET/POST /api/ai/chat`, `POST /api/ai/frame-colours` |
+| Deliberate exception | `POST /api/ai/sign-layouts` **stays in Next.js.** Its suggestions are checked against the signage rules (`src/data/signage.ts`, about 800 lines incl. Indic script handling and `Intl.Segmenter` grapheme counting), which the design studio also runs in the browser as the customer types. A Python copy would have to match a browser-side rule set character for character, and any drift would suggest layouts the studio then rejects. The route is a thin call to Claude next to rules that must stay in TypeScript. Revisit only if the studio's rules move server-side |
+| Providers | The chat keeps its **OpenAI-compatible provider** (`OBASIX_AI_*`, default `gpt-4o-mini`), ported as plain HTTP exactly as the site calls it: not switched to Claude, which is a product decision. Frame colours use Claude (`claude-opus-5-5`) through the official Anthropic Python SDK: `beta.messages.parse` with a Pydantic output model, `output_config.effort: "low"`, and the server-side refusal fallback (`fallbacks: "default"`). A probe confirmed the SDK sends the same request body the TypeScript route sends |
+| Shared text | The chat's system prompt and catalogue context are **exported from the site's own code** (`scripts/export-shared-data.mjs` → `api/app/data/ai.json`), so they can't drift; CI checks the export is current |
+| Database changes | None |
+| Rollback | Remove `ai` from `OBASIX_API_ROUTES` |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): chat against a stand-in provider (grounded answer filters made-up product ids; JSON inside text; junk → catalogue answer; provider without JSON mode gets one retry; auth and quota errors; unconfigured; input checks; 20/min limit; cross-site), frame colours against a Claude stand-in (exact request: model, beta header, `fallbacks`, effort, JSON schema, image; refusal → 422; Claude 429 → plain message; photo checks), status; parity of the catalogue fallback, product-id filter and customizer link with the site's TypeScript | 129/129 (all migrations) |
+| Migration E2E: the site's chat widget answers through FastAPI with catalogue links; status, checks, cross-site; sign layouts still answered by Next.js | 36/36 Chromium; 108/108 three browsers |
+| The site's integration suite with the Claude stand-in, unchanged, via FastAPI: "suggestions come back, limited to what OBASIX makes" and "a Claude outage gives a plain message". FastAPI's request log shows 200 and 502 for `/api/ai/frame-colours` | 6/6 |
+| Regression with all 21 areas on FastAPI | 30/30 |

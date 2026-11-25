@@ -50,6 +50,26 @@ jobs:
         if: ${{ !cancelled() }}
         with: { name: api-junit, path: api/junit.xml, retention-days: 14 }
 
+  admin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm, cache-dependency-path: admin/package-lock.json }
+      - run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Unit and component tests
+        run: npm test
+      - name: Production build
+        run: npx vite build
+      - name: Dependency vulnerabilities (high and critical)
+        run: npm audit --omit=dev --audit-level=high
+
   migrations-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -66,6 +86,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: npm }
       - run: npm ci
+      # The admin app (MIG-004) is built and served by the migration suite.
+      - run: npm ci --prefix admin
       - name: Dependency vulnerabilities (npm, high and critical)
         run: npm audit --omit=dev --audit-level=high
       - uses: astral-sh/setup-uv@v6

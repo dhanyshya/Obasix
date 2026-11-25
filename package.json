@@ -21,7 +21,8 @@
     "test:api": "scripts/test-api.sh",
     "test:e2e:migrations": "playwright test -c playwright.migrations.config.ts",
     "test:all": "scripts/test-all.sh",
-    "build:all": "next build && docker build -t obasix-api ./api"
+    "build:all": "next build && npm --prefix admin run build && docker build -t obasix-api ./api",
+    "test:admin": "npm --prefix admin test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",

@@ -1,28 +1,37 @@
 import { startTransition } from "react";
 
 /**
- * Runs `update` (as a transition) once this page's streamed content is in place.
+ * Runs `update` (as a transition) once none of this page's streamed content is still waiting
+ * to be swapped in.
  *
- * Why: every page sits inside a Suspense boundary (the root loading.tsx) and usually streams
- * in after the shell, as a hidden `<div id="S:n">` that React then swaps in. React 19 queues
- * that swap: it can happen tens of milliseconds after the document has finished loading, and
- * after hydration has started. If a context above the boundary changes in that window (the
- * session or the saved cart arriving), React client-renders the boundary itself, and when the
- * queued swap runs there is nothing left to swap into, so the streamed copy stays in the page,
- * hidden: a second copy of the page with the same ids (duplicate forms and rows).
+ * Why: every page sits inside a Suspense boundary (the root loading.tsx) and usually streams in
+ * after the shell: the server sends the content as a hidden `<div id="S:n">` plus a marker
+ * `<template id="B:n">` where it belongs, and React swaps one into the other. React 19 queues
+ * that swap, and on a slow device or dev server it can come long after hydration has started.
+ * If a context above the boundary changes while a segment is still pending (the session or the
+ * saved cart arriving), React renders the boundary on the client instead: anything typed so far
+ * is reset, and the queued swap later finds no marker, so the streamed copy stays in the page,
+ * hidden, with the same ids as the live one (duplicate forms and rows).
  *
- * So this waits for the document to finish parsing and for every streamed segment to be
- * swapped in (no hidden `S:` element left). It never waits more than `maxWaitMs`, so an update
- * can't be held back for good.
+ * So the update waits while a segment is truly pending (its `S:n` and `B:n` both exist). A
+ * segment whose marker is already gone will never be swapped in: it is a stale copy outside
+ * React's tree, and is removed. `safetyMs` only guarantees an update is never held forever.
  */
-const pendingSegment = () => document.querySelector('[id^="S:"][hidden]') !== null;
+function pendingSegments() {
+  let pending = false;
+  for (const segment of Array.from(document.querySelectorAll<HTMLElement>('[id^="S:"][hidden]'))) {
+    if (document.getElementById(`B:${segment.id.slice(2)}`)) pending = true;
+    else segment.remove(); // orphaned: its boundary was rendered on the client
+  }
+  return pending;
+}
 
-export function afterStream(update: () => void, maxWaitMs = 2000) {
+export function afterStream(update: () => void, safetyMs = 10_000) {
   const run = () => startTransition(update);
   if (typeof document === "undefined") return run();
 
   const whenSwapped = () => {
-    if (!pendingSegment()) return run();
+    if (!pendingSegments()) return run();
     let done = false;
     const finish = () => {
       if (done) return;
@@ -31,9 +40,9 @@ export function afterStream(update: () => void, maxWaitMs = 2000) {
       clearTimeout(timer);
       run();
     };
-    const observer = new MutationObserver(() => !pendingSegment() && finish());
+    const observer = new MutationObserver(() => !pendingSegments() && finish());
     observer.observe(document.body, { childList: true, subtree: true });
-    const timer = setTimeout(finish, maxWaitMs);
+    const timer = setTimeout(finish, safetyMs);
   };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", whenSwapped, { once: true });

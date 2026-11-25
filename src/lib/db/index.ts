@@ -151,9 +151,15 @@ export function connection(): Db {
   return globalForDb.obasixDb;
 }
 
+/** OBASIX_SCHEMA_OWNER=alembic on Postgres: tables come from `alembic upgrade head`, not from the site. */
+export const schemaOwnedByAlembic = () => usingPostgres() && process.env.OBASIX_SCHEMA_OWNER === "alembic";
+
 /** Runs a store's schema setup once per process, then returns the connection. */
 export async function ensureSchema(name: string, setup: (db: Db) => Promise<void>): Promise<Db> {
   const db = connection();
+  // Once Alembic owns the schema (api/migrations, applied at deploy), the site never issues DDL.
+  // scripts/check-schema.sh proves Alembic creates everything the setups below would.
+  if (schemaOwnedByAlembic()) return db;
   const registry = (globalForDb.obasixSchema ??= new Map());
   let ready = registry.get(name);
   if (!ready) {

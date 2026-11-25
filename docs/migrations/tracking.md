@@ -328,3 +328,27 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 | Migration E2E: the site's chat widget answers through FastAPI with catalogue links; status, checks, cross-site; sign layouts still answered by Next.js | 36/36 Chromium; 108/108 three browsers |
 | The site's integration suite with the Claude stand-in, unchanged, via FastAPI: "suggestions come back, limited to what OBASIX makes" and "a Claude outage gives a plain message". FastAPI's request log shows 200 and 502 for `/api/ai/frame-colours` | 6/6 |
 | Regression with all 21 areas on FastAPI | 30/30 |
+
+## MIG-009: Alembic owns the schema
+
+| Field | Value |
+|---|---|
+| Objective | One owner for the database schema: Alembic migrations in `api/migrations`, applied at deploy. The site stops creating and altering tables |
+| Status | **Complete.** Production setting: `OBASIX_SCHEMA_OWNER=alembic` on the site; run `alembic upgrade head` before starting either app |
+| How it's proven | `scripts/check-schema.sh` (also in CI) builds two empty databases, one through the site's own 11 store setups and one through `alembic upgrade head`, and compares every column (type, nullability, default) and index. Result: all **233** of the site's columns and indexes are created identically by Alembic; Alembic adds only the API's own tables (`staff_roles`, `audit_log`, `alembic_version`) |
+| Site change | `ensureSchema` skips the setup when `OBASIX_SCHEMA_OWNER=alembic` on Postgres. Local development without Postgres keeps SQLite and its setups (Alembic targets Postgres only) |
+| Rollback | Unset `OBASIX_SCHEMA_OWNER`; the site's setups are idempotent `IF NOT EXISTS` statements |
+| Rule from now on | Every schema change is an Alembic migration. CI fails if the site's own setup code ever creates something Alembic doesn't |
+
+**Tests, each on a brand-new empty database whose only DDL came from Alembic**
+
+| Suite | Result |
+|---|---|
+| Migration E2E (MIG-001 to 008) | 36/36 |
+| The site's own suites with all 21 areas on FastAPI | 30/30 |
+| Integration suite (live payments, email, Claude stand-ins) | 6/6 |
+
+**Revised plan**
+
+- "SQLite dropped" is replaced by "SQLite for local development only": dropping it would make Docker mandatory for every contributor and for the site's existing CI suite, with nothing gained in production.
+- Remaining direct database access from the site: 6 account pages and 12 staff-portal files. These are MIG-010 and MIG-011.

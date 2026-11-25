@@ -77,6 +77,8 @@ export default defineConfig({
       env: {
         DATABASE_URL: databaseUrl,
         OBASIX_API_URL: `http://127.0.0.1:${apiPort}`,
+        // MIG-009: the site issues no DDL; FastAPI's `alembic upgrade head` (run first) made every table.
+        OBASIX_SCHEMA_OWNER: "alembic",
         OBASIX_API_ROUTES: "auth,account,admin-core,admin-stock,quotes,admin-quotes,quote-submit,admin-quote-files,proofs,admin-proofs,commerce,stock,admin-orders,associates,admin-associates,distributors,admin-distributors,partners,admin-partners,company,ai",
         OBASIX_API_PROXY_SECRET: secret,
         OBASIX_COMMERCE_MODE: "demo",

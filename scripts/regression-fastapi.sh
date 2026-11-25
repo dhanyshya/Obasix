@@ -14,7 +14,7 @@ trap cleanup EXIT
   OBASIX_ADMIN_EMAILS=e2e-staff@example.test OBASIX_FILES_DIR="$PWD/../.data" \
   uv run uvicorn app.main:app --port 8218 > /dev/null 2>&1 &)
 [ -d .next ] && [ "${SKIP_BUILD:-0}" = "1" ] || npx next build > /dev/null
-DATABASE_URL="$DB" OBASIX_API_URL=http://127.0.0.1:8218 OBASIX_API_ROUTES="$ROUTES" OBASIX_API_PROXY_SECRET="$SECRET" \
+DATABASE_URL="$DB" OBASIX_SCHEMA_OWNER=alembic OBASIX_API_URL=http://127.0.0.1:8218 OBASIX_API_ROUTES="$ROUTES" OBASIX_API_PROXY_SECRET="$SECRET" \
   OBASIX_COMMERCE_MODE=demo OBASIX_ADMIN_EMAILS=e2e-staff@example.test TRUST_PROXY_HEADERS=1 NEXT_PUBLIC_SITE_URL="$SITE" \
   AUTH_SECRET="$AUTH" npx next start -p 3218 > /dev/null 2>&1 &
 ready=0

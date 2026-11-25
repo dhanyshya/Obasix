@@ -75,7 +75,10 @@ The build fails if `OBASIX_API_URL` is set without `DATABASE_URL` or a valid sec
 | MIG-006 | Commerce | `/api/commerce/{mode,orders,payment,payment/webhook,track}`, `/api/stock`, `/api/admin/orders`; admin app Orders page | Done, off by default; see tracking |
 | MIG-007 | Trade channels | Associates, distributors, partners, company accounts (customer and staff endpoints); admin app pages | Done, off by default; see tracking |
 | MIG-008 | AI | `/api/ai/status`, `/api/ai/chat`, `/api/ai/frame-colours` on FastAPI; `/api/ai/sign-layouts` stays in Next.js by design | Done, off by default; see tracking |
-| MIG-009 | Schema ownership | Next.js stops creating tables; Alembic owns every change; SQLite dropped | Planned |
+| MIG-009 | Schema ownership | Alembic owns the schema (`OBASIX_SCHEMA_OWNER=alembic`: the site issues no DDL); `scripts/check-schema.sh` proves parity in CI | Done; see tracking |
+| MIG-010 | Account pages via FastAPI | Associate, company, distributor, partner and proofs account pages render from FastAPI instead of the database | Planned |
+| MIG-011 | Retire the Next.js staff portal | `/admin` pages hand over to the React admin app | Planned |
+| MIG-012 | Remove migrated route handlers | Delete `src/app/api/*` handlers for areas proven in production | After a production run |
 
 ## Running it
 

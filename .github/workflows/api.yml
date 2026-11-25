@@ -39,6 +39,10 @@ jobs:
       - name: Migrations apply, and apply again with no change
         env: { DATABASE_URL: "postgresql://obasix:ci-only@localhost:5432/obasix_test" }
         run: uv run alembic upgrade head && uv run alembic upgrade head
+      - name: Alembic creates everything the site creates
+        working-directory: .
+        env: { SCHEMA_CHECK_URL: "postgresql://obasix:ci-only@localhost:5432" }
+        run: scripts/check-schema.sh
       - name: Unit and integration tests
         env: { TEST_DATABASE_URL: "postgresql://obasix:ci-only@localhost:5432/obasix_test" }
         run: uv run pytest --junitxml=junit.xml

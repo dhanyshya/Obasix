@@ -10,6 +10,12 @@ import { SignIn } from "./pages/SignIn";
 // Each section loads when first opened, so sign-in stays small.
 const Overview = lazy(() => import("./pages/Overview").then((m) => ({ default: m.Overview })));
 const Stock = lazy(() => import("./pages/Stock").then((m) => ({ default: m.Stock })));
+const Orders = lazy(() => import("./pages/Orders").then((m) => ({ default: m.Orders })));
+const Quotes = lazy(() => import("./pages/Quotes").then((m) => ({ default: m.Quotes })));
+const Proofs = lazy(() => import("./pages/Proofs").then((m) => ({ default: m.Proofs })));
+const Associates = lazy(() => import("./pages/Associates").then((m) => ({ default: m.Associates })));
+const Distributors = lazy(() => import("./pages/Distributors").then((m) => ({ default: m.Distributors })));
+const Partners = lazy(() => import("./pages/Partners").then((m) => ({ default: m.Partners })));
 const Audit = lazy(() => import("./pages/Audit").then((m) => ({ default: m.Audit })));
 const Staff = lazy(() => import("./pages/Staff").then((m) => ({ default: m.Staff })));
 
@@ -57,7 +63,13 @@ export const routes: RouteObject[] = [
     errorElement: <RouteError />,
     children: [
       { index: true, element: <Loading><Overview /></Loading> },
+      { path: "orders", element: <RequirePermission needs="orders:read"><Loading><Orders /></Loading></RequirePermission> },
       { path: "stock", element: <RequirePermission needs="stock:read"><Loading><Stock /></Loading></RequirePermission> },
+      { path: "quotes", element: <RequirePermission needs="quotes:read"><Loading><Quotes /></Loading></RequirePermission> },
+      { path: "proofs", element: <RequirePermission needs="proofs:read"><Loading><Proofs /></Loading></RequirePermission> },
+      { path: "associates", element: <RequirePermission needs="associates:read"><Loading><Associates /></Loading></RequirePermission> },
+      { path: "distributors", element: <RequirePermission needs="distributors:read"><Loading><Distributors /></Loading></RequirePermission> },
+      { path: "partners", element: <RequirePermission needs="partners:read"><Loading><Partners /></Loading></RequirePermission> },
       { path: "audit", element: <RequirePermission needs="audit:read"><Loading><Audit /></Loading></RequirePermission> },
       { path: "staff", element: <RequirePermission needs="staff:manage"><Loading><Staff /></Loading></RequirePermission> },
       { path: "*", element: <NotFound /> },

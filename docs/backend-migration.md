@@ -26,8 +26,8 @@ The site's proxy sends the visitor's IP to FastAPI in `x-obasix-client-ip`, alon
 
 | Role | Permissions |
 |---|---|
-| `admin` | `stock:read`, `stock:write`, `audit:read`, `staff:manage` |
-| `staff` | `stock:read`, `stock:write` |
+| `admin` | all of the above, plus `audit:read`, `staff:manage`, `associates:*`, `distributors:approve`, `partners:approve` (money and approvals) |
+| `staff` | `stock:*`, `quotes:read`, `proofs:*`, `orders:*`, `distributors:read`/`write` (trade orders), `partners:read`/`write` (advance, lost) |
 
 Each later admin migration adds its own permissions (for example `orders:write`) and decides which roles get them.
 
@@ -36,12 +36,25 @@ Each later admin migration adds its own permissions (for example `orders:write`)
 - Signed-out visitors and customers get `404 Not found.` from every admin endpoint. Staff without the permission an endpoint needs get `403`.
 - Until the React admin app (MIG-004) exists, the `/admin` pages in Next.js still admit only `OBASIX_ADMIN_EMAILS`. Someone granted `staff` in the table can use the admin API, but can't open those pages yet.
 
+## Files (decided in MIG-005b)
+
+Quote attachments and design proofs live in a private Vercel Blob store in production, and in the site's `.data/` folder otherwise. FastAPI uses the same store:
+
+- **Production:** `api/app/core/storage.py` speaks the private Blob protocol of `@vercel/blob` 2.x. `api/tests/test_storage.py` runs the official SDK and the Python client against the same recording server and requires identical uploads (method, path, body, every header except the per-request id and the HTTP client's own). Downloads use the SDK's URL and token. Set the same `BLOB_READ_WRITE_TOKEN` on both sides.
+- **Local and single-server:** set `OBASIX_FILES_DIR` to the site's `.data` folder. `npm run dev:all` and the migration tests do this.
+- If the Blob protocol changes (new `@vercel/blob` major version), the parity test fails before anything ships.
+
 ## Configuration
 
 | Variable | Where | Purpose |
 |---|---|---|
 | `OBASIX_API_URL` | site | FastAPI base URL. Leave unset to keep everything in Next.js |
-| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`) |
+| `OBASIX_API_ROUTES` | site | Areas to forward, comma-separated (`auth`, `account`, `admin-core`, `admin-stock`, `quotes`, `admin-quotes`, `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs`, `commerce`, `stock`, `admin-orders`, `associates`, `admin-associates`, `distributors`, `admin-distributors`, `partners`, `admin-partners`, `company`, `ai`). An entry ending in `/` in `src/lib/fastApi.ts` is a prefix |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | site and API | The same values on both once `commerce` is on (the webhook URL stays the site's) |
+| `ANTHROPIC_API_KEY`; `OBASIX_AI_API_KEY`, `OBASIX_AI_BASE_URL`, `OBASIX_AI_MODEL` | API (and the site for sign layouts) | Claude for design help; the chat's OpenAI-compatible provider |
+| `BLOB_READ_WRITE_TOKEN` | site and API | The same private Blob store (production) |
+| `OBASIX_FILES_DIR` | API | The site's `.data` folder when there's no Blob token |
+| `AUTH_SECRET` | site and API | Required on both, with the same value, once `quotes` or `quote-submit` is on: it signs the cookie that lets a browser read the quote it sent. The build fails without it |
 | `OBASIX_API_PROXY_SECRET` | site and API | Same random value on both sides, 32+ characters |
 | `DATABASE_URL` | site and API | The same Postgres database |
 | `ALLOWED_ORIGINS` | API | Browser origins allowed to make changes (the site, later the admin) |
@@ -57,11 +70,15 @@ The build fails if `OBASIX_API_URL` is set without `DATABASE_URL` or a valid sec
 | MIG-002 | Account data | `/api/account` (profile, password, addresses, wishlist, saved configs, cart; lists orders read-only) | Done, off by default; see tracking |
 | MIG-003 | Admin foundation + stock | Roles (`admin`, `staff`) and permissions, append-only audit log, `/api/admin/{me,audit,staff}`, `/api/admin/stock` | Done, off by default; see tracking |
 | MIG-004 | Admin app | New React app (`admin/`, Vite) on MIG-003; the `/admin` pages in Next.js are retired | Planned |
-| MIG-005 | Quotes and proofs | `/api/quotes*`, `/api/proofs*`, `/api/admin/{quotes,proofs}`, file storage | Planned |
-| MIG-006 | Commerce (incl. `/api/admin/orders`) | orders, payment, Razorpay webhook, tracking, stock | Planned; highest risk, money moves |
-| MIG-007 | Trade channels | distributors, partners, associates, and their `/api/admin/*` routes; fix DEF-001 first | Planned |
-| MIG-008 | AI | chat, frame colours, sign layouts | Planned |
-| MIG-009 | Schema ownership | Next.js stops creating tables; Alembic owns every change; SQLite dropped | Planned |
+| MIG-005 | Reading quotes | `GET /api/quotes/{reference}`, staff list `GET /api/admin/quotes`, admin app Quotes page | Done, off by default; see tracking |
+| MIG-005b | Files, quote submission, proofs | `POST /api/quotes`, `/api/admin/quotes/{ref}/file`, `/api/proofs`, `/api/proofs/{id}/file`, `/api/admin/proofs`; admin app Proofs page | Done, off by default; see tracking |
+| MIG-006 | Commerce | `/api/commerce/{mode,orders,payment,payment/webhook,track}`, `/api/stock`, `/api/admin/orders`; admin app Orders page | Done, off by default; see tracking |
+| MIG-007 | Trade channels | Associates, distributors, partners, company accounts (customer and staff endpoints); admin app pages | Done, off by default; see tracking |
+| MIG-008 | AI | `/api/ai/status`, `/api/ai/chat`, `/api/ai/frame-colours` on FastAPI; `/api/ai/sign-layouts` stays in Next.js by design | Done, off by default; see tracking |
+| MIG-009 | Schema ownership | Alembic owns the schema (`OBASIX_SCHEMA_OWNER=alembic`: the site issues no DDL); `scripts/check-schema.sh` proves parity in CI | Done; see tracking |
+| MIG-010 | Account pages via FastAPI | Associate, company, distributor, partner and proofs account pages render from FastAPI instead of the database | Planned |
+| MIG-011 | Retire the Next.js staff portal | `/admin` pages hand over to the React admin app | Planned |
+| MIG-012 | Remove migrated route handlers | Delete `src/app/api/*` handlers for areas proven in production | After a production run |
 
 ## Running it
 
@@ -70,7 +87,9 @@ npm run dev:all           # Postgres (docker) + migrations + FastAPI :8000 + sit
 npm test                  # FastAPI lint, unit and integration tests (needs docker)
 npm run test:e2e:migrations
 npm run test:all          # every gate, in order
-npm run build:all         # site production build + API container image
+npm run build:all         # site production build + admin app + API container image
+npm run test:e2e:regression-fastapi   # the site's own suites with every migrated area on FastAPI
+npm run test:e2e:integrations-fastapi # live payments, email and AI (stand-ins) with every migrated area on FastAPI
 ```
 
 FastAPI docs: http://127.0.0.1:8000/docs (turned off when `APP_ENV=production`).

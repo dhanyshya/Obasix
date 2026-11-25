@@ -7,8 +7,24 @@ import { AssociateApplyForm } from "@/components/associates/AssociateApplyForm";
 import { ShareLinks } from "@/components/associates/ShareLinks";
 import { signType } from "@/components/home/directory/sign";
 import { readSession } from "@/lib/auth/session";
+import { readFromFastApi } from "@/lib/fastApiServer";
 import { associateCommissionRate, referralWindowDays } from "@/lib/associates/program";
 import { findAssociateByUser, listAttributedQuotes, listCommissions, type CommissionState } from "@/lib/associates/store";
+
+type Dashboard = {
+  associate: NonNullable<Awaited<ReturnType<typeof findAssociateByUser>>>;
+  commissions: Awaited<ReturnType<typeof listCommissions>>;
+  quotes: Awaited<ReturnType<typeof listAttributedQuotes>>;
+};
+
+// Through FastAPI once the associates area is switched on; otherwise straight from the database.
+async function readDashboard(userId: string): Promise<Dashboard | null> {
+  const remote = await readFromFastApi<Dashboard>("/api/associates/me");
+  if (remote !== undefined) return remote;
+  const associate = await findAssociateByUser(userId);
+  if (!associate) return null;
+  return { associate, commissions: await listCommissions(associate.code), quotes: await listAttributedQuotes(associate.code) };
+}
 import { formatPrice } from "@/lib/format";
 import { brandTokens as brand } from "@/theme/brandTokens";
 
@@ -24,7 +40,8 @@ const stateColour: Record<CommissionState, string> = {
 export default async function AccountAssociatePage() {
   const session = await readSession();
   if (!session) return null; // The account layout redirects signed-out visitors.
-  const associate = await findAssociateByUser(session.user.id);
+  const dashboard = await readDashboard(session.user.id);
+  const associate = dashboard?.associate;
 
   if (!associate) {
     return (
@@ -43,8 +60,7 @@ export default async function AccountAssociatePage() {
 
   const host = (await headers()).get("host") ?? "localhost:3000";
   const origin = `${host.startsWith("localhost") ? "http" : "https"}://${host}`;
-  const commissions = await listCommissions(associate.code);
-  const quotes = await listAttributedQuotes(associate.code);
+  const { commissions, quotes } = dashboard!;
   const sum = (state: CommissionState) =>
     commissions.filter((c) => c.state === state).reduce((total, c) => total + c.amount, 0);
   const referredSales = commissions.filter((c) => c.state !== "Void").reduce((total, c) => total + c.baseAmount, 0);

@@ -12,6 +12,8 @@ dependencies = [
   "sqlalchemy>=2.0",
   "httpx>=0.28",
   "sentry-sdk[fastapi]>=2.40",
+  "python-multipart>=0.0.20",
+  "anthropic>=1.0",
 ]
 
 [dependency-groups]
@@ -33,4 +35,4 @@ ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
 # Fixed test passwords and subprocess calls to node are expected in tests.
-"tests/**" = ["S105", "S106", "S603", "S607"]
+"tests/**" = ["S105", "S106", "S603", "S607", "E501"]

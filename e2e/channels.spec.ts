@@ -12,7 +12,7 @@ async function pick(page: Page, label: string | RegExp, option: string | RegExp)
   await page.getByRole("option", { name: option }).click();
 }
 
-test("associate: join → share link → referred order → commission on both dashboards", async ({ page, browser, baseURL }) => {
+test("associate: join → share link → referred order → commission on both dashboards", { tag: "@portal" }, async ({ page, browser, baseURL }) => {
   await signUp(page, "associate");
   await page.goto("/account/associate", { waitUntil: "networkidle" });
   await pick(page, "What work do you do?", "Architect or interior designer");
@@ -45,7 +45,7 @@ test("associate: join → share link → referred order → commission on both d
   await staff.context.close();
 });
 
-test("distributor: apply → staff approve with credit → trade order on credit → staff sees it", async ({ page, browser, baseURL }) => {
+test("distributor: apply → staff approve with credit → trade order on credit → staff sees it", { tag: "@portal" }, async ({ page, browser, baseURL }) => {
   await signUp(page, "distributor");
   const business = `E2E Traders ${uid()}`;
   await page.goto("/account/distributor", { waitUntil: "networkidle" });
@@ -81,7 +81,7 @@ test("distributor: apply → staff approve with credit → trade order on credit
   await staff.context.close();
 });
 
-test("partner: apply → staff approve → register project → staff quote margin → partner sees it", async ({ page, browser, baseURL }) => {
+test("partner: apply → staff approve → register project → staff quote margin → partner sees it", { tag: "@portal" }, async ({ page, browser, baseURL }) => {
   await signUp(page, "partner");
   const company = `E2E Fitouts ${uid()}`;
   await page.goto("/account/partner", { waitUntil: "networkidle" });

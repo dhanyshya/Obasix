@@ -20,7 +20,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
-import { api, type Page, type QuoteSummary } from "../api";
+import { Link } from "react-router";
+import { api, apiUrl, type Page, type QuoteSummary } from "../api";
 import { describeError } from "../components/Notifications";
 import { useLoad } from "../useLoad";
 
@@ -242,11 +243,18 @@ export function Quotes() {
                   </Box>
                 ) : null}
                 {open.attachment ? (
-                  <Alert severity="info">
-                    File: {open.attachment.name} ({kb(open.attachment.size)}). Download it from the staff portal on the site for now; files move to this app in a
-                    later step.
-                  </Alert>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      File
+                    </Typography>
+                    <a href={apiUrl(`/api/admin/quotes/${encodeURIComponent(open.reference)}/file`)} download>
+                      Download {open.attachment.name} ({kb(open.attachment.size)})
+                    </a>
+                  </Box>
                 ) : null}
+                <Box>
+                  <Link to={`/proofs?quoteReference=${encodeURIComponent(open.reference)}`}>Proofs for this quote</Link>
+                </Box>
               </Stack>
             </DialogContent>
             <DialogActions>

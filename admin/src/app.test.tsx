@@ -63,7 +63,7 @@ describe("permissions", () => {
     renderAt("/staff");
     expect(await screen.findByRole("heading", { name: "No access" })).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Admin sections" });
-    expect(within(nav).getAllByRole("link").map((l) => l.textContent)).toEqual(["Overview", "Stock", "Quotes"]);
+    expect(within(nav).getAllByRole("link").map((l) => l.textContent)).toEqual(["Overview", "Orders", "Stock", "Quotes", "Proofs", "Distributors", "Partners"]);
   });
 
   it("goes back to sign-in when the API says the role is gone", async () => {

@@ -6,7 +6,7 @@ import { chromium, type FullConfig } from "@playwright/test";
  * the browser can reload more than once. Visiting each page here until the
  * network goes quiet means the tests start against a ready site.
  */
-const pages = ["/", "/register", "/login", "/forgot-password", "/reset-password", "/products", "/cart", "/account", "/account/profile", "/account/wishlist", "/admin/stock", "/products/superior-pinup-green-2x3", "/quote", "/quote/confirmation"];
+const pages = ["/", "/register", "/login", "/forgot-password", "/reset-password", "/products", "/cart", "/account", "/account/profile", "/account/wishlist", "/products/superior-pinup-green-2x3", "/quote", "/quote/confirmation", "/account/proofs", "/cart", "/checkout", "/checkout/payment", "/checkout/confirmation", "/orders/track", "/products/classic-magnetic-whiteboard-2x3"];
 
 export default async function warmUp(config: FullConfig) {
   const baseURL = String(config.projects[0].use.baseURL);

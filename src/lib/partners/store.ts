@@ -353,7 +353,7 @@ export async function updateProject(id: string, change: ProjectAction, staffEmai
       if (project.conflictWith) return { ok: false, message: `This client was registered first in ${project.conflictWith}. Resolve that before quoting.` };
       if (change.quotedValue < 1) return { ok: false, message: "Enter the quoted project value." };
       if (!(change.marginRate >= 0 && change.marginRate <= maxMarginRate)) {
-        return { ok: false, message: `Set a margin between 0 and ${maxMarginRate * 100}%.` };
+        return { ok: false, message: `Set a margin between 0 and ${Math.round(maxMarginRate * 100)}%.` };
       }
       return set({ status: "Quoted", quoted_value: change.quotedValue, margin_rate: change.marginRate, staff_note: change.note });
     }

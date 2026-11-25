@@ -22,7 +22,10 @@
     "test:e2e:migrations": "playwright test -c playwright.migrations.config.ts",
     "test:all": "scripts/test-all.sh",
     "build:all": "next build && npm --prefix admin run build && docker build -t obasix-api ./api",
-    "test:admin": "npm --prefix admin test"
+    "test:admin": "npm --prefix admin test",
+    "test:e2e:regression-fastapi": "scripts/regression-fastapi.sh",
+    "test:e2e:integrations-fastapi": "playwright test -c playwright.integrations-fastapi.config.ts",
+    "check:schema": "scripts/check-schema.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",

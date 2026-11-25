@@ -14,10 +14,17 @@ from starlette.exceptions import HTTPException
 
 from app.account.router import router as account_router
 from app.admin.router import router as admin_router
+from app.ai.router import router as ai_router
 from app.auth.router import router as auth_router
+from app.channels.associates import router as associates_router
+from app.channels.company import router as company_router
+from app.channels.distributors import router as distributors_router
+from app.channels.partners import router as partners_router
+from app.commerce.router import router as commerce_router
 from app.core import db
 from app.core.config import get_settings
 from app.core.logging import configure_logging, request_id
+from app.proofs.router import router as proofs_router
 from app.quotes.router import router as quotes_router
 
 log = logging.getLogger("obasix.api")
@@ -117,6 +124,13 @@ def create_app() -> FastAPI:
     app.include_router(account_router)
     app.include_router(admin_router)
     app.include_router(quotes_router)
+    app.include_router(proofs_router)
+    app.include_router(commerce_router)
+    app.include_router(associates_router)
+    app.include_router(distributors_router)
+    app.include_router(partners_router)
+    app.include_router(company_router)
+    app.include_router(ai_router)
     return app
 
 

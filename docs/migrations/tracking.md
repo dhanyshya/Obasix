@@ -198,3 +198,227 @@ The full regression suite (`npx playwright test`, 2 workers) overloaded this mac
 **Watch**
 
 - The MIG-002 password-change test failed once in the first full run (the "current password is incorrect" message never appeared), then passed alone and in two full runs. Not reproduced; if it recurs, the trace will be in the CI report.
+
+## MIG-005b: Files, quote submission and design proofs on FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | Move everything left in quotes and proofs: submitting a quote with its file, staff file downloads, and the proof workflow |
+| Status | **Complete (behind a switch).** Areas `quote-submit`, `admin-quote-files`, `proofs`, `admin-proofs` |
+| Storage decision | Taken without the product owner, as instructed to proceed. Port the private Vercel Blob protocol and prove it against the official SDK (see docs/backend-migration.md, "Files"); a shared `OBASIX_FILES_DIR` for local and single-server use. Reversible: the areas can be switched off, and storage is one module |
+| Endpoints | Same as the site: `POST /api/quotes`, `GET /api/admin/quotes/{ref}/file`, `POST /api/admin/proofs`, `POST /api/proofs`, `GET /api/proofs/{id}/file`. New: `GET /api/admin/proofs` (filter by quote and status, pages) |
+| Database changes | Alembic `0005`: `design_proofs` and the associate tables, `IF NOT EXISTS` (already created by the site) |
+| Permissions | `proofs:read`, `proofs:write` (admin and staff). Quote files need `quotes:read` |
+| Audit | `proof.upload`, `quote.file.download` |
+| Rollback | Remove the four areas from `OBASIX_API_ROUTES` |
+
+**Shared writes until later migrations**
+
+- Quote submission credits associates (`associate_quotes`), as the site does. The associate tables stay owned by the site until trade channels move (MIG-007).
+
+**Behaviour changes (intended)**
+
+- Proof uploads take a per-quote lock, so two uploads at once can't get the same version number.
+- Downloading a customer's quote file is written to the audit log.
+- Attribution failures are logged; the site ignored them silently.
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): storage incl. byte-for-byte parity with `@vercel/blob`; 21 quote-submission cases (every field rule, idempotency, rate limit, modes, account link, associate credit); proofs (rules, versions, approval closes the thread, decisions, who may see files, staff list, audit) | 73/73 |
+| Admin app (Vitest): Proofs page (list, file checks, confirm, multipart upload), quote download and proofs links | 28/28 |
+| Migration E2E: quote with a file submitted on the site → FastAPI → file in the shared store → downloaded from the site's staff portal and the admin app (audited) → stranger 404; proofs v1 from the admin app → customer requests changes on the site → v2 → approved → further uploads refused → stranger can't see or decide | 28/28 Chromium; 84/84 three browsers |
+| Regression with all ten areas on FastAPI (`scripts/regression-fastapi.sh`, new) | 30/30 |
+
+**Issues found and fixed**
+
+1. `request.form()` returns Starlette's `UploadFile`, not FastAPI's subclass, so files were ignored. Fixed in both endpoints.
+2. A multipart part limit just above 2 MB turned "file too large" into "could not be read". Limits are now above the validation sizes (8 MB quotes, 12 MB proofs), so the site's messages come through.
+3. The first version of the regression script ran `alembic` without `DATABASE_URL`, so FastAPI never started, and the script carried on after its readiness wait anyway (15 false failures). It now fails unless both servers are healthy.
+
+## MIG-006: Commerce on FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | Checkout (demo and live Razorpay), payment confirmation, tracking, public stock and staff order handling on FastAPI; Orders in the admin app |
+| Status | **Complete (behind a switch).** Areas `commerce`, `stock`, `admin-orders` |
+| Endpoints | Same as the site: `GET /api/commerce/mode`, `POST/GET /api/commerce/orders`, `POST /api/commerce/payment`, `POST /api/commerce/payment/webhook`, `POST /api/commerce/track`, `GET /api/stock`, `POST /api/admin/orders`. New: `GET /api/admin/orders` (search, status, payment, live/demo, dates, pages) |
+| Database changes | None (`demo_orders`, `product_stock`, `associate_commissions` have baselines in 0002, 0003, 0005) |
+| Permissions | `orders:read`, `orders:write` (admin and staff) |
+| Audit | `order.advance` (before/after, courier and tracking number on dispatch), `order.cancel` (with the note) |
+| Rollback | Remove the three areas from `OBASIX_API_ROUTES` |
+
+**Shared writes until MIG-007**
+
+- A paid order credits the referring associate (`associate_commissions`), with the site's rules (not your own order, not your own email, active associates only).
+
+**Behaviour changes (intended)**
+
+- Two identical checkouts at the same moment (same idempotency key) make one order; on the site both could pass the "already exists?" check.
+- Staff order changes lock the order row instead of failing with "the order changed meanwhile".
+- An account reads one of its orders by owner, not by "is it among my latest 50".
+
+**Parity bugs found and fixed before release**
+
+1. Python's `round()` rounds halves to even, and JavaScript's `Math.round` rounds them up. The 5% commission on ₹3,650 (182.5) would have been ₹182 instead of the site's ₹183. Now `js.round_half_up`; the Razorpay amount uses it too.
+2. The same trap in rupee formatting: `Intl.NumberFormat` rounds halves away from zero (₹1,824.5 → ₹1,825). Fixed and checked against Node for 11 amounts, including Indian grouping (₹1,00,000) and a negative half.
+3. The shared JSON body reader treated `{}` as unreadable; JavaScript treats it as a real body. It now matches `!body` exactly (MIG-001 onward).
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): 24 commerce cases (modes, demo pricing and idempotency incl. simultaneous duplicates, every checkout message, commission rules, live checkout against a Razorpay stand-in, Razorpay down, forged and genuine callback, unsigned and genuine webhook, paid exactly once (emails, stock and commission once), tracking by email or phone, same 404 for wrong contact, rate limit, own orders only, public stock, staff advance/dispatch/cancel with audit, list filters, rupees and signatures vs Node) | 97/97 |
+| Admin app (Vitest): dispatch needs courier and tracking; cancel needs a reason; unpaid can't advance; filters | 31/31 |
+| Migration E2E: demo checkout on the site → FastAPI prices and saves it → tracked → staff move it to Processing and Dispatched in the admin app (audited) → the customer's tracking shows it; cancel with a reason; wrong contact and strangers get nothing | 30/30 Chromium; 90/90 three browsers |
+| The site's own live-payment and email suite, unchanged, with commerce on FastAPI (`playwright.integrations-fastapi.config.ts`, new): Razorpay order, forged signature refused, genuine confirmed once, webhook-only payment, unsigned webhook refused, Razorpay down, reset email. FastAPI's request log confirms it served each call | 6/6 |
+| Regression with all 13 areas on FastAPI | 30/30 |
+
+## MIG-007: Trade channels on FastAPI (associates, distributors, partners, company accounts)
+
+| Field | Value |
+|---|---|
+| Objective | Move the four trade channels (customer and staff endpoints) and give staff admin app pages for them |
+| Status | **Complete (behind a switch).** Areas `associates`, `admin-associates`, `distributors`, `admin-distributors`, `partners`, `admin-partners`, `company` |
+| Steps | 007a associates, 007b distributors, 007c partners, 007d company accounts. Each was ported, unit and integration tested, and checked against the site's own channel journeys before the next |
+| Endpoints | Same as the site: `POST /api/associates`, `/api/associates/ref`, `/api/admin/associates`; `POST /api/distributors`, `/api/distributors/orders`, `/api/admin/distributors`; `POST /api/partners`, `/api/admin/partners`; `POST /api/company`. New reads: `GET /api/associates/me`, `/api/admin/associates`, `/api/admin/commissions`, `/api/distributors/me`, `/api/admin/distributors`, `/api/admin/trade-orders`, `/api/partners/me`, `/api/admin/partners`, `/api/admin/projects`, `/api/company` |
+| Database changes | Alembic `0006` (payout columns), `0007` distributors, `0008` partners, `0009` company: all `IF NOT EXISTS` matching what the site creates |
+| Permissions | Admin only: `associates:*` (payouts), `distributors:approve` (tier, credit, territory), `partners:approve` (approval, margins, payouts). Staff: `distributors:read`/`write` (trade orders), `partners:read`/`write` (advance, lost) |
+| Audit | `associate.pause`/`activate`, `commission.pay`/`void`, `distributor.decide`, `trade.record-payment`/`advance`/`cancel`, `partner.decide`, `project.quote`/`advance`/`lose`/`pay` |
+| Rollback | Remove the seven areas from `OBASIX_API_ROUTES` |
+
+**Behaviour changes (intended)**
+
+- Locks where the site had check-then-write races: joining the associate programme, applying as a distributor, trade orders (two at once could both fit the same available credit), project registration per client, company people changes (the last owner can't be removed twice over), reorder list limits, and order or project updates (row locks).
+- Approvals, margins and payouts are admin-only. On the site any allowlisted staff member could do them.
+- A partner's own project list says a project is "held" without naming the other partner's project.
+- **Site fix:** the partner margin message read "Set a margin between 0 and 30.000000000000004%." (`0.3 * 100` in JavaScript). Now "30%" on both sides.
+
+**Parity checked against the site's code** (Node runs the TypeScript): financial-quarter boundaries for six dates around year and quarter edges; trade prices (`Math.round(price × (1 − discount))` with JavaScript rounding); V8's acceptance of dates like 2027-02-30 for expected order dates.
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): associates 9, distributors 6, partners 4, company 3 (rules and messages, codes, referral window, commission states, payouts, approvals, credit and simultaneous orders, protection and conflicts, one payout per order, owners, reorder lists, role limits, audit, Node parity) | 120/120 |
+| Admin app (Vitest): bulk payout with a reference; full distributor decision; staff can't decide; partner quote | 34/34 |
+| Migration E2E (admin app): distributor approved → trade order → payment → dispatch (audited); partner approved → project → margin quoted (30% limit); referred order delivered → commission paid; strangers refused | 33/33 Chromium; 99/99 three browsers |
+| The site's own `channels.spec.ts` and `admin.spec.ts` with all channels on FastAPI | 9/9 |
+| Regression and integration suites with all 20 areas on FastAPI | 30/30, 6/6 |
+
+## MIG-008: AI on FastAPI (chat assistant, design help)
+
+| Field | Value |
+|---|---|
+| Objective | Serve the chat assistant, frame-colour suggestions and the design-help status from FastAPI |
+| Status | **Complete (behind a switch).** Area `ai` |
+| Endpoints | Same as the site: `GET /api/ai/status`, `GET/POST /api/ai/chat`, `POST /api/ai/frame-colours` |
+| Deliberate exception | `POST /api/ai/sign-layouts` **stays in Next.js.** Its suggestions are checked against the signage rules (`src/data/signage.ts`, about 800 lines incl. Indic script handling and `Intl.Segmenter` grapheme counting), which the design studio also runs in the browser as the customer types. A Python copy would have to match a browser-side rule set character for character, and any drift would suggest layouts the studio then rejects. The route is a thin call to Claude next to rules that must stay in TypeScript. Revisit only if the studio's rules move server-side |
+| Providers | The chat keeps its **OpenAI-compatible provider** (`OBASIX_AI_*`, default `gpt-4o-mini`), ported as plain HTTP exactly as the site calls it: not switched to Claude, which is a product decision. Frame colours use Claude (`claude-opus-5-5`) through the official Anthropic Python SDK: `beta.messages.parse` with a Pydantic output model, `output_config.effort: "low"`, and the server-side refusal fallback (`fallbacks: "default"`). A probe confirmed the SDK sends the same request body the TypeScript route sends |
+| Shared text | The chat's system prompt and catalogue context are **exported from the site's own code** (`scripts/export-shared-data.mjs` → `api/app/data/ai.json`), so they can't drift; CI checks the export is current |
+| Database changes | None |
+| Rollback | Remove `ai` from `OBASIX_API_ROUTES` |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): chat against a stand-in provider (grounded answer filters made-up product ids; JSON inside text; junk → catalogue answer; provider without JSON mode gets one retry; auth and quota errors; unconfigured; input checks; 20/min limit; cross-site), frame colours against a Claude stand-in (exact request: model, beta header, `fallbacks`, effort, JSON schema, image; refusal → 422; Claude 429 → plain message; photo checks), status; parity of the catalogue fallback, product-id filter and customizer link with the site's TypeScript | 129/129 (all migrations) |
+| Migration E2E: the site's chat widget answers through FastAPI with catalogue links; status, checks, cross-site; sign layouts still answered by Next.js | 36/36 Chromium; 108/108 three browsers |
+| The site's integration suite with the Claude stand-in, unchanged, via FastAPI: "suggestions come back, limited to what OBASIX makes" and "a Claude outage gives a plain message". FastAPI's request log shows 200 and 502 for `/api/ai/frame-colours` | 6/6 |
+| Regression with all 21 areas on FastAPI | 30/30 |
+
+## MIG-009: Alembic owns the schema
+
+| Field | Value |
+|---|---|
+| Objective | One owner for the database schema: Alembic migrations in `api/migrations`, applied at deploy. The site stops creating and altering tables |
+| Status | **Complete.** Production setting: `OBASIX_SCHEMA_OWNER=alembic` on the site; run `alembic upgrade head` before starting either app |
+| How it's proven | `scripts/check-schema.sh` (also in CI) builds two empty databases, one through the site's own 11 store setups and one through `alembic upgrade head`, and compares every column (type, nullability, default) and index. Result: all **233** of the site's columns and indexes are created identically by Alembic; Alembic adds only the API's own tables (`staff_roles`, `audit_log`, `alembic_version`) |
+| Site change | `ensureSchema` skips the setup when `OBASIX_SCHEMA_OWNER=alembic` on Postgres. Local development without Postgres keeps SQLite and its setups (Alembic targets Postgres only) |
+| Rollback | Unset `OBASIX_SCHEMA_OWNER`; the site's setups are idempotent `IF NOT EXISTS` statements |
+| Rule from now on | Every schema change is an Alembic migration. CI fails if the site's own setup code ever creates something Alembic doesn't |
+
+**Tests, each on a brand-new empty database whose only DDL came from Alembic**
+
+| Suite | Result |
+|---|---|
+| Migration E2E (MIG-001 to 008) | 36/36 |
+| The site's own suites with all 21 areas on FastAPI | 30/30 |
+| Integration suite (live payments, email, Claude stand-ins) | 6/6 |
+
+**Revised plan**
+
+- "SQLite dropped" is replaced by "SQLite for local development only": dropping it would make Docker mandatory for every contributor and for the site's existing CI suite, with nothing gained in production.
+- Remaining direct database access from the site: 6 account pages and 12 staff-portal files. These are MIG-010 and MIG-011.
+
+## MIG-010: Account pages read through FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | The account pages (associate, distributor, partner, company, proofs) stop reading the database directly when their area is served by FastAPI |
+| Status | **Complete** |
+| How | `src/lib/fastApiServer.ts` `readFromFastApi(path)`: inside a server component, GETs FastAPI with the visitor's cookie, client IP and the proxy secret. It returns `undefined` when the area is still on Next.js, so each page keeps its direct read as the fallback and the switch stays reversible per area |
+| New endpoint | `GET /api/proofs`: the signed-in customer's proof threads, newest first, only for quotes linked to the account or sent from its email |
+| Unchanged on purpose | `layout.tsx` only reads the session cookie (same cookie and table as FastAPI's auth). The company page's "recent orders" first kept its direct read; since MIG-012a it reads `GET /api/commerce/orders` too |
+| Rollback | Remove the area from `OBASIX_API_ROUTES`; the page falls back to its direct read |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): new customer proof list (401 signed out; own threads only, newest version first; a stranger sees none) | 130/130 |
+| Migration E2E `migration-010-account-pages.spec.ts`: each page rendered for a real account shows what FastAPI holds; the proofs page and `GET /api/proofs` hide another customer's thread | 4/4 Chromium |
+
+## MIG-011: The site's staff portal gives way to the React admin app
+
+| Field | Value |
+|---|---|
+| Objective | Staff use one admin: the React app (`admin/`), which goes only through FastAPI (roles, audit log). The site's old `/admin` pages, which write to the database directly and keep no audit trail, are no longer reachable |
+| Status | **Complete** (switch). Deleting the old pages' code is part of MIG-012, so turning the switch off restores them |
+| How | New setting `OBASIX_ADMIN_APP_URL` on the site. When set, `src/proxy.ts` answers every `/admin` and `/admin/<section>` page with a permanent (308) redirect to the same section of the admin app. The build fails if the URL isn't absolute http(s), or if `admin-core` isn't in `OBASIX_API_ROUTES`, because the app talks only to FastAPI |
+| Why not delete now | The site's own suites (`e2e/admin.spec.ts`, `channels.spec.ts`, `security.spec.ts`) still run the portal in the deployment mode without FastAPI. Removing it before production runs on FastAPI would leave staff with no admin in that mode |
+| Rollback | Unset `OBASIX_ADMIN_APP_URL` |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| Migration E2E `migration-011-admin-portal.spec.ts`: `/admin`, `/admin/orders`, `/admin/stock`, `/admin/proofs` → 308 to the app's section; a visitor following it lands on the app's sign-in; `/api/admin/*` forwarding unchanged. `migration-003` now drives stock through the API (the screen is covered by `migration-004`) | 46/46 Chromium (whole migration suite, MIG-001 to 011) |
+
+## MIG-012: Remove the Next.js copies (gated on production)
+
+| Field | Value |
+|---|---|
+| Objective | Delete the site's own handlers for every area FastAPI now serves (`src/app/api/*` for the 21 areas), the old `/admin` pages and `src/components/admin/*`, the direct-read fallbacks added in MIG-010, and the store code only they use |
+| Status | **Not started: gated.** It removes the rollback path for every earlier migration, so it waits for evidence from production |
+| Gate (all required) | 1. Production has run with all 21 areas in `OBASIX_API_ROUTES`, `OBASIX_SCHEMA_OWNER=alembic` and `OBASIX_ADMIN_APP_URL` set for at least two weeks, including a month-end. 2. No rollback was used in that time. 3. FastAPI's 5xx rate and p95 latency are no worse than the site's before the switch (Sentry / request logs). 4. A sign-off from the person who owns operations |
+| Also needed first | Done in MIG-012a: the customer order list. `/api/ai/sign-layouts` stays in Next.js by design (its rules also run in the browser) |
+| Steps when the gate passes | Delete in one PR per area group (auth+account, admin, quotes+proofs, commerce, channels, AI), each running the regression suite with that group's code gone. Then make `OBASIX_API_URL` required in production builds, drop `servedByFastApi` fallbacks, and move the site's suites that exercised the portal (`e2e/admin.spec.ts`) onto the admin app |
+| Rollback | Revert the PR; config switches still exist until the last step |
+
+## MIG-012a: Customer order list on FastAPI
+
+| Field | Value |
+|---|---|
+| Objective | The last direct read on the account pages (company page, "recent orders") goes through FastAPI |
+| Status | **Complete** |
+| Endpoint | `GET /api/commerce/orders` with no `id`: the signed-in account's newest 50 orders (same query as the site's `listDemoOrdersForUser`); 401 when signed out. It answers in every commerce mode, because the history is the account's own data and the company page reorders from it. With `?id=` the behaviour is unchanged. The path is already in the `commerce` area, so no forwarding change |
+| Rollback | Remove `commerce` from `OBASIX_API_ROUTES`; the page falls back to its direct read |
+
+**Tests**
+
+| Suite | Result |
+|---|---|
+| API (pytest): signed out → 401; own orders newest first; still listed when checkout is unconfigured while `?id=` keeps its 503; another account sees none | 131/131 |
+| Migration E2E: a demo order placed through FastAPI is listed by `GET /api/commerce/orders` and shown on `/account/company` | migration-010 and 006: 6/6 Chromium. Whole migration suite (MIG-001 to 012a), three browsers: 138/138 |
+
+**Regression script with the admin redirect on (`scripts/regression-fastapi.sh`)**
+
+The script now starts the site as production will run it, with `OBASIX_ADMIN_APP_URL` set (`ADMIN_APP_URL=off` restores the old behaviour). The site's tests that drive the old `/admin` pages are tagged `@portal`, and the script runs two passes:
+
+| Pass | Site setting | Tests | Result |
+|---|---|---|---|
+| 1 | `OBASIX_ADMIN_APP_URL=http://localhost:4173` | Everything except `@portal`, plus a new check that `/admin/orders` answers 308 to the admin app | 22/22 |
+| 2 | unset (the MIG-011 rollback) | Only `@portal`: the old portal still works for a deployment that hasn't set the URL | 9/9 |

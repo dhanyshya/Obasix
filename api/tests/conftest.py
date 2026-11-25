@@ -43,7 +43,9 @@ async def clean_tables() -> None:
     async with db.connection() as conn:
         await conn.execute(
             "TRUNCATE users, sessions, password_resets, carts, wishlist_items, rate_limit_hits, addresses, "
-            "saved_configs, customer_quotes, demo_orders, product_stock, staff_roles, audit_log, quote_requests"
+            "saved_configs, customer_quotes, demo_orders, product_stock, staff_roles, audit_log, quote_requests, "
+            "design_proofs, associates, associate_quotes, associate_commissions, distributors, distributor_orders, "
+            "partners, partner_projects, reorder_lists, company_members, companies"
         )
 
 

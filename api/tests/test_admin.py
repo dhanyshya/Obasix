@@ -21,6 +21,8 @@ async def signed_in(email: str) -> AsyncIterator[httpx.AsyncClient]:
         response = await client.post(
             "/api/auth?action=register", json={"name": "Person", "email": email, "password": PASSWORD}
         )
+        if response.status_code == 409:  # already registered in this test: sign in instead
+            response = await client.post("/api/auth?action=login", json={"email": email, "password": PASSWORD})
         assert response.status_code == 200, response.text
         yield client
 
@@ -72,14 +74,44 @@ async def test_visitors_and_customers_get_404_everywhere(client, customer):
 async def test_config_admin_has_every_permission(boss):
     me = (await boss.get("/api/admin/me")).json()
     assert me["role"] == "admin" and me["source"] == "config"
-    assert set(me["permissions"]) == {"stock:read", "stock:write", "audit:read", "staff:manage", "quotes:read"}
+    assert set(me["permissions"]) == {
+        "stock:read",
+        "stock:write",
+        "audit:read",
+        "staff:manage",
+        "quotes:read",
+        "proofs:read",
+        "proofs:write",
+        "orders:read",
+        "orders:write",
+        "associates:read",
+        "associates:write",
+        "distributors:read",
+        "distributors:write",
+        "distributors:approve",
+        "partners:read",
+        "partners:write",
+        "partners:approve",
+    }
 
 
 async def test_staff_role_can_work_stock_but_not_audit_or_staff(boss):
     await grant(boss, "clerk@example.com", "staff")
     async with signed_in("clerk@example.com") as clerk:
         me = (await clerk.get("/api/admin/me")).json()
-        assert me["role"] == "staff" and me["permissions"] == ["quotes:read", "stock:read", "stock:write"]
+        assert me["role"] == "staff" and me["permissions"] == [
+            "distributors:read",
+            "distributors:write",
+            "orders:read",
+            "orders:write",
+            "partners:read",
+            "partners:write",
+            "proofs:read",
+            "proofs:write",
+            "quotes:read",
+            "stock:read",
+            "stock:write",
+        ]
         assert (await clerk.get("/api/admin/stock")).status_code == 200
         assert (await clerk.post("/api/admin/stock", json={"productId": "cmwb6090", "onHand": 3})).json() == {
             "ok": True

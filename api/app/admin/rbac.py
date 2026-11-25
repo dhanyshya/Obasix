@@ -25,12 +25,39 @@ class Permission(StrEnum):
     AUDIT_READ = "audit:read"
     STAFF_MANAGE = "staff:manage"
     QUOTES_READ = "quotes:read"
+    PROOFS_READ = "proofs:read"
+    PROOFS_WRITE = "proofs:write"
+    ORDERS_READ = "orders:read"
+    ORDERS_WRITE = "orders:write"
+    # Payouts are money: admins only.
+    ASSOCIATES_READ = "associates:read"
+    ASSOCIATES_WRITE = "associates:write"
+    DISTRIBUTORS_READ = "distributors:read"
+    DISTRIBUTORS_WRITE = "distributors:write"  # trade orders: payments, dispatch, cancel
+    DISTRIBUTORS_APPROVE = "distributors:approve"  # tier, credit limit, territory: admins only
+    PARTNERS_READ = "partners:read"
+    PARTNERS_WRITE = "partners:write"  # advance a project, mark it lost
+    PARTNERS_APPROVE = "partners:approve"  # approve partners, quote margins, pay out: admins only
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
     "admin": frozenset(Permission),
     # Staff prepare quotes and proofs, so they may read quote requests (names, emails, phones).
-    "staff": frozenset({Permission.STOCK_READ, Permission.STOCK_WRITE, Permission.QUOTES_READ}),
+    "staff": frozenset(
+        {
+            Permission.STOCK_READ,
+            Permission.STOCK_WRITE,
+            Permission.QUOTES_READ,
+            Permission.PROOFS_READ,
+            Permission.PROOFS_WRITE,
+            Permission.ORDERS_READ,
+            Permission.ORDERS_WRITE,
+            Permission.DISTRIBUTORS_READ,
+            Permission.DISTRIBUTORS_WRITE,
+            Permission.PARTNERS_READ,
+            Permission.PARTNERS_WRITE,
+        }
+    ),
 }
 ROLES = tuple(ROLE_PERMISSIONS)
 

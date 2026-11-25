@@ -10,7 +10,7 @@ from typing import Any
 from psycopg import AsyncConnection
 
 
-def _order(row: dict[str, Any]) -> dict[str, Any]:
+def to_order(row: dict[str, Any]) -> dict[str, Any]:
     order = {
         "id": row["id"],
         "idempotencyKey": row["idempotency_key"],
@@ -36,4 +36,4 @@ async def orders_for_user(conn: AsyncConnection[dict[str, Any]], user_id: str) -
     rows = await (
         await conn.execute("SELECT * FROM demo_orders WHERE user_id = %s ORDER BY created_at DESC LIMIT 50", (user_id,))
     ).fetchall()
-    return [_order(row) for row in rows]
+    return [to_order(row) for row in rows]
